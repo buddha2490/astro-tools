@@ -156,3 +156,16 @@ calibration(path, "bias")
 
 path <- file.path("/volumes/SSD-Astro/Automated Copy/2024-10-17/Flats")
 calibration(path, "flats", "LULTIMATE")
+
+
+
+# Clean horizon file ------------------------------------------------------
+
+df <- readr::read_csv("raw horizon v2.csv") %>%
+  select(HDG_DEG, VERT) %>%
+  arrange(HDG_DEG, (VERT)) %>%
+  mutate(HDG_DEG = ifelse(HDG_DEG == 0, 1, HDG_DEG)) %>%
+  distinct(HDG_DEG, .keep_all = TRUE)
+
+write.table(df, "horizon_19Oct2024 v2.hrz", row.names = FALSE, col.names = FALSE,
+            sep = ",")
