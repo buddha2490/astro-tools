@@ -77,6 +77,16 @@ myLog <- function(path, object) {
 }
 myLogWrapper <- function() {
   
+  logPath <- "/users/briancarter/Astronomy/Imaging Logs"
+  backupLog <- file.path(logPath, "backups")
+  dir.create(backupLog, showWarnings = FALSE)
+  
+  logs <- list.files("/users/briancarter/Astronomy/Imaging Logs", pattern = ".xlsx", full.names = TRUE) 
+  lapply(logs, function(x) {
+    file.copy(x, file.path(backupLog))
+    file.remove(x)
+  })
+  
   dirs <- list.dirs(progressPath, full.names = FALSE, recursive = FALSE)
   images <- lapply(dirs, function(x) {
     myLog(progressPath, x)
@@ -106,7 +116,6 @@ nina_rename(myPath, "ES127", "M33", "night3", "BROADBAND")
 
 
 # Update my excel file with new data
-progressPath <- "/Volumes/BDC-HD/Astronomy/In Progress/ES127"
 progressPath <- "/Volumes/SSD-Astro/In Progress/ES127"
 
 myLogWrapper()
