@@ -110,9 +110,7 @@ myLogWrapper <- function() {
 
 # REname stuff
 myPath <- ("/volumes/SSD-Astro/In Progress")
-nina_rename(myPath, "ES127", "M33", "night1", "BROADBAND")
-nina_rename(myPath, "ES127", "M33", "night2", "BROADBAND")
-nina_rename(myPath, "ES127", "M33", "night3", "BROADBAND")
+nina_rename(myPath, "ES127", "", "", "")
 
 
 # Update my excel file with new data
@@ -120,6 +118,37 @@ progressPath <- "/Volumes/SSD-Astro/In Progress/ES127"
 
 myLogWrapper()
 
+# this matches what I've set up in NINA
+# 20 October 2024
+
+images <- openxlsx::read.xlsx(file.path("../Imaging Logs", "Imaging Log - 2024-10-20.xlsx"), sheet = "Images")
+images$Date <- as.Date(images$Date, origin = "1899-12-30") # Excel date
+for (i in 1:nrow(images)) {
+myPath <- file.path("/volumes/SSD-Astro/In Progress")
+scope <- "ES127"
+object <- images$Object[i]
+night <- images$Subfolder[i]
+date <- images$Date[i]
+filter <- images$Filter[i]
+filter <- ifelse(is.na(filter), filter <- "", ifelse(
+  filter == "L-Ultimate", "LULTIMATE", ifelse(
+    filter == "L-PRO", "LPRO", "UVIR")))
+exposure <- glue::glue("{images$Exposure[i]}s")
+
+homePath <- file.path(glue::glue("{myPath}/{scope}/{object}"))
+nightPath <- glue::glue("{homePath}/{object}_{night}")
+newPath <- glue::glue("{homePath}/{object}_{date}")
+
+
+files <- data.frame(oldFiles = list.files(nightPath, pattern = ".fit"))
+files$number <- 1:nrow(files) |> as.character() |> stringr::str_pad(3, side = "left", pad = "0")
+files$newName <- glue::glue("{object}_{filter}_{exposure}_{files$number}.fit")
+for (j in 1:nrow(files)) {
+  file.rename(from = file.path(nightPath, files$oldFiles[j]), 
+              to = file.path(nightPath, files$newName[j]))
+}
+file.rename(nightPath, newPath)
+}
 
 
 # renaming darks and flats
@@ -161,11 +190,11 @@ calibration(path, "flats", "LULTIMATE")
 
 # Clean horizon file ------------------------------------------------------
 
-df <- readr::read_csv("raw horizon v2.csv") %>%
+df <- readr::read_csv("raw horizon v3.csv") %>%
   select(HDG_DEG, VERT) %>%
   arrange(HDG_DEG, (VERT)) %>%
   mutate(HDG_DEG = ifelse(HDG_DEG == 0, 1, HDG_DEG)) %>%
   distinct(HDG_DEG, .keep_all = TRUE)
 
-write.table(df, "horizon_19Oct2024 v2.hrz", row.names = FALSE, col.names = FALSE,
+write.table(df, "horizon_19Oct2024 v3.hrz", row.names = FALSE, col.names = FALSE,
             sep = ",")
