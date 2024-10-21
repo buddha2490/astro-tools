@@ -1,0 +1,12 @@
+name: imagingLog
+title: imagingLog
+username: bcarter2490
+account: bcarter2490
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13080189
+bundleId: 9250362
+url: https://bcarter2490.shinyapps.io/imagingLog/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
