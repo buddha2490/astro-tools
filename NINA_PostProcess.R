@@ -11,17 +11,25 @@ library(dplyr)
 username <- Sys.getenv("AstroPCUsername")
 password <- Sys.getenv("AstroPCPassword")
 mbp14 <- Sys.getenv("mbp14")
-users <- paste0("open 'smb://", username, ":", password, "@astro-pc/users'")
-ssd <- paste0("open 'smb://", username, ":", password, "@astro-pc/Telescope'")
+users <- paste0("open 'smb://", username, ":", password, "@es127/users'")
 laptop <- paste0("open 'smb://", username, ":", password, "@", mbp14, "/briancarter/Astronomy'")
 system(laptop)
-system(ssd)
 system(users)
-rm(users, ssd, username, password, mbp14, laptop, mbp)
+rm(users, username, password, mbp14, laptop)
 
+testit <- function(x)
+{
+  p1 <- proc.time()
+  Sys.sleep(x)
+  proc.time() - p1 # The cpu usage should be negligible
+}
+
+
+
+testit(10) # wait a few seconds for the drives to mount
 
 officeSSD <- "/Volumes/Astro-SSD/In Progress/ES127" # this is my SSD attached to office laptop
-pcSSD <- "/Volumes/Users/bcart/astronomy/In Progress/ES127" # this is the SSD internal to astro-pc
+pcSSD <- "/Volumes/Users/Brian Carter/astronomy/In Progress/ES127" # this is the SSD internal to astro-pc
 laptop <- "/Volumes/Astronomy" # macbook pro 14", main computer
 
 
@@ -60,6 +68,7 @@ myLog <- function(path, object) {
     filter <- list.files(x, pattern = "masterFlat") |>
       stringr::str_remove("masterFlat_") |>
       stringr::str_remove(".xisf") |>
+      stringr::str_remove(".fits") |>
       as.character()
     
     date <- file.info(file.path(x, list.files(x, pattern = ".fit")[1]))$mtime %>%
