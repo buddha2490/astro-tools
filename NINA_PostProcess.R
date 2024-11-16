@@ -1,7 +1,7 @@
 library(openxlsx)
 library(magrittr)
 library(dplyr)
-
+library(tidyr)
 
 
 
@@ -44,101 +44,79 @@ lapply(myDirs, function(x) {
 })
 
 
-myLog <- function(path, object) {
-  src <- glue::glue("{path}/{object}")
-  subdirs <- list.dirs(src, full.names = TRUE, recursive = TRUE)
-  
-  metadata <- readr::read_csv(file.path(src, "object_info.csv"))
-  
-  
-  foo <- lapply(subdirs, function(x) {
-    
-    
-    
-    subfolder <- basename(x) |>
-      stringr::str_remove(glue::glue("{object}_"))
-    
-    # exposure time comes from the darks file
-    exposure <- list.files(x, pattern = "masterDark") |>
-      stringr::str_remove("masterDark_") |>
-      stringr::str_remove("s.xisf") |>
-      as.numeric()
-    
-    # Filter
-    filter <- list.files(x, pattern = "masterFlat") |>
-      stringr::str_remove("masterFlat_") |>
-      stringr::str_remove(".xisf") |>
-      stringr::str_remove(".fits") |>
-      as.character()
-    
-    date <- file.info(file.path(x, list.files(x, pattern = ".fit")[1]))$mtime %>%
-      as.Date()
-    
-    filter <- ifelse(filter == "UVIR", "Broadband", ifelse(
-      filter == "LPRO", "L-PRO", "L-Ultimate"
-    ))
-    
-    # Number of frames
-    files <- list.files(x, pattern = ".fit") |> 
-      length()
-    
-    if (files != 0) {
-      
-      df <- data.frame(
-        Object = object, 
-        Name = metadata$Name |> as.character(),
-        Constellation = metadata$Constellation |> as.character(),
-        Type = metadata$Type |> as.character(),
-        Date = date,
-        Filter = filter,
-        Subfolder = subfolder,
-        Exposure = exposure,
-        TotalSubs = files,
-        TotalTimeHrs = (files * exposure / 3600) |> round(2)
-      )
-      return(df)
-    }
-  }
-  )
-  do.call("rbind", foo)
-}
-myLogWrapper <- function(path) {
-  
-  # Remove old version of log file
-  logs <- list.files(laptop, pattern = "Imaging Log", full.names = TRUE) 
-  file.remove(logs)
 
-  dirs <- list.dirs(path, full.names = FALSE, recursive = FALSE)
-  images <- data.frame()
-  for (i in 1:length(dirs)) {
-    images <- rbind(images, myLog(path, dirs[i]))
-  }
+# metadata
+getMetadata <- function(path) {
   
+ list.files(path, pattern = "object_info.csv", recursive = TRUE, full.names = TRUE) %>%
+    lapply(function(x) {
+    readr::read_csv(x)
+    }) %>%
+    bind_rows()
   
-  images <- lapply(dirs, function(x) {
-    myLog(path, x)
-  }) %>%
-    do.call("rbind", .)
+}
+countFiles <- function(path) {
   
-  summaries <- images %>%
-    dplyr::group_by(Object, Name, Filter) %>%
-    dplyr::summarize(TotalSubs = sum(TotalSubs), 
-                     TotalTimeHrs = sum(TotalTimeHrs))
+fits <- list.files(path, pattern = "fit", recursive = TRUE) %>%
+  basename()
+calibration <- fits[grep("flat", fits, ignore.case = TRUE)]
+dark <- fits[grep("dark", fits, ignore.case = TRUE)]
+fits <- fits[!fits %in% c(dark, calibration)]
+
+df <- data.frame(fits = fits)
+df$fits <- sub(".fits", "", df$fits)
+
+df2 <- df |>
+  separate_wider_delim(fits, delim = "_", 
+                       names = c("Object", "Grouping", "Filter", "Exposure", "Sequence"))
+
+meta <- getMetadata(path)
+
+nightly <- df2 %>%
+  dplyr::group_by(Object, Grouping, Filter, Exposure) %>%
+  dplyr::summarize(Subs = n()) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(Exposure = as.numeric(Exposure)) %>%
+  left_join(meta, by = "Object") %>%
+  dplyr::select(Object, Name, Constellation, Type, Filter, Grouping, Exposure, Subs) %>%
+  dplyr::mutate(Time = Exposure * Subs / 60 / 60) %>%
+  dplyr::mutate(Time = round(Time, 2))
+
+
+summaries <- nightly %>%
+  dplyr::group_by(Object, Filter) %>%
+  dplyr::summarize(TotalTime = sum(Time),
+                   TotalSubs = sum(Subs)) %>%
+  dplyr::ungroup() %>%
+  dplyr::left_join(meta, by = "Object") %>%
+  dplyr::select(Object, Name, Constellation, Type, Filter, TotalSubs, TotalTime) %>%
+  dplyr::mutate(TotalTime = round(TotalTime, 2))
+
+return(list (nightly = nightly, summaries = summaries))
+
+}
+saveWB <- function(inputs) {
   
-  
+  nightly <- inputs$nightly
+  summaries <- inputs$summaries
+
   wb <- createWorkbook(glue::glue("{laptop}/Imaging Log - {Sys.Date()}.xlsx"))
-  addWorksheet(wb, "Images")
+  addWorksheet(wb, "Objects")
   addWorksheet(wb, "Summary")
-  writeData(wb, "Images", images)
+  writeData(wb, "Objects", nightly)
   writeData(wb, "Summary", summaries)
-  saveWorkbook(wb, glue::glue("{laptop}/Imaging Log - {Sys.Date()}.xlsx"))
-  
+  saveWorkbook(wb, glue::glue("{laptop}/Imaging Log - {Sys.Date()}.xlsx"),
+               overwrite = TRUE)
   
 }
-myLogWrapper("/Volumes/Astro-SSD/In Progress/ES127")
 
 
 
+path <- "/Volumes/Astro-SSD/In Progress/ES127/"
+countFiles(path) %>%
+  saveWB()
 
+
+foo <- countFiles(path)
 
 
