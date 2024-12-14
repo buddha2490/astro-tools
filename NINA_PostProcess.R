@@ -2,7 +2,7 @@ library(openxlsx)
 library(magrittr)
 library(dplyr)
 library(tidyr)
-
+options(dplyr.summarise.inform = FALSE)
 
 
 # Functions ---------------------------------------------------------------
@@ -59,16 +59,21 @@ summaries <- function() {
   allFiles <- getFiles(ASI533) |>
     dplyr::bind_rows(getFiles(ASI2600)) |>
     dplyr::select(-fits) |>
-    dplyr::filter(object != "FlatWizard")
+    dplyr::filter(object != "FlatWizard") |>
+    dplyr::rename(Length = time)
   
   sessions <- allFiles |>
+    select(Camera, Scope, object, date, filter, Length) |>
     dplyr::group_by(Camera, Scope, object, date, filter) |>
     dplyr::summarize(Subs = n(),
-                     Time = sum(time, na.rm = TRUE) /60/60) |>
-    dplyr::ungroup()
+                     Time = sum(Length, na.rm = TRUE) /60/60) |>
+    dplyr::ungroup() |>
+    dplyr::left_join(allFiles, by = c("Camera", "Scope", "object", "date", "filter")) |>
+    dplyr::distinct(Camera, Scope, object, date, filter, Subs, Time, .keep_all = TRUE) |>
+    dplyr::select(Camera, Scope, Object=object, Date = date, Filter = filter, Subs, Length, Time)
   
   totals <- sessions |>
-    dplyr::group_by(Camera, Scope, object) |>
+    dplyr::group_by(Camera, Scope, Object) |>
     dplyr::summarize(Subs = sum(Subs),
                      Time = sum(Time))
   
@@ -90,11 +95,13 @@ saveWB <- function(images) {
     dplyr::mutate(Subs = as.integer(Subs))
   file.remove(delete)
   
-  
+  suppressMessages({
   new <- sessions %>%
     dplyr::anti_join(orig)
+  })
   
-  newObjects <- !duplicated(new$object)
+  
+  newObjects <- !duplicated(new$Object)
   nSubs <- sum(new$Subs)
   time <- sum(new$Time)
   
@@ -142,7 +149,7 @@ testit(10) # wait a few seconds for the drives to mount
 
 astroSSD <- "/Volumes/Astro-SSD"
 mbp14 <- "/Volumes/Astronomy"
-es127 <- "/Volumes/users/Brian Carter/Astronomy/In Progress"
+es127 <- "/Volumes/users/Brian Carter/Astronomy/ASI2600MC"
 
 # Sub locations
 # 1. astroSSD/ASI533MC
