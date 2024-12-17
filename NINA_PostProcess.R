@@ -36,6 +36,8 @@ eachScope <- function(path, scope) {
     df$filter[grep("UVIR", df$file)] <- "UVIR"
     df$filter[grep("LPRO", df$file)] <- "LPRO"
     df$filter[grep("LULTIMATE", df$file)] <- "LULTIMATE"
+    df$filter[grep("HAOIII", df$file)] <- "HAOIII"
+    df$filter[grep("SIIOIII", df$file)] <- "SIIOIII"
     
     df <- df |>
       dplyr::mutate(time = stringr::str_replace(file, glue::glue("{object}_{date}_{filter}_"), ""))
@@ -60,7 +62,7 @@ summaries <- function() {
     dplyr::bind_rows(getFiles(ASI2600)) |>
     dplyr::select(-fits) |>
     dplyr::filter(object != "FlatWizard") |>
-    dplyr::rename(Length = time)
+    dplyr::rename(Length = time) 
   
   sessions <- allFiles |>
     select(Camera, Scope, object, date, filter, Length) |>
@@ -70,7 +72,8 @@ summaries <- function() {
     dplyr::ungroup() |>
     dplyr::left_join(allFiles, by = c("Camera", "Scope", "object", "date", "filter")) |>
     dplyr::distinct(Camera, Scope, object, date, filter, Subs, Time, .keep_all = TRUE) |>
-    dplyr::select(Camera, Scope, Object=object, Date = date, Filter = filter, Subs, Length, Time)
+    dplyr::select(Camera, Scope, Object=object, Date = date, Filter = filter, Subs, Length, Time) |>
+    dplyr::mutate(Filter = ifelse(Filter == "LULTIMATE", "HAOIII", Filter))
   
   totals <- sessions |>
     dplyr::group_by(Camera, Scope, Object) |>
