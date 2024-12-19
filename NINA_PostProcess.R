@@ -13,6 +13,7 @@ testit <- function(x) {
 }
 eachScope <- function(path, scope) {
   
+
   one <- list.dirs(file.path(path, scope))
   one_fits <- sapply(one, function(x) list.files(x, pattern = "fit", full.names = TRUE, recursive = TRUE)) |>
     unlist()
@@ -36,7 +37,7 @@ eachScope <- function(path, scope) {
     df$filter[grep("UVIR", df$file)] <- "UVIR"
     df$filter[grep("LPRO", df$file)] <- "LPRO"
     df$filter[grep("LULTIMATE", df$file)] <- "LULTIMATE"
-    df$filter[grep("HAOIII", df$file)] <- "HAOIII"
+    df$filter[grep("HAOIII", df$file)] <- "LULTIMATE"
     df$filter[grep("SIIOIII", df$file)] <- "SIIOIII"
     
     df <- df |>
@@ -58,6 +59,11 @@ getFiles <- function(path) {
   rbind(bigscope, babyscope)
 }
 summaries <- function() {
+  
+  ASI533 <- "/Volumes/Astro-SSD/ASI533MC"
+  ASI2600 <- "/Volumes/Astro-SSD/ASI2600MC"
+  
+  
   allFiles <- getFiles(ASI533) |>
     dplyr::bind_rows(getFiles(ASI2600)) |>
     dplyr::select(-fits) |>
@@ -65,7 +71,7 @@ summaries <- function() {
     dplyr::rename(Length = time) 
   
   sessions <- allFiles |>
-    select(Camera, Scope, object, date, filter, Length) |>
+    dplyr::select(Camera, Scope, object, date, filter, Length) |>
     dplyr::group_by(Camera, Scope, object, date, filter) |>
     dplyr::summarize(Subs = n(),
                      Time = sum(Length, na.rm = TRUE) /60/60) |>
@@ -73,7 +79,7 @@ summaries <- function() {
     dplyr::left_join(allFiles, by = c("Camera", "Scope", "object", "date", "filter")) |>
     dplyr::distinct(Camera, Scope, object, date, filter, Subs, Time, .keep_all = TRUE) |>
     dplyr::select(Camera, Scope, Object=object, Date = date, Filter = filter, Subs, Length, Time) |>
-    dplyr::mutate(Filter = ifelse(Filter == "LULTIMATE", "HAOIII", Filter))
+    dplyr::mutate(Filter = ifelse(Filter == "HAOIII", "LULTIMATE", Filter))
   
   totals <- sessions |>
     dplyr::group_by(Camera, Scope, Object) |>
@@ -85,6 +91,19 @@ summaries <- function() {
        totals = totals)
 }
 saveWB <- function(images) {
+  
+  username <- Sys.getenv("AstroPCUsername")
+  password <- Sys.getenv("AstroPCPassword")
+  mbp14 <- Sys.getenv("mbp14")
+  laptop <- paste0("open 'smb://", username, ":", password, "@", mbp14, "/briancarter/Astronomy'")
+  system(laptop) # MBP14 connection
+  rm(username, password, mbp14, laptop)
+  
+  testit(5)
+  
+  astroSSD <- "/Volumes/Astro-SSD"
+  mbp14 <- "/Volumes/Astronomy"
+  
   
   allFiles <- images$allFiles
   sessions <- images$sessions |>
@@ -127,44 +146,82 @@ generateReport <- function() {
   images <- summaries() |>
   saveWB()
 }
+runES127 <- function() {
+  username <- Sys.getenv("AstroPCUsername")
+  password <- Sys.getenv("AstroPCPassword")
+  mbp14 <- Sys.getenv("mbp14")
+  users <- paste0("open 'smb://", username, ":", password, "@es127/users/Brian Carter/Astronomy/ASI2600MC/ES127'")
+  laptop <- paste0("open 'smb://", username, ":", password, "@", mbp14, "/briancarter/Astronomy'")
+  system(laptop) # MBP14 connection
+  system(users) # ES127 connection
+  rm(users, username, password, mbp14, laptop)
+  
+  testit(5)
+  
+  astroSSD <- "/Volumes/Astro-SSD"
+  mbp14 <- "/Volumes/Astronomy"
+  es127 <- "/Volumes/ES127"
+
+  # Sub locations
+  ASI2600 <- file.path(astroSSD, "ASI2600MC")
+  
+  # Copy nightly data from scope and generate a report
+  file.copy(es127, ASI2600, recursive = TRUE, overwrite = FALSE) # copy from big scope
+
+  # unmount the directories
+  system(glue::glue("diskutil unmount {mbp14}"))
+  system(glue::glue("diskutil unmount {es127}"))
+
+}
+runBaby <- function() {
+  
+  username <- Sys.getenv("AstroPCUsername")
+  password <- Sys.getenv("AstroPCPassword")
+  mbp14 <- Sys.getenv("mbp14")
+  babyscopeIP <- Sys.getenv("BabyScopeIP")
+  babyscopeuser <- Sys.getenv("BabyScopeUsername")
+  babyscopepassword <- Sys.getenv("BabyScopePassword")
+  laptop <- paste0("open 'smb://", username, ":", password, "@", mbp14, "/briancarter/Astronomy'")
+  babyscope <- paste0("open 'smb://", babyscopeuser, ":", babyscopepassword, "@", babyscopeIP, "/Users/bcart/Astronomy/ASI2600MC/BabyScope'")
+  system(babyscope) # BabyScope connection
+  system(laptop) # MBP14 connection
+  rm(username, password, mbp14, laptop, babyscopeIP, babyscopeuser, babyscopepassword, babyscope)
+  
+  testit(5) # wait a few seconds for the drives to mount
+  
+
+  astroSSD <- "/Volumes/Astro-SSD"
+  mbp14 <- "/Volumes/Astronomy"
+  babyscope <- "/Volumes/BabyScope"
+  ASI2600 <- file.path(astroSSD, "ASI2600MC")
+  
+  
+  
+  # Copy nightly data from scope and generate a report
+  # Only run the one that is connected
+  file.copy(babyscope, ASI2600, recursive = TRUE, overwrite = FALSE) # copy from babyscope
+
+  # unmount the directories
+  system(glue::glue("diskutil unmount {mbp14}"))
+  system(glue::glue("diskutil unmount {babyscope}"))
+}
 
 
-
-# Connect to astro-pc/users to get the most recent copy of the images
-#
-
-username <- Sys.getenv("AstroPCUsername")
-password <- Sys.getenv("AstroPCPassword")
-mbp14 <- Sys.getenv("mbp14")
-users <- paste0("open 'smb://", username, ":", password, "@es127/users'")
-laptop <- paste0("open 'smb://", username, ":", password, "@", mbp14, "/briancarter/Astronomy'")
-system(laptop) # MBP14 connection
-system(users) # ES127 connection
-rm(users, username, password, mbp14, laptop)
-
-testit(10) # wait a few seconds for the drives to mount
-
-
-# Locations
-# 1.  MBP13 - external SSD - "Astro-SSD"
-# 2.  ES127 - external SSD - " Samsung-SSD"
-# 3.  MBP14 - internal - "Astronomy"
-
-astroSSD <- "/Volumes/Astro-SSD"
-mbp14 <- "/Volumes/Astronomy"
-es127 <- "/Volumes/users/Brian Carter/Astronomy/ASI2600MC"
-
-# Sub locations
-# 1. astroSSD/ASI533MC
-# 2. astroSSD/ASI2600MC
-
-ASI533 <- file.path(astroSSD, "ASI533MC")
-ASI2600 <- file.path(astroSSD, "ASI2600MC")
-
-
-
-# Copy nightly data from scope and generate a report
-file.copy(file.path(es127, "BabyScope"), ASI2600, recursive = TRUE, overwrite = FALSE)
-file.copy(file.path(es127, "ES127"), ASI2600, recursive = TRUE, overwrite = FALSE)
+runES127()
+runBaby()
 generateReport()
+
+
+
+# Rename files ------------------------------------------------------------
+files <- list.files(ASI533, full.names = TRUE, recursive = TRUE, pattern = ".fits")
+files <- files[!grepl("Flat", files)]
+files <- files[grepl("LULTIMATE", files)]
+
+
+files <- list.files(file.path(ASI2600,"ES127/IC405"), full.names = TRUE, recursive = TRUE, pattern = ".fits")
+files <- files[!grepl("Flat", files)]
+files <- files[grepl("HAOIII", files)]
+newfiles <- stringr::str_replace(files, "HAOIII", "LULTIMATE")
+file.rename(files, newfiles) 
 
