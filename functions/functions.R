@@ -63,6 +63,7 @@ summaries <- function() {
     dplyr::select(-fits) |>
     dplyr::filter(object != "FlatWizard") |>
     dplyr::rename(Length = time) 
+  allFiles <- allFiles[-grep("FlatWizard", allFiles$object),]
   
   sessions <- allFiles |>
     dplyr::select(Camera, Scope, object, date, filter, Length) |>
@@ -85,7 +86,6 @@ summaries <- function() {
        totals = totals)
 }
 saveWB <- function(images) {
-  
   username <- Sys.getenv("AstroPCUsername")
   password <- Sys.getenv("AstroPCPassword")
   mbp14 <- Sys.getenv("mbp14")
@@ -117,7 +117,7 @@ saveWB <- function(images) {
   })
   
   
-  newObjects <- !duplicated(new$Object)
+  newObjects <- new$Object[!duplicated(new$Object) ]
   nSubs <- sum(new$Subs)
   time <- sum(new$Time)
   
@@ -143,17 +143,13 @@ generateReport <- function() {
 runES127 <- function() {
   username <- Sys.getenv("AstroPCUsername")
   password <- Sys.getenv("AstroPCPassword")
-  mbp14 <- Sys.getenv("mbp14")
   users <- paste0("open 'smb://", username, ":", password, "@es127/users/Brian Carter/Astronomy/ASI2600MC/ES127'")
-  laptop <- paste0("open 'smb://", username, ":", password, "@", mbp14, "/briancarter/Astronomy'")
-  system(laptop) # MBP14 connection
   system(users) # ES127 connection
-  rm(users, username, password, mbp14, laptop)
+  rm(users, username, password)
   
   testit(5)
   
   astroSSD <- "/Volumes/Astro-SSD"
-  mbp14 <- "/Volumes/Astronomy"
   es127 <- "/Volumes/ES127"
   
   # Sub locations
@@ -163,7 +159,6 @@ runES127 <- function() {
   file.copy(es127, ASI2600, recursive = TRUE, overwrite = FALSE) # copy from big scope
   
   # unmount the directories
-  system(glue::glue("diskutil unmount {mbp14}"))
   system(glue::glue("diskutil unmount {es127}"))
   
 }
@@ -171,21 +166,17 @@ runBaby <- function() {
   
   username <- Sys.getenv("AstroPCUsername")
   password <- Sys.getenv("AstroPCPassword")
-  mbp14 <- Sys.getenv("mbp14")
   babyscopeIP <- Sys.getenv("BabyScopeIP")
   babyscopeuser <- Sys.getenv("BabyScopeUsername")
   babyscopepassword <- Sys.getenv("BabyScopePassword")
-  laptop <- paste0("open 'smb://", username, ":", password, "@", mbp14, "/briancarter/Astronomy'")
   babyscope <- paste0("open 'smb://", babyscopeuser, ":", babyscopepassword, "@", babyscopeIP, "/Users/bcart/Astronomy/ASI2600MC/BabyScope'")
   system(babyscope) # BabyScope connection
-  system(laptop) # MBP14 connection
-  rm(username, password, mbp14, laptop, babyscopeIP, babyscopeuser, babyscopepassword, babyscope)
+  rm(username, password, babyscopeIP, babyscopeuser, babyscopepassword, babyscope)
   
-  testit(5) # wait a few seconds for the drives to mount
+  testit(15) # wait a few seconds for the drives to mount
   
   
   astroSSD <- "/Volumes/Astro-SSD"
-  mbp14 <- "/Volumes/Astronomy"
   babyscope <- "/Volumes/BabyScope"
   ASI2600 <- file.path(astroSSD, "ASI2600MC")
   
@@ -196,6 +187,5 @@ runBaby <- function() {
   file.copy(babyscope, ASI2600, recursive = TRUE, overwrite = FALSE) # copy from babyscope
   
   # unmount the directories
-  system(glue::glue("diskutil unmount {mbp14}"))
   system(glue::glue("diskutil unmount {babyscope}"))
-}
+} 
