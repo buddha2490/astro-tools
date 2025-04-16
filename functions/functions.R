@@ -31,8 +31,11 @@ eachScope <- function(path, scope) {
     df$filter[grep("UVIR", df$file)] <- "UVIR"
     df$filter[grep("LPRO", df$file)] <- "LPRO"
     df$filter[grep("LULTIMATE", df$file)] <- "LULTIMATE"
-    df$filter[grep("HAOIII", df$file)] <- "LULTIMATE"
+    df$filter[grep("HAO3", df$file)] <- "HAO3"
     df$filter[grep("SIIOIII", df$file)] <- "SIIOIII"
+    df$filter[grep("S2O3", df$file)] <- "S2O3"
+    df$filter[grep("SO", df$file)] <- "SO"
+    df$filter[grep("HO", df$file)] <- "HO"
     
     df <- df |>
       dplyr::mutate(time = stringr::str_replace(file, glue::glue("{object}_{date}_{filter}_"), ""))
@@ -63,7 +66,15 @@ summaries <- function() {
     dplyr::select(-fits) |>
     dplyr::filter(object != "FlatWizard") |>
     dplyr::rename(Length = time) 
-  allFiles <- allFiles[-grep("FlatWizard", allFiles$object),]
+  # allFiles <- allFiles[-grep("Flat", allFiles$object),]
+  drop <- c(file.path(ASI2600, "ES127/Future Projects"),
+            file.path(ASI2600, "ES127/FlatWizard"),
+            file.path(ASI2600, "ES127/SkyFlats"),
+            file.path(ASI2600, "ES127/darks")) |>
+    paste(collapse = "|")
+  allFiles <- allFiles[-grep(drop, allFiles$Folder),]
+  
+  
   
   sessions <- allFiles |>
     dplyr::select(Camera, Scope, object, date, filter, Length) |>
@@ -107,23 +118,13 @@ saveWB <- function(images) {
   
   
   delete <- list.files(mbp14, pattern = "Imaging Log", full.names = TRUE)
-  orig <- openxlsx::read.xlsx(delete, sheet = "Sessions") |>
-    dplyr::mutate(Subs = as.integer(Subs))
   file.remove(delete)
   
   suppressMessages({
-    new <- sessions %>%
-      dplyr::anti_join(orig)
+    new <- sessions 
   })
   
-  
-  newObjects <- new$Object[!duplicated(new$Object) ]
-  nSubs <- sum(new$Subs)
-  time <- sum(new$Time)
-  
-  message <- glue::glue("Since the last repo, {nSubs} subs have been taken across {length(newObjects)} objects for a total of {time} hours.")
-  cat(message)
-  
+ 
   wb <- createWorkbook(glue::glue("{mbp14}/Imaging Log - {Sys.Date()}.xlsx"))
   addWorksheet(wb, "FitFiles")
   addWorksheet(wb, "Sessions")
