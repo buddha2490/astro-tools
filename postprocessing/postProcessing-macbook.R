@@ -12,7 +12,7 @@ wait <- function(x) {
 }
 wbppScripter <- function(dir, outputdir = dir) {
   
-  app <- '"/Applications/PixInsight/PixInsight.app/Contents/MacOS/PixInsight"  -n --automation-mode -r='
+  app <- 'PixInsight  -n --automation-mode -r='
   
   js1 <- '"/Applications/Pixinsight/src/scripts/BatchPreprocessing/WBPP.js,automationMode=true,outputDirectory='
   
@@ -102,7 +102,7 @@ wbppFlats <- function(dir) {
 
 
 homePath <- "/Volumes/Astro-SSD"
-path <- glue::glue("{homePath}/Nebulae")
+path <- glue::glue("{homePath}/Messier Globs")
 subdirs <- list.dirs(path, recursive = TRUE, full.names = TRUE)
 flatdirs <- subdirs[grepl("flats", subdirs, ignore.case = TRUE)]
 masterBias <- file.path("/Volumes/Astro-SSD/Dark Library/-10/gain100/masterBias_gain100.xisf")
@@ -112,7 +112,9 @@ wbppLoop <- NULL  # vector that holds the names of the final directories I need 
 # Run wbpp to generate the wbpp script
 # flat directories that were already done and just needed a flat file moved, those are cleaned up
 for (i in 1:length(flatdirs)) {
-  wbppFlats(flatdirs[i])
+  wbppFlats(flatdirs[2])
+  glue::glue("/bin/bash {flatdirs[i]}/wbpp.sh") %>%
+    system(wait = TRUE, intern = TRUE)
 }
 
 # run it
@@ -120,7 +122,7 @@ system("/bin/bash /Users/briancarter/astro-tools/wbpp.sh", wait = TRUE, intern =
 lapply(wbppLoop, cleanup)
 
 
-
+glue::glue("/bin/bash {flatdirs[i]}/wbpp.sh") %>% system()
 
 # Functions ---------------------------------------------------------------
 
