@@ -57,30 +57,24 @@ buildDB <- function(group) {
   
   final <- exposure
   
+  # on the MB14
   myDB <- DBI::dbConnect(RSQLite::SQLite(), 
-                         dbname = file.path(mbp14, "objectDB.db"))
-  
-  oldTable <- tbl(myDB, "objectDB") %>% collect()
-  
+                         dbname = "/Users/briancarter/astro-tools/objectDB.db")
+
+  # main DB on the MBP14
+  oldTable <- tbl(myDB, "images") %>% collect()
   newObjects <- final %>%
     anti_join(oldTable, by = c("path"))
+  DBI::dbWriteTable(myDB, "images", newObjects, append = TRUE)
   
-  DBI::dbWriteTable(myDB, "objectDB", newObjects, append = TRUE)
+  timestamp <- data.frame(Date = Sys.Date(), time = Sys.time(), newobjects = nrow(newObjects))
+  dbWriteTable(myDB, "timestamp", timestamp, append = TRUE)
   
   dbDisconnect(myDB)
+  rm(oldTable, newObjects)
+  
 }
 
-# Get object info
-username <- Sys.getenv("AstroPCUsername")
-password <- Sys.getenv("AstroPCPassword")
-mbp14 <- Sys.getenv("mbp14")
-con <- glue::glue("open 'smb://{username}:{password}@{mbp14}/briancarter/Astronomy'") %>% as.character()
-system(con); 
-wait(5)
-rm(con, username, password, mbp14)
-
-# MB14 path for the database file
-mbp14 <- "/Volumes/Astronomy"
 
 # Inventory my files - this takes a minute
 ssdPath <- file.path("/Volumes/Astro-SSD")  
@@ -93,4 +87,4 @@ rm(galaxies, nebulae, globs, messier, ssdPath)
 
 buildDB(group)
 
-saveRDS(group, file= file.path(mbp14, "dbjects.rds"))
+
