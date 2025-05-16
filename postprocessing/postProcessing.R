@@ -27,17 +27,16 @@ processObjects <- function(myObject) {
 
   # I only want to process the last night
   # The most recent imaging session will be labeled with last nights' date
-  sessions <- data.frame(sessions = list.dirs(myObject, recursive = FALSE, full.names = TRUE)) %>%
-    mutate(object = basename(myObject)) %>%
-    mutate(folder = basename(sessions)) %>%
-    mutate(dates = stringr::str_replace(folder, paste0(object, "_"), ""))  %>%
-    filter(dates == Sys.Date() - 1)
-  
-  date <- sessions$dates %>% as.character()
+  sessions <- data.frame(object = basename(dirname(myObject)))  %>%
+    mutate(folder = (myObject)) %>%
+    mutate(session = basename(myObject)) %>%
+    mutate(dates = stringr::str_replace(session, paste0(object, "_"), "")) 
+
+  date <- sessions$dates %>%  as.character()
   
   objectName <- sessions$object %>% as.character() 
   
-  path <- sessions$sessions[1]
+  path <- sessions$folder[1]
   
   # Get the image metadata
   # This metadata file does not include calibration subs
@@ -48,7 +47,7 @@ processObjects <- function(myObject) {
   # create some directories
   objectFlats <- glue::glue(path, "/flats"); dir.create(objectFlats, showWarnings = FALSE)
   objectFits <- glue::glue(path, "/checkFits"); dir.create(objectFits, showWarnings = FALSE)
-  
+  objectMeta <- glue::glue(path, "/metadata"); dir.create(objectMeta, showWarnings = FALSE)
   
   # Move flats into the flats folder
   flatfiles <- list.files(path, pattern = "FLAT", full.names = TRUE)
@@ -95,18 +94,49 @@ processObjects <- function(myObject) {
       mutate(HighHFR = ifelse(HFR > mean(HFR) + 2 * metrics$HFR, 1, 0)) %>%
       mutate(HighFWHM = ifelse(FWHM > mean(FWHM) + 2 * metrics$FWHM, 1, 0)) %>%
       mutate(notRound = ifelse(Eccentricity > 0.6, 1, 0)) %>%
-      mutate(badGuiding = ifelse(GuidingRMSArcSec > 1.05, 1, 0)) %>%
-      mutate(flag = ifelse(LowStars == 1 | HighHFR == 1 | HighFWHM == 1 | notRound == 1 | badGuiding == 1, 1, 0)) %>%
+      mutate(badGuiding = ifelse(GuidingRMSArcSec > 1, 1, 0)) %>%
+      mutate(Exclusion = ifelse(LowStars == 1, 1, ifelse(
+        HighHFR == 1, 2, ifelse(HighFWHM == 1, 3, ifelse(
+          notRound == 1, 4, ifelse(
+            badGuiding == 1, 5, 99)))))) %>%
+      mutate(Exclusion = factor(Exclusion, c(1:5, 99), c("Low star count", ">HFR", ">FWHM", 
+                                                         "Eccentricity > 0.6", "Poor Guiding", "")))
+
+
+    # Move flagged subs to a directory for individual review
+    flaggedSubs <- df %>%  
       filter(flag == 1) %>%
-      select(FilePath, FilterName, DetectedStars, HFR, HFRStDev, FWHM, Eccentricity, GuidingRMSArcSec, flag)
+      select(FilePath, FilterName, DetectedStars, HFR, HFRStDev, FWHM, Eccentricity, GuidingRMSArcSec, Exclusion)
     
-    lapply(df$FilePath, function(x) {
+    lapply(flaggedSubs$FilePath, function(x) {
       if (file.exists(x)) file.copy(x, glue::glue("{path}/checkFits"))
       if (file.exists(x)) file.remove(x)
     })
     
-    write.csv(df, file = glue::glue("{path}/checkFits/{imageCombo$filter[i]}_summary.csv"), row.names = FALSE)
+    # Generate summary report
+    df2 <- df %>%
+      mutate(flag = factor(flag, 0:1, c("Keep", "Flagged"))) %>%
+      group_by(flag, FilterName, Exclusion) %>%
+      summarize(Total_Subs = n(),
+                Stars =  mean(DetectedStars),
+                HFR = mean(HFR),
+                FWHM = mean(FWHM),
+                Eccentricity = mean(Eccentricity),
+                Guiding = mean(GuidingRMSArcSec),
+                TotalMinutes = sum(Duration) / 60,
+                TotalHours = TotalMinutes / 60)
+                
     
+    formatVars <- c("HFR", "FWHM", "Eccentricity", "Guiding", "TotalMinutes", "TotalHours")
+    df2[,formatVars] <- lapply(df2[,formatVars], function(x) {
+      format(round(x, 3), nsmall = 3)
+    })
+    df2$Stars <- floor(df2$Stars)
+    
+    openxlsx::write.xlsx(df2, glue::glue("{objectMeta}/{basename(myObject)}.xlsx"))
+    readr::write_csv(df2, glue::glue("{objectMeta}/{basename(myObject)}.csv"))
+    
+
   }
   
   # Copy over my darks
@@ -181,7 +211,8 @@ camera <- "c:/users/bcart/astronomy/ASI2600MC/ES127"
 
 darks <- file.path(camera, "../Dark Library/") 
 
-objects <- list.dirs(camera, recursive = FALSE, full.names = TRUE) 
+objects <- list.dirs(camera, recursive = FALSE, full.names = TRUE) %>%
+  list.dirs(recursive = FALSE, full.names = TRUE)
 
 
 objects %>%  lapply(processObjects)
