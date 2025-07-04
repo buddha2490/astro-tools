@@ -90,9 +90,9 @@ processObjects <- function(myObject) {
     
     # Flag files 
     df <- df %>%
-      mutate(LowStars = ifelse(DetectedStars < mean(DetectedStars) - 2* metrics$stars, 1, 0)) %>%
-      mutate(HighHFR = ifelse(HFR > mean(HFR) + 2 * metrics$HFR, 1, 0)) %>%
-      mutate(HighFWHM = ifelse(FWHM > mean(FWHM) + 2 * metrics$FWHM, 1, 0)) %>%
+      mutate(LowStars = ifelse(DetectedStars < mean(DetectedStars, na.rm = TRUE) - 2 * metrics$stars, 1, 0)) %>%
+      mutate(HighHFR = ifelse(HFR > mean(HFR, na.rm = TRUE) + 2 * metrics$HFR, 1, 0)) %>%
+      mutate(HighFWHM = ifelse(FWHM > mean(FWHM, na.rm = TRUE) + 2 * metrics$FWHM, 1, 0)) %>%
       mutate(notRound = ifelse(Eccentricity > 0.6, 1, 0)) %>%
       mutate(badGuiding = ifelse(GuidingRMSArcSec > 1, 1, 0)) %>%
       mutate(Exclusion = ifelse(LowStars == 1, 1, ifelse(
@@ -100,7 +100,8 @@ processObjects <- function(myObject) {
           notRound == 1, 4, ifelse(
             badGuiding == 1, 5, 99)))))) %>%
       mutate(Exclusion = factor(Exclusion, c(1:5, 99), c("Low star count", ">HFR", ">FWHM", 
-                                                         "Eccentricity > 0.6", "Poor Guiding", "")))
+                                                         "Eccentricity > 0.6", "Poor Guiding", ""))) %>%
+      mutate(flag = ifelse(Exclusion == "", 0 , 1))
 
 
     # Move flagged subs to a directory for individual review
@@ -187,17 +188,27 @@ testit <- function(x) {
 countFlats <- function(objectFlats) {
   
   nFlats <-list.files(objectFlats, pattern = "fits")
-  UVIR <- nFlats[grep("UVIR", nFlats)]
-  LPRO <- nFlats[grep("LPRO", nFlats)]
-  HO <- nFlats[grep("HO", nFlats)]
-  SO <- nFlats[grep("SO", nFlats)]
+  L <- nFlats[grep("L", nFlats)]
+  R <- nFlats[grep("R", nFlats)]
+  G <- nFlats[grep("G", nFlats)]
+  B <- nFlats[grep("B", nFlats)]
+  H <- nFlats[grep("H", nFlats)]
+  S <- nFlats[grep("S", nFlats)]
+  O <- nFlats[grep("O", nFlats)]
   
-  UVIR <- ifelse(length(UVIR) > 0, 1, 0)
-  LPRO <- ifelse(length(LPRO) > 0, 1, 0)
-  HO <- ifelse(length(HO) > 0, 1, 0)
-  SO <- ifelse(length(SO) > 0, 1, 0)
+
   
-  sum(UVIR, LPRO, HO, SO)
+  L <- ifelse(length(L) > 0, 1, 0)
+  R <- ifelse(length(R) > 0, 1, 0)
+  G <- ifelse(length(G) > 0, 1, 0)
+  B <- ifelse(length(B) > 0, 1, 0)
+  H <- ifelse(length(H) > 0, 1, 0)
+  S <- ifelse(length(S) > 0, 1, 0)
+  O <- ifelse(length(O) > 0, 1, 0)
+  
+  sum(L, R, G, B, H, S, O)
+
+  
 }
 
 
