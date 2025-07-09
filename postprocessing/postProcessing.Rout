@@ -40,11 +40,11 @@ The following objects are masked from 'package:base':
 > # go get my darks
 > getDarks <- function(temp = temp, gain = gain, duration = duration, copyto = sessions) {
 +   
-+   biasfile <- glue::glue("{darks}/{temp}/Gain{gain}/masterBias_gain{gain}.xisf")
++   biasfile <- glue::glue("{darks}/{temp}/Gain{gain}/masterBias_gain{gain}.xisf") %>% normalizePath()
 +   
-+   darkfile <- glue::glue("{darks}/{temp}/Gain{gain}/masterDark_{duration}s.xisf")
++   darkfile <- glue::glue("{darks}/{temp}/Gain{gain}/masterDark_{duration}s.xisf") %>% normalizePath()
 +   
-+   biasCopyto <- glue::glue("{copyto}/flats")
++   biasCopyto <- glue::glue("{copyto}/flats") %>% normalizePath()
 +   
 +   file.copy(biasfile, biasCopyto)
 +   
@@ -80,6 +80,8 @@ The following objects are masked from 'package:base':
 +   objectMeta <- glue::glue(path, "/metadata"); dir.create(objectMeta, showWarnings = FALSE)
 +   
 +   # Move flats into the flats folder
++   #TODO: with mono, there are about 200 flats per object and this copy is a significant bottleneck
++   # see if I can leverage some system command
 +   flatfiles <- list.files(path, pattern = "FLAT", full.names = TRUE)
 +   returnStatus = sapply(flatfiles, function(x) file.copy(from = x, to = glue::glue(path, "/flats"), overwrite = T))
 +   names(returnStatus) <- NULL
@@ -218,17 +220,27 @@ The following objects are masked from 'package:base':
 > countFlats <- function(objectFlats) {
 +   
 +   nFlats <-list.files(objectFlats, pattern = "fits")
-+   UVIR <- nFlats[grep("UVIR", nFlats)]
-+   LPRO <- nFlats[grep("LPRO", nFlats)]
-+   HO <- nFlats[grep("HO", nFlats)]
-+   SO <- nFlats[grep("SO", nFlats)]
++   L <- nFlats[grep("L", nFlats)]
++   R <- nFlats[grep("R", nFlats)]
++   G <- nFlats[grep("G", nFlats)]
++   B <- nFlats[grep("B", nFlats)]
++   H <- nFlats[grep("H", nFlats)]
++   S <- nFlats[grep("S", nFlats)]
++   O <- nFlats[grep("O", nFlats)]
 +   
-+   UVIR <- ifelse(length(UVIR) > 0, 1, 0)
-+   LPRO <- ifelse(length(LPRO) > 0, 1, 0)
-+   HO <- ifelse(length(HO) > 0, 1, 0)
-+   SO <- ifelse(length(SO) > 0, 1, 0)
++ 
 +   
-+   sum(UVIR, LPRO, HO, SO)
++   L <- ifelse(length(L) > 0, 1, 0)
++   R <- ifelse(length(R) > 0, 1, 0)
++   G <- ifelse(length(G) > 0, 1, 0)
++   B <- ifelse(length(B) > 0, 1, 0)
++   H <- ifelse(length(H) > 0, 1, 0)
++   S <- ifelse(length(S) > 0, 1, 0)
++   O <- ifelse(length(O) > 0, 1, 0)
++   
++   sum(L, R, G, B, H, S, O)
++ 
++   
 + }
 > 
 > 
@@ -238,7 +250,7 @@ The following objects are masked from 'package:base':
 > 
 > src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
 > 
-> camera <- "c:/users/bcart/astronomy/ASI2600MC/ES127"
+> camera <- "c:/users/bcart/astronomy/ASI2600MM/ES127"
 > 
 > darks <- file.path(camera, "../Dark Library/") 
 > 
@@ -247,5 +259,40 @@ The following objects are masked from 'package:base':
 > 
 > 
 > objects %>%  lapply(processObjects)
-Error: 'c:/users/bcart/astronomy/ASI2600MC/ES127/FlatWizard/FlatWizard_2025-07-03/ImageMetaData.csv' does not exist.
-Execution halted
+Rows: 198 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (4): FilePath, FilterName, Binning, PierSide
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+[[1]]
+[1] 0
+
+> 
+> 
+> 
+>   
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+   2.96   12.85   95.31 

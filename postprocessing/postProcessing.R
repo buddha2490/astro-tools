@@ -10,11 +10,11 @@ setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing")
 # go get my darks
 getDarks <- function(temp = temp, gain = gain, duration = duration, copyto = sessions) {
   
-  biasfile <- glue::glue("{darks}/{temp}/Gain{gain}/masterBias_gain{gain}.xisf")
+  biasfile <- glue::glue("{darks}/{temp}/Gain{gain}/masterBias_gain{gain}.xisf") %>% normalizePath()
   
-  darkfile <- glue::glue("{darks}/{temp}/Gain{gain}/masterDark_{duration}s.xisf")
+  darkfile <- glue::glue("{darks}/{temp}/Gain{gain}/masterDark_{duration}s.xisf") %>% normalizePath()
   
-  biasCopyto <- glue::glue("{copyto}/flats")
+  biasCopyto <- glue::glue("{copyto}/flats") %>% normalizePath()
   
   file.copy(biasfile, biasCopyto)
   
@@ -50,6 +50,8 @@ processObjects <- function(myObject) {
   objectMeta <- glue::glue(path, "/metadata"); dir.create(objectMeta, showWarnings = FALSE)
   
   # Move flats into the flats folder
+  #TODO: with mono, there are about 200 flats per object and this copy is a significant bottleneck
+  # see if I can leverage some system command
   flatfiles <- list.files(path, pattern = "FLAT", full.names = TRUE)
   returnStatus = sapply(flatfiles, function(x) file.copy(from = x, to = glue::glue(path, "/flats"), overwrite = T))
   names(returnStatus) <- NULL
@@ -218,7 +220,7 @@ countFlats <- function(objectFlats) {
 
 src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
 
-camera <- "c:/users/bcart/astronomy/ASI2600MC/ES127"
+camera <- "c:/users/bcart/astronomy/ASI2600MM/ES127"
 
 darks <- file.path(camera, "../Dark Library/") 
 

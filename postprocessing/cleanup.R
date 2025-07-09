@@ -5,7 +5,7 @@ library(tidyr)
 
 src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
 
-camera <- "c:/users/bcart/astronomy/ASI2600MC/ES127"
+camera <- "c:/users/bcart/astronomy/ASI2600MM/ES127"
 
 objects <- list.dirs(camera, recursive = FALSE, full.names = TRUE) 
 
@@ -25,11 +25,15 @@ cleanup <- function(myObject) {
   
   # Count the types of flats
   flats <- list.files(flatDir, pattern = "fits")
-  uvir <- ifelse(length(flats[grep("UVIR", flats)]) >0, 1, 0)
-  lpro <- ifelse(length(flats[grep("LPRO", flats)]) >0, 1, 0)
-  ho <- ifelse(length(flats[grep("HO", flats)]) >0, 1, 0)
-  so <- ifelse(length(flats[grep("SO", flats)]) >0, 1, 0)
-  totalFlats <- sum(uvir, lpro, ho, so)
+  l <- ifelse(length(flats[grep("L", flats)]) >0, 1, 0)
+  r <- ifelse(length(flats[grep("R", flats)]) >0, 1, 0)
+  g <- ifelse(length(flats[grep("G", flats)]) >0, 1, 0)
+  b <- ifelse(length(flats[grep("B", flats)]) >0, 1, 0)
+  h <- ifelse(length(flats[grep("H", flats)]) >0, 1, 0)
+  s <- ifelse(length(flats[grep("S", flats)]) >0, 1, 0)
+  o <- ifelse(length(flats[grep("O", flats)]) >0, 1, 0)
+
+  totalFlats <- sum(l, r, g, b, h, s, o)
 
   # Count the stacked flats
   nMaster <- list.files(masterDir, pattern = ".xisf", full.names = TRUE)
