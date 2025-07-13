@@ -15,20 +15,21 @@ library(pharmaRTF)
 
 
 # change this for production
-debug <- FALSE
+debug <- TRUE
 
 # Path to the log file on the mele-astro mini computer
 # change for particular pc
-logPath <- "C:/Users/bcart/AppData/Local/NINA/Logs"
+# logPath <- "C:/Users/bcart/AppData/Local/NINA/Logs"
+logPath <- "data"
 
 # Path to my subs
 subsPath <- "C:/Users/bcart/Astronomy/ASI2600MM/ES127"
 
 
 # Functions ---------------------------------------------------------------
-eventPairs <- function(df) {
+eventPairs <- function(dat) {
   
-  starts <- df %>%
+  starts <- dat %>%
     filter(str_detect(MESSAGE, "^Starting Category:")) %>%
     mutate(
       ROLE = str_match(MESSAGE, "Item: ([^,]+)")[,2],
@@ -36,7 +37,7 @@ eventPairs <- function(df) {
       TYPE = "start"
     )
   
-  finishes <- df %>%
+  finishes <- dat %>%
     filter(str_detect(MESSAGE, "^Finishing Category:")) %>%
     mutate(
       ROLE = str_match(MESSAGE, "Item: ([^,]+)")[,2],
@@ -228,7 +229,16 @@ getMetadata <- function(path) {
 
 }
 
-
+cleanup <- function(dat) {
+  
+  dat %>%
+    filter(stringr::str_detect(MESSAGE, "Trigger") == FALSE) %>%
+    mutate(ROLE =  ifelse(ROLE %in% c("CenterAndRotate", "FineHome", "Center"), "Slew, rotate, platesolve", ifelse(
+      ((ROLE %in% c("CloseClover", "OpenCover", "SetBrightness", "ToggleLight")) |
+       (stringr::str_detect(MESSAGE, "Flat") == TRUE)), "Flats", ROLE)
+    ))
+  
+}
 # Process logs --------------------------------------------------------------------
 
 # creates a clean delimited character vector of the logs
@@ -242,16 +252,18 @@ logReport <- read_delim(
   col_names = c("DATE", "LEVEL", "SOURCE", "MEMBER", "LINE", "MESSAGE"),
   trim_ws = TRUE,
   col_types = cols(.default = "c")
-)  %>% 
+)  %>%
   mutate(DATE = ymd_hms(DATE, tz = "UTC", quiet = TRUE)) %>%
   eventPairs() %>%
-  mutate(ROLE = ifelse(stringr::str_detect(MESSAGE, "Flat") == TRUE, "FlatWizard", ROLE)) %>%
-  mutate(ROLE = ifelse(ROLE %in% c("CenterAndRotate", "Center"), "Slew, rotate, platesolve", ROLE)) %>%
+  cleanup() %>%
   devFix(debug) %>%
   times() %>%
   reportGen() %>%
   mutate_if(is.numeric, ~as.character(.)) %>%
   mutate_if(is.character, ~tidyr::replace_na(., ""))
+
+
+
 
 
 
