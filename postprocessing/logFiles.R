@@ -19,11 +19,17 @@ debug <- TRUE
 
 # Path to the log file on the mele-astro mini computer
 # change for particular pc
-# logPath <- "C:/Users/bcart/AppData/Local/NINA/Logs"
-logPath <- "data"
+
+if (debug == FALSE) {
+  logPath <- "C:/Users/bcart/AppData/Local/NINA/Logs"
+  subsPath <- "C:/Users/bcart/Astronomy/ASI2600MM/ES127"
+} else {
+  logPath <- "data"
+  subsPath <- "D:/NAS/ASI2600MM/ES127"
+}
+
 
 # Path to my subs
-subsPath <- "C:/Users/bcart/Astronomy/ASI2600MM/ES127"
 
 
 # Functions ---------------------------------------------------------------
@@ -236,7 +242,9 @@ cleanup <- function(dat) {
     mutate(ROLE =  ifelse(ROLE %in% c("CenterAndRotate", "FineHome", "Center"), "Slew, rotate, platesolve", ifelse(
       ((ROLE %in% c("CloseClover", "OpenCover", "SetBrightness", "ToggleLight")) |
        (stringr::str_detect(MESSAGE, "Flat") == TRUE)), "Flats", ROLE)
-    ))
+    )) %>%
+    mutate(ROLE = ifelse(ROLE == "TakeExposure" & stringr::str_detect(MESSAGE, "FLAT") == TRUE, "Flats", ROLE))
+  
   
 }
 # Process logs --------------------------------------------------------------------
@@ -270,6 +278,7 @@ logReport <- read_delim(
 
 # Report on the night's subs ----------------------------------------------
 
+# n = 169
 subsReport <- lapply(list.dirs(subsPath, full.names = TRUE, recursive = FALSE), getMetadata) %>%
   do.call("rbind", .) %>%
   mutate_if(is.numeric, ~as.character(.)) %>%
