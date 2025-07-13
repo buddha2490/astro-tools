@@ -259,7 +259,7 @@ The following objects are masked from 'package:base':
 > 
 > 
 > objects %>%  lapply(processObjects)
-Rows: 198 Columns: 34
+Rows: 349 Columns: 34
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (4): FilePath, FilterName, Binning, PierSide
@@ -268,31 +268,6 @@ dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-`summarise()` has grouped output by 'flag', 'FilterName'. You can override
-using the `.groups` argument.
-`summarise()` has grouped output by 'flag', 'FilterName'. You can override
-using the `.groups` argument.
-`summarise()` has grouped output by 'flag', 'FilterName'. You can override
-using the `.groups` argument.
-`summarise()` has grouped output by 'flag', 'FilterName'. You can override
-using the `.groups` argument.
-[[1]]
-[1] 0
-
-> 
-> 
-> 
->   
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> proc.time()
-   user  system elapsed 
-   2.96   12.85   95.31 
+Error in sum(returnStatus) : invalid 'type' (list) of argument
+Calls: %>% -> lapply -> FUN
+Execution halted

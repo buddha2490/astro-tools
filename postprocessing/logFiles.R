@@ -15,7 +15,7 @@ library(pharmaRTF)
 
 
 # change this for production
-debug <- TRUE
+debug <- FALSE
 
 # Path to the log file on the mele-astro mini computer
 # change for particular pc
@@ -87,8 +87,8 @@ pullLogs <- function(path, debug = debug) {
   
   # clean up
   if (debug != TRUE) {
-    logfile %>% file.copy(to = archive)
-    logfile %>% file.remove()
+    logFilePath %>% file.copy(to = archive)
+    logFilePath %>% file.remove()
   }
   return(logfile)
 }
@@ -158,13 +158,18 @@ times <- function(dat) {
 
 reportGen <- function(dat) {
   
+  
+  totaltime <- difftime(endtime, starttime, units = "mins") %>% as.numeric()
+  
   report <- dat %>%
     group_by(ROLE) %>%
     summarise(
       TotalMinutes = sum(TIME, na.rm = TRUE) / 60,
       N_events = ceiling(n() / 2)
     ) %>%
-    mutate(AverageTime = TotalMinutes / N_events)
+    mutate(AverageTime = TotalMinutes / N_events) %>%
+    mutate(PercentTime = TotalMinutes / totaltime * 100) %>%
+    arrange(desc(PercentTime))
   
   tots <- data.frame(
     ROLE = c("", "Total Event Time", "Total Sequence Time"),
@@ -175,9 +180,10 @@ reportGen <- function(dat) {
   report <- report %>%
     bind_rows(tots) %>%
     mutate(TotalMinutes = format(round(TotalMinutes, 2), nsmall = 2)) %>%
-    mutate(AverageTime = format(round(AverageTime, 2), nsmall = 2))
+    mutate(AverageTime = format(round(AverageTime, 2), nsmall = 2)) %>%
+    mutate(PercentTime = format(round(PercentTime, 2), nsmall = 2))
   
-  colnames(report) <- c("Role", "Total Minutes", "N Events", "Average Time (mins)")
+  colnames(report) <- c("Role", "Total Minutes", "N Events", "Average Time (mins)", "Percent (Total Sequence)")
   
   return(report)
 }
@@ -245,9 +251,10 @@ logReport <- read_delim(
 
 
 
+
 # Report on the night's subs ----------------------------------------------
 
-subsReport <- lapply(subDirs, getMetadata) %>%
+subsReport <- lapply(list.dirs(subsPath, full.names = TRUE, recursive = FALSE), getMetadata) %>%
   do.call("rbind", .) %>%
   mutate_if(is.numeric, ~as.character(.)) %>%
   mutate_if(is.character, ~tidyr::replace_na(., ""))
@@ -270,7 +277,7 @@ final <- bind_rows(logReport,  subsReport) %>%
 final[,names(final)] <- lapply(final[,names(final)], function(x) {
   ifelse(stringr::str_detect(x, "NA") == TRUE, "", x)
 })
-names(final)[5:7] <- rep("", 3)
+names(final)[6:7] <- rep("", 2)
 
 
 
@@ -278,35 +285,40 @@ report <- final %>%
   huxtable() %>%
   set_all_padding(0.0) %>%
   huxtable::set_bold(1, 1:ncol(.)) %>%
-  huxtable::set_bold(14, 1:ncol(.)) %>%
   huxtable::set_top_padding(6) %>%
   huxtable::set_bottom_padding(6) %>%
   huxtable::set_top_border(1, 1:ncol(.), 1) %>%
   huxtable::set_bottom_border(1, 1:ncol(.), 1) %>%
   huxtable::set_width(1.5) %>%
   huxtable::set_font("arial") %>%
-  huxtable::set_font_size(12) %>%
-  huxtable::map_align(huxtable::by_cols(from = 2, "center"))
+  huxtable::set_font_size(10) %>%
+  huxtable::map_align(huxtable::by_cols(from = 2, "center")) %>%
+  huxtable::set_bold(15, 1:ncol(.), TRUE) %>%              # Bold row 14 only
+  huxtable::set_top_border(15, 1:ncol(.), 1) %>%           # Set top border for row 14
+  huxtable::set_bottom_border(15, 1:ncol(.), 1)            # Set bottom border for row 14
 
-
+col_width(report) <- c(0.3, rep(0.7/6,6))  
 
 # Export the table --------------------------------------------------------
 telescope <- subsPath %>% basename()
 camera <- subsPath %>% dirname() %>% basename()
-
-
 title1 <- glue::glue("Imaging report for {Sys.Date()}")
 title2 <- glue::glue("{telescope} --- {camera}")
 
-
-
 # Create the RTF document with both tables
-report %>%
-  rtf_doc() %>%
+doc <- report %>%
+  rtf_doc(header_rows = 1) %>%
   add_titles(hf_line(title1, bold = TRUE, font = "arial", font_size = 12)) %>%
   add_titles(hf_line(title2, bold = TRUE, font = "arial", font_size = 12)) %>%
-  write_rtf(file = glue::glue("{subsPath}/NINA Imaging report - {Sys.Date()}.rtf"))
+  add_titles(hf_line(""))
 
 
-  
-  
+
+#pagesize(doc) <- c(height = 8.5, width = 11)
+margins(doc) <- c(top = 0.25, bottom = 0.25, left = 0.25, right = 0.25)
+write_rtf(doc, file = glue::glue("{subsPath}/NINA Imaging report - {Sys.Date()}.rtf"))
+
+
+
+
+

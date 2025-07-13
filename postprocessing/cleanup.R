@@ -3,6 +3,10 @@ library(magrittr)
 library(tidyr)
 
 
+# First run the report
+
+source("C:/Users/bcart/Astronomy/astro-tools/postprocessing/logFiles.R")
+
 src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
 
 camera <- "c:/users/bcart/astronomy/ASI2600MM/ES127"

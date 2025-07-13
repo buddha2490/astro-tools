@@ -40,9 +40,54 @@ The following object is masked from 'package:magrittr':
 
 > 
 > 
+> # First run the report
+> 
+> source("C:/Users/bcart/Astronomy/astro-tools/postprocessing/logFiles.R")
+
+Attaching package: 'lubridate'
+
+The following objects are masked from 'package:base':
+
+    date, intersect, setdiff, union
+
+
+Attaching package: 'huxtable'
+
+The following object is masked from 'package:dplyr':
+
+    add_rownames
+
+
+Attaching package: 'pharmaRTF'
+
+The following objects are masked from 'package:huxtable':
+
+    align, align<-, bold, bold<-, font, font_size, font_size<-, font<-,
+    header_rows, header_rows<-, italic, italic<-, set_align, set_bold,
+    set_font, set_font_size, set_header_rows, set_italic
+
+The following object is masked from 'package:graphics':
+
+    text
+
+Rows: 349 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (4): FilePath, FilterName, Binning, PierSide
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+New names:
+• `` -> `...5`
+• `` -> `...6`
+• `` -> `...7`
+There were 50 or more warnings (use warnings() to see the first 50)
+> 
 > src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
 > 
-> camera <- "c:/users/bcart/astronomy/ASI2600MC/ES127"
+> camera <- "c:/users/bcart/astronomy/ASI2600MM/ES127"
 > 
 > objects <- list.dirs(camera, recursive = FALSE, full.names = TRUE) 
 > 
@@ -86,7 +131,14 @@ The following object is masked from 'package:magrittr':
 + }
 > 
 > objects %>% lapply(cleanup)
-list()
+[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/M27/M27_2025-07-11/flats/master/masterFlat_BIN-1_6248x4176_FILTER-B_mono.xisf"
+[2] "c:/users/bcart/astronomy/ASI2600MM/ES127/M27/M27_2025-07-11/flats/master/masterFlat_BIN-1_6248x4176_FILTER-G_mono.xisf"
+[3] "c:/users/bcart/astronomy/ASI2600MM/ES127/M27/M27_2025-07-11/flats/master/masterFlat_BIN-1_6248x4176_FILTER-L_mono.xisf"
+[4] "c:/users/bcart/astronomy/ASI2600MM/ES127/M27/M27_2025-07-11/flats/master/masterFlat_BIN-1_6248x4176_FILTER-R_mono.xisf"
+[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/M27/M27_2025-07-11"
+[[1]]
+[1] 0
+
 > file.remove("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat")
 [1] TRUE
 > con <- file("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat")
@@ -95,4 +147,4 @@ list()
 > 
 > proc.time()
    user  system elapsed 
-   1.06    0.48    2.20 
+   6.35    4.01   22.03 
