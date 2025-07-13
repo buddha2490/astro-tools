@@ -5,6 +5,7 @@ library(lubridate)
 library(tidyr)
 library(huxtable)
 library(pharmaRTF)
+library(r2rtf)
 
 
 
@@ -278,7 +279,10 @@ logReport <- read_delim(
 
 # Report on the night's subs ----------------------------------------------
 
-# n = 169
+# n = 169, 338 minutes
+# This doesn't match with above report
+# it seems that the log doesn't catch some of the "end times" for captures,
+# so there are a bunch with ONLY START
 subsReport <- lapply(list.dirs(subsPath, full.names = TRUE, recursive = FALSE), getMetadata) %>%
   do.call("rbind", .) %>%
   mutate_if(is.numeric, ~as.character(.)) %>%
@@ -292,21 +296,7 @@ names(subsReport) <- cols
 
 # RTF Report --------------------------------------------------------------
 
-subsReport <- rbind("", "", colnames(subsReport), subsReport)
-names(subsReport) <- names(logReport)
-
-
-final <- bind_rows(logReport,  subsReport) %>%
-  mutate_if(is.character, ~tidyr::replace_na(.,""))
-
-final[,names(final)] <- lapply(final[,names(final)], function(x) {
-  ifelse(stringr::str_detect(x, "NA") == TRUE, "", x)
-})
-names(final)[6:7] <- rep("", 2)
-
-
-
-report <- final %>% 
+report1 <- subsReport %>%
   huxtable() %>%
   set_all_padding(0.0) %>%
   huxtable::set_bold(1, 1:ncol(.)) %>%
@@ -317,31 +307,61 @@ report <- final %>%
   huxtable::set_width(1.5) %>%
   huxtable::set_font("arial") %>%
   huxtable::set_font_size(10) %>%
-  huxtable::map_align(huxtable::by_cols(from = 2, "center")) %>%
-  huxtable::set_bold(15, 1:ncol(.), TRUE) %>%              # Bold row 14 only
-  huxtable::set_top_border(15, 1:ncol(.), 1) %>%           # Set top border for row 14
-  huxtable::set_bottom_border(15, 1:ncol(.), 1)            # Set bottom border for row 14
+  huxtable::map_align(huxtable::by_cols(from = 2, "center"))
 
-col_width(report) <- c(0.3, rep(0.7/6,6))  
+report2 <- logReport %>%
+  mutate_if(is.character, ~ifelse(stringr::str_detect(., "NA"), "", .)) %>%
+  huxtable() %>%
+  set_all_padding(0.0) %>%
+  huxtable::set_bold(1, 1:ncol(.)) %>%
+  huxtable::set_top_padding(6) %>%
+  huxtable::set_bottom_padding(6) %>%
+  huxtable::set_top_border(1, 1:ncol(.), 1) %>%
+  huxtable::set_bottom_border(1, 1:ncol(.), 1) %>%
+  huxtable::set_width(1.5) %>%
+  huxtable::set_font("arial") %>%
+  huxtable::set_font_size(10) %>%
+  huxtable::map_align(huxtable::by_cols(from = 2, "center"))
+
+
+
 
 # Export the table --------------------------------------------------------
 telescope <- subsPath %>% basename()
 camera <- subsPath %>% dirname() %>% basename()
-title1 <- glue::glue("Imaging report for {Sys.Date()}")
+title1 <- glue::glue("Imaging report for {Sys.Date() - 1}")
 title2 <- glue::glue("{telescope} --- {camera}")
 
 # Create the RTF document with both tables
-doc <- report %>%
+doc1 <- report1 %>%
   rtf_doc(header_rows = 1) %>%
   add_titles(hf_line(title1, bold = TRUE, font = "arial", font_size = 12)) %>%
   add_titles(hf_line(title2, bold = TRUE, font = "arial", font_size = 12)) %>%
   add_titles(hf_line(""))
 
+pagesize(doc1) <- c(height = 8.5, width = 11)
+margins(doc1) <- c(top = 0.25, bottom = 0.25, left = 0.25, right = 0.25)
 
 
-#pagesize(doc) <- c(height = 8.5, width = 11)
-margins(doc) <- c(top = 0.25, bottom = 0.25, left = 0.25, right = 0.25)
-write_rtf(doc, file = glue::glue("{subsPath}/NINA Imaging report - {Sys.Date()}.rtf"))
+
+doc2 <- report2 %>%
+  rtf_doc(header_rows = 1) %>%
+  add_titles(hf_line(title1, bold = TRUE, font = "arial", font_size = 12)) %>%
+  add_titles(hf_line(title2, bold = TRUE, font = "arial", font_size = 12)) %>%
+  add_titles(hf_line(""))
+
+pagesize(doc2) <- c(height = 8.5, width = 11)
+margins(doc2) <- c(top = 0.25, bottom = 0.25, left = 0.25, right = 0.25)
+
+
+
+subsPath <- "Z:/Transfer"
+
+
+write_rtf(doc1, file = glue::glue("{subsPath}/NINA Subs report - {Sys.Date()-1}.rtf"))
+write_rtf(doc2, file = glue::glue("{subsPath}/NINA Logs report - {Sys.Date()-1}.rtf"))
+
+
 
 
 
