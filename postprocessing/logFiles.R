@@ -51,7 +51,7 @@ eventPairs <- function(df) {
   
 }
 
-pullLogs <- function(path, debug = debug) {
+pullLogs <- function(path, debug = debug, subsPath = subsPath) {
   
   # Get a list of log files- ideally I want to take the most recent one
   # Maybe create an archive for the the log files after I run this script?
@@ -88,6 +88,7 @@ pullLogs <- function(path, debug = debug) {
   # clean up
   if (debug != TRUE) {
     logFilePath %>% file.copy(to = archive)
+    logFilePath %>% file.copy(to = "C:/Users/bcart/Astronomy/ASI2600MM/ES127", overwrite = TRUE)
     logFilePath %>% file.remove()
   }
   return(logfile)
@@ -156,7 +157,10 @@ times <- function(dat) {
   
 }
 
-reportGen <- function(dat) {
+reportGen <- function(dat, endtime = endtime, starttime = starttime) {
+  
+  starttime <- dat$DATE[1]
+  endtime <- dat$DATE[nrow(dat)]
   
   
   totaltime <- difftime(endtime, starttime, units = "mins") %>% as.numeric()

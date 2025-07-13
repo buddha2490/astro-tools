@@ -5,7 +5,6 @@ library(tidyr)
 
 # First run the report
 
-source("C:/Users/bcart/Astronomy/astro-tools/postprocessing/logFiles.R")
 
 src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
 
@@ -57,3 +56,6 @@ file.remove("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat")
 con <- file("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat")
 writeLines("", con)
 close(con)
+
+source("C:/Users/bcart/Astronomy/astro-tools/postprocessing/logFiles.R")
+
