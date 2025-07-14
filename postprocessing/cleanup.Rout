@@ -89,14 +89,17 @@ The following object is masked from 'package:magrittr':
 + }
 > 
 > objects %>% lapply(cleanup)
-[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/M16/M16_2025-07-12/flats/master/masterFlat_BIN-1_6248x4176_FILTER-H_mono.xisf"
-[2] "c:/users/bcart/astronomy/ASI2600MM/ES127/M16/M16_2025-07-12/flats/master/masterFlat_BIN-1_6248x4176_FILTER-O_mono.xisf"
-[3] "c:/users/bcart/astronomy/ASI2600MM/ES127/M16/M16_2025-07-12/flats/master/masterFlat_BIN-1_6248x4176_FILTER-S_mono.xisf"
-[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/M16/M16_2025-07-12"
-[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/NGC7293/NGC7293_2025-07-12/flats/master/masterFlat_BIN-1_6248x4176_FILTER-H_mono.xisf"
-[2] "c:/users/bcart/astronomy/ASI2600MM/ES127/NGC7293/NGC7293_2025-07-12/flats/master/masterFlat_BIN-1_6248x4176_FILTER-O_mono.xisf"
-[3] "c:/users/bcart/astronomy/ASI2600MM/ES127/NGC7293/NGC7293_2025-07-12/flats/master/masterFlat_BIN-1_6248x4176_FILTER-S_mono.xisf"
-[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/NGC7293/NGC7293_2025-07-12"
+[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/M16/M16_2025-07-13/flats/master/masterFlat_BIN-1_6248x4176_FILTER-H_mono.xisf"
+[2] "c:/users/bcart/astronomy/ASI2600MM/ES127/M16/M16_2025-07-13/flats/master/masterFlat_BIN-1_6248x4176_FILTER-O_mono.xisf"
+[3] "c:/users/bcart/astronomy/ASI2600MM/ES127/M16/M16_2025-07-13/flats/master/masterFlat_BIN-1_6248x4176_FILTER-S_mono.xisf"
+[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/M16/M16_2025-07-13"
+[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/NGC6992/NGC6992_2025-07-13/flats/master/masterFlat_BIN-1_6248x4176_FILTER-B_mono.xisf"
+[2] "c:/users/bcart/astronomy/ASI2600MM/ES127/NGC6992/NGC6992_2025-07-13/flats/master/masterFlat_BIN-1_6248x4176_FILTER-G_mono.xisf"
+[3] "c:/users/bcart/astronomy/ASI2600MM/ES127/NGC6992/NGC6992_2025-07-13/flats/master/masterFlat_BIN-1_6248x4176_FILTER-H_mono.xisf"
+[4] "c:/users/bcart/astronomy/ASI2600MM/ES127/NGC6992/NGC6992_2025-07-13/flats/master/masterFlat_BIN-1_6248x4176_FILTER-L_mono.xisf"
+[5] "c:/users/bcart/astronomy/ASI2600MM/ES127/NGC6992/NGC6992_2025-07-13/flats/master/masterFlat_BIN-1_6248x4176_FILTER-O_mono.xisf"
+[6] "c:/users/bcart/astronomy/ASI2600MM/ES127/NGC6992/NGC6992_2025-07-13/flats/master/masterFlat_BIN-1_6248x4176_FILTER-R_mono.xisf"
+[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/NGC6992/NGC6992_2025-07-13"
 [[1]]
 [1] 0
 
@@ -137,6 +140,33 @@ The following object is masked from 'package:graphics':
 
     text
 
-Error in reportGen(.) : object 'endtime' not found
-Calls: source ... is_grouped_df -> reportGen -> %>% -> difftime -> as.POSIXct
-Execution halted
+
+Attaching package: 'r2rtf'
+
+The following object is masked from 'package:pharmaRTF':
+
+    write_rtf
+
+Rows: 109 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (4): FilePath, FilterName, Binning, PierSide
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 53 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (4): FilePath, FilterName, Binning, PierSide
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> 
+> 
+> proc.time()
+   user  system elapsed 
+   2.82    5.29   48.89 

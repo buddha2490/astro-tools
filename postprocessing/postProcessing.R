@@ -53,35 +53,27 @@ processObjects <- function(myObject) {
   #TODO: with mono, there are about 200 flats per object and this copy is a significant bottleneck
   # see if I can leverage some system command
   flatfiles <- list.files(path, pattern = "FLAT", full.names = TRUE)
+  if (length(flatfiles) > 0) {
   returnStatus = sapply(flatfiles, function(x) file.copy(from = x, to = glue::glue(path, "/flats"), overwrite = T))
   names(returnStatus) <- NULL
   if (sum(returnStatus) == length(flatfiles)) {
     sapply(flatfiles, file.remove)
+  }
   }
   
   # grab some info from the file
   # Figure out how many image loops I need
   # i.e. if I have two filters, two sets of flats
   # I need this metric for later
-  temp <- metadata %>%
-    distinct(CameraTargetTemp) %>%
-    pull() %>%
-    as.character()
-  gain <- metadata %>%
-    distinct(Gain) %>%
-    as.character()
-  duration <- metadata %>%
-    distinct(Duration) %>%
-    pull()
-  filter <- metadata %>%
-    distinct(FilterName) %>%
-    pull()
-  imageCombo <- data.frame(temp, gain, duration, filter) # one row per filter
+  
+  imageCombo <- metadata %>%
+    group_by(CameraTargetTemp, Gain, Duration, FilterName) %>%
+    distinct(CameraTargetTemp, Gain, Duration, FilterName)
   
   
   # Flag the fit files that need individual review
   for (i in 1:nrow(imageCombo)) {
-    df <- filter(metadata, FilterName == imageCombo$filter[i])
+    df <- filter(metadata, FilterName == imageCombo$FilterName[i])
     
     
     measures <- c("DetectedStars", "HFR", "FWHM", "Eccentricity", "GuidingRMSArcSec")
@@ -147,9 +139,9 @@ processObjects <- function(myObject) {
   # Also gets a matched master bias to stack with the flats
   for (i in 1:nrow(imageCombo)) {
     getDarks(
-      temp = imageCombo$temp[i],
-      gain = imageCombo$gain[i],
-      duration = imageCombo$duration[i],
+      temp = imageCombo$CameraTargetTemp[i],
+      gain = imageCombo$Gain[i],
+      duration = imageCombo$Duration[i],
       copyto = path
     )
   }

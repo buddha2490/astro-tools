@@ -16,7 +16,7 @@ library(r2rtf)
 
 
 # change this for production
-debug <- TRUE
+debug <- FALSE
 
 # Path to the log file on the mele-astro mini computer
 # change for particular pc
@@ -251,25 +251,25 @@ cleanup <- function(dat) {
 # Process logs --------------------------------------------------------------------
 
 # creates a clean delimited character vector of the logs
-logfile <- logPath %>% pullLogs(debug = debug)
+# logfile <- logPath %>% pullLogs(debug = debug)
 
 # Main data file will have start and stop times of each event
 # From there it should be easy to group_by()
-logReport <- read_delim(
-  paste(logfile, collapse = "\n"),
-  delim = "|",
-  col_names = c("DATE", "LEVEL", "SOURCE", "MEMBER", "LINE", "MESSAGE"),
-  trim_ws = TRUE,
-  col_types = cols(.default = "c")
-)  %>%
-  mutate(DATE = ymd_hms(DATE, tz = "UTC", quiet = TRUE)) %>%
-  eventPairs() %>%
-  cleanup() %>%
-  devFix(debug) %>%
-  times() %>%
-  reportGen() %>%
-  mutate_if(is.numeric, ~as.character(.)) %>%
-  mutate_if(is.character, ~tidyr::replace_na(., ""))
+# logReport <- read_delim(
+#   paste(logfile, collapse = "\n"),
+#   delim = "|",
+#   col_names = c("DATE", "LEVEL", "SOURCE", "MEMBER", "LINE", "MESSAGE"),
+#   trim_ws = TRUE,
+#   col_types = cols(.default = "c")
+# )  %>%
+#   mutate(DATE = ymd_hms(DATE, tz = "UTC", quiet = TRUE)) %>%
+#   eventPairs() %>%
+#   cleanup() %>%
+#   devFix(debug) %>%
+#   times() %>%
+#   reportGen() %>%
+#   mutate_if(is.numeric, ~as.character(.)) %>%
+#   mutate_if(is.character, ~tidyr::replace_na(., ""))
 
 
 
@@ -309,19 +309,19 @@ report1 <- subsReport %>%
   huxtable::set_font_size(10) %>%
   huxtable::map_align(huxtable::by_cols(from = 2, "center"))
 
-report2 <- logReport %>%
-  mutate_if(is.character, ~ifelse(stringr::str_detect(., "NA"), "", .)) %>%
-  huxtable() %>%
-  set_all_padding(0.0) %>%
-  huxtable::set_bold(1, 1:ncol(.)) %>%
-  huxtable::set_top_padding(6) %>%
-  huxtable::set_bottom_padding(6) %>%
-  huxtable::set_top_border(1, 1:ncol(.), 1) %>%
-  huxtable::set_bottom_border(1, 1:ncol(.), 1) %>%
-  huxtable::set_width(1.5) %>%
-  huxtable::set_font("arial") %>%
-  huxtable::set_font_size(10) %>%
-  huxtable::map_align(huxtable::by_cols(from = 2, "center"))
+# report2 <- logReport %>%
+#   mutate_if(is.character, ~ifelse(stringr::str_detect(., "NA"), "", .)) %>%
+#   huxtable() %>%
+#   set_all_padding(0.0) %>%
+#   huxtable::set_bold(1, 1:ncol(.)) %>%
+#   huxtable::set_top_padding(6) %>%
+#   huxtable::set_bottom_padding(6) %>%
+#   huxtable::set_top_border(1, 1:ncol(.), 1) %>%
+#   huxtable::set_bottom_border(1, 1:ncol(.), 1) %>%
+#   huxtable::set_width(1.5) %>%
+#   huxtable::set_font("arial") %>%
+#   huxtable::set_font_size(10) %>%
+#   huxtable::map_align(huxtable::by_cols(from = 2, "center"))
 
 
 
@@ -343,23 +343,18 @@ pagesize(doc1) <- c(height = 8.5, width = 11)
 margins(doc1) <- c(top = 0.25, bottom = 0.25, left = 0.25, right = 0.25)
 
 
-
-doc2 <- report2 %>%
-  rtf_doc(header_rows = 1) %>%
-  add_titles(hf_line(title1, bold = TRUE, font = "arial", font_size = 12)) %>%
-  add_titles(hf_line(title2, bold = TRUE, font = "arial", font_size = 12)) %>%
-  add_titles(hf_line(""))
-
-pagesize(doc2) <- c(height = 8.5, width = 11)
-margins(doc2) <- c(top = 0.25, bottom = 0.25, left = 0.25, right = 0.25)
-
-
-
-subsPath <- "Z:/Transfer"
-
+# 
+# doc2 <- report2 %>%
+#   rtf_doc(header_rows = 1) %>%
+#   add_titles(hf_line(title1, bold = TRUE, font = "arial", font_size = 12)) %>%
+#   add_titles(hf_line(title2, bold = TRUE, font = "arial", font_size = 12)) %>%
+#   add_titles(hf_line(""))
+# 
+# pagesize(doc2) <- c(height = 8.5, width = 11)
+# margins(doc2) <- c(top = 0.25, bottom = 0.25, left = 0.25, right = 0.25)
 
 write_rtf(doc1, file = glue::glue("{subsPath}/NINA Subs report - {Sys.Date()-1}.rtf"))
-write_rtf(doc2, file = glue::glue("{subsPath}/NINA Logs report - {Sys.Date()-1}.rtf"))
+# write_rtf(doc2, file = glue::glue("{subsPath}/NINA Logs report - {Sys.Date()-1}.rtf"))
 
 
 
