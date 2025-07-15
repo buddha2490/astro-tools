@@ -62,6 +62,7 @@ eventPairs <- function(dat) {
   
 }
 
+
 pullLogs <- function(path, debug = debug, subsPath = subsPath) {
   
   # Get a list of log files- ideally I want to take the most recent one
@@ -100,7 +101,7 @@ pullLogs <- function(path, debug = debug, subsPath = subsPath) {
   if (debug != TRUE) {
     logFilePath %>% file.copy(to = archive)
     logFilePath %>% file.copy(to = "C:/Users/bcart/Astronomy/ASI2600MM/ES127", overwrite = TRUE)
-    logFilePath %>% file.remove()
+    # logFilePath %>% file.remove()
   }
   return(logfile)
 }
@@ -162,6 +163,7 @@ times <- function(dat) {
   
   dat %>%
     filter(DATE >= starttime & DATE <= endtime) %>%
+    filter(ROLE != "Annotation") %>%
     group_by(EVENT_ID) %>%
     mutate(TIME = ifelse(TYPE == "end", difftime(DATE, lag(DATE), units = "secs"), 0)) %>%
     ungroup()
@@ -247,8 +249,7 @@ cleanup <- function(dat) {
       ((ROLE %in% c("CloseClover", "OpenCover", "SetBrightness", "ToggleLight")) |
        (stringr::str_detect(MESSAGE, "Flat") == TRUE)), "Flats", ROLE)
     )) %>%
-    mutate(ROLE = ifelse(ROLE == "TakeExposure" & stringr::str_detect(MESSAGE, "FLAT") == TRUE, "Flats", ROLE)) %>%
-    filter(ROLE != "Annotation")
+    mutate(ROLE = ifelse(ROLE == "TakeExposure" & stringr::str_detect(MESSAGE, "FLAT") == TRUE, "Flats", ROLE))
   
   
 }
@@ -282,7 +283,9 @@ cleanLogFolder <- function(path = logPath) {
 
 guideFiles <- data.frame(file = list.files(phd2Logs, pattern = ".txt", full.names = TRUE)) %>%
   mutate(mtime = file.mtime(file)) %>%
-  arrange(desc(mtime))
+  arrange(desc(mtime)) %>%
+  distinct(file, .keep_all = TRUE) %>%
+  filter(stringr::str_detect(file, "GuideLog") == TRUE)
 
 guideFiles %>%
   slice(1) %>%
@@ -404,7 +407,7 @@ margins(doc2) <- c(top = 0.25, bottom = 0.25, left = 0.25, right = 0.25)
 write_rtf(doc1, file = glue::glue("{subsPath}/NINA Subs report - {Sys.Date()-1}.rtf"))
 write_rtf(doc2, file = glue::glue("{subsPath}/NINA Logs report - {Sys.Date()-1}.rtf"))
 
-cleanLogFolder(logPath)
+# cleanLogFolder(logPath)
 
 
 
