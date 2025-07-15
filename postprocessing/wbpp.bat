@@ -1,1 +1,3 @@
 
+"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\WeightedBatchPreprocessing\WeightedBatchPreprocessing.js,automationMode=true,outputDirectory=c:/users/bcart/astronomy/ASI2600MM/ES127/M16/M16_2025-07-14/flats,dir=c:/users/bcart/astronomy/ASI2600MM/ES127/M16/M16_2025-07-14/flats" --force-exit
+"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\WeightedBatchPreprocessing\WeightedBatchPreprocessing.js,automationMode=true,outputDirectory=c:/users/bcart/astronomy/ASI2600MM/ES127/NGC6992/NGC6992_2025-07-14/flats,dir=c:/users/bcart/astronomy/ASI2600MM/ES127/NGC6992/NGC6992_2025-07-14/flats" --force-exit

@@ -83,35 +83,27 @@ The following objects are masked from 'package:base':
 +   #TODO: with mono, there are about 200 flats per object and this copy is a significant bottleneck
 +   # see if I can leverage some system command
 +   flatfiles <- list.files(path, pattern = "FLAT", full.names = TRUE)
++   if (length(flatfiles) > 0) {
 +   returnStatus = sapply(flatfiles, function(x) file.copy(from = x, to = glue::glue(path, "/flats"), overwrite = T))
 +   names(returnStatus) <- NULL
 +   if (sum(returnStatus) == length(flatfiles)) {
 +     sapply(flatfiles, file.remove)
++   }
 +   }
 +   
 +   # grab some info from the file
 +   # Figure out how many image loops I need
 +   # i.e. if I have two filters, two sets of flats
 +   # I need this metric for later
-+   temp <- metadata %>%
-+     distinct(CameraTargetTemp) %>%
-+     pull() %>%
-+     as.character()
-+   gain <- metadata %>%
-+     distinct(Gain) %>%
-+     as.character()
-+   duration <- metadata %>%
-+     distinct(Duration) %>%
-+     pull()
-+   filter <- metadata %>%
-+     distinct(FilterName) %>%
-+     pull()
-+   imageCombo <- data.frame(temp, gain, duration, filter) # one row per filter
++   
++   imageCombo <- metadata %>%
++     group_by(CameraTargetTemp, Gain, Duration, FilterName) %>%
++     distinct(CameraTargetTemp, Gain, Duration, FilterName)
 +   
 +   
 +   # Flag the fit files that need individual review
 +   for (i in 1:nrow(imageCombo)) {
-+     df <- filter(metadata, FilterName == imageCombo$filter[i])
++     df <- filter(metadata, FilterName == imageCombo$FilterName[i])
 +     
 +     
 +     measures <- c("DetectedStars", "HFR", "FWHM", "Eccentricity", "GuidingRMSArcSec")
@@ -177,9 +169,9 @@ The following objects are masked from 'package:base':
 +   # Also gets a matched master bias to stack with the flats
 +   for (i in 1:nrow(imageCombo)) {
 +     getDarks(
-+       temp = imageCombo$temp[i],
-+       gain = imageCombo$gain[i],
-+       duration = imageCombo$duration[i],
++       temp = imageCombo$CameraTargetTemp[i],
++       gain = imageCombo$Gain[i],
++       duration = imageCombo$Duration[i],
 +       copyto = path
 +     )
 +   }
@@ -259,7 +251,7 @@ The following objects are masked from 'package:base':
 > 
 > 
 > objects %>%  lapply(processObjects)
-Rows: 109 Columns: 34
+Rows: 110 Columns: 34
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (4): FilePath, FilterName, Binning, PierSide
@@ -268,6 +260,61 @@ dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Error in sum(returnStatus) : invalid 'type' (list) of argument
-Calls: %>% -> lapply -> FUN
-Execution halted
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+Rows: 119 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (4): FilePath, FilterName, Binning, PierSide
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+`summarise()` has grouped output by 'flag', 'FilterName'. You can override
+using the `.groups` argument.
+[[1]]
+[1] 0
+
+[[2]]
+[1] 0
+
+> 
+> 
+> 
+>   
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+   7.04   46.95  322.75 
