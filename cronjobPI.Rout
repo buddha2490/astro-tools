@@ -1,0 +1,148 @@
+
+R version 4.4.0 (2024-04-24) -- "Puppy Cup"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin20
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # daily cronjob Pixinsight
+> 
+> library(dplyr)
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> library(magrittr)
+> source("/Users/briancarter/astro-tools/buildDB.R")
+> 
+> 
+> wait <- function(x) {
++   p1 <- proc.time()
++   Sys.sleep(x)
++   proc.time() - p1
++ }
+> wbppScripter <- function(dir, outputdir = dir) {
++   
++   app <- '"/Applications/PixInsight/PixInsight.app/Contents/MacOS/PixInsight"  -n --automation-mode -r='
++   
++   js1 <- '"/Applications/Pixinsight/src/scripts/BatchPreprocessing/FBPP.js,automationMode=true,outputDirectory='
++   
++   outputdir <- outputdir
++   
++   dir <- glue::glue(dir, '"')
++   
++   js2 <- '--force-exit'
++   
++   foo <- glue::glue("{app}{js1}{outputdir},dir={dir} {js2}")
++   
++   wbpp <- file(glue::glue("{outputdir}/wbpp.sh"), "a")
++   write(foo, wbpp, append = TRUE)
++   close(wbpp)
++   
++ }
+> 
+> # Process the data in the Transfer folder
+> one <- TRUE
+> if (one) {
++ homePath <- "/Volumes/Astro-SSD"
++ path <- glue::glue("{homePath}/Transfer")
++ objects <- list.dirs(path, recursive = FALSE, full.names = TRUE)
++ subdirs <- list.dirs(path, recursive = TRUE, full.names = TRUE)
++ subdirs <- subdirs[!subdirs %in% c(objects, path)]
++ subdirs <- subdirs[!grepl("master", subdirs, ignore.case = TRUE)] # Exclude master directories
++ subdirs <- subdirs[!grepl("checkFits", subdirs, ignore.case = TRUE)] # Exclude checkFits directories"
++ }
+> 
+> 
+> if (length(subdirs) > 0) {
++ for (i in 1:length(subdirs)) {
++   
++   # First write the WBPP script and execute it
++   wbppScripter(dir = subdirs[i], outputdir = subdirs[i])
++   glue::glue("/bin/bash {subdirs[i]}/wbpp.sh") %>% system() 
++   
++ 
++   # Process the voluminous output
++   object <- subdirs[i] %>% basename() # format: objects_date, m1_2024-01-01
++   master <- glue::glue("{subdirs[i]}/master") # master stack location
++   
++   
++   # Remove unnecessary directories
++   junk <- list.dirs(subdirs[i], recursive = FALSE) # logs, registered, calibrated
++   junk <- junk[!junk %in% master] 
++   junk <- junk[!grepl("checkFits", junk, ignore.case = TRUE)] # Exclude checkFits directories
++   
++   
++   # Uncomment if you want to keep these folders
++   # junk <- junk[!junk %in% glue::glue("{subdirs[i]}/logs")]
++   # junk <- junk[!junk %in% glue::glue("{subdirs[i]}/registered")]
++   # junk <- junk[!junk %in% glue::glue("{subdirs[i]}/calibrated")]
++   
++   # Remove that junk
++   lapply(junk, unlink, recursive = T, force = T)
++   
++   
++   # Master files - can have multiple if I have multiple filters, but typically I have one a night
++   masterFiles <- list.files(master, full.names = TRUE)
++   autocropped <- masterFiles[grep("autocrop", masterFiles, ignore.case = TRUE)] # this is the only one I want to keep
++   dropfiles <- setdiff(masterFiles, autocropped)
++   lapply(dropfiles, file.remove)
++   
++   # rename files
++   for (k in 1:length(autocropped)) {
++     oldname = autocropped[k]
++     newname <- glue::glue("{object}_{k}.xisf")
++     file.rename(oldname, file.path(master, newname))
++   }
++   
++   
++   #  move to the transfer directory
++   lapply(list.files(master, full.names = TRUE), function(x) {
++     file.copy(x, file.path(path))
++   })
++   
++   # remove the master directory
++   glue::glue("{master}") %>% unlink(recursive = TRUE, force = TRUE) 
++   
++   # Remove the WBPP.sh file 
++   if (file.exists(glue::glue("{subdirs[i]}/wbpp.sh"))) {
++   file.remove(glue::glue("{subdirs[i]}/wbpp.sh"))
++   }
++   
++ }
++ }
+
+PixInsight Core 1.9.2 Lockhart (x64)
+Copyright (c) 2003-2024 Pleiades Astrophoto
+
+2025-04-20 10:00:44.889 PixInsight[27677:2634901] +[IMKClient subclass]: chose IMKClient_Modern
+2025-04-20 10:00:44.889 PixInsight[27677:2634901] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+
+:LOGFILE:/Volumes/Astro-SSD/Transfer/DARKS/DARKS_2025-04-19/logs/20250420140053.log:LOGFILE:
+
+TEST MANUALLY INTERRUPTED
+
+<* Warning *> Unconditional exit as per user request: No data were saved!
+
+Error in file.rename(oldname, file.path(master, newname)) : 
+  'from' and 'to' are of different lengths
+Execution halted

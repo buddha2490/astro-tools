@@ -5,7 +5,7 @@ library(lubridate)
 library(tidyr)
 library(huxtable)
 library(pharmaRTF)
-library(r2rtf)
+
 
 
 
@@ -17,7 +17,7 @@ library(r2rtf)
 
 # change this for production
 debug <- FALSE
-
+mac <- TRUE
 
 phd2Logs <- "C:/Users/bcart/Documents/PHD2"
 
@@ -30,6 +30,11 @@ if (debug == FALSE) {
 } else {
   logPath <- "data"
   subsPath <- "D:/NAS/ASI2600MM/ES127"
+}
+if (mac == TRUE) {
+  logPath <- "/Volumes/Astro-SSD/Transfer"
+  subsPath <- "/Volumes/Astro-SSD/Transfer"
+  phd2Logs <- subsPath
 }
 
 
@@ -63,7 +68,7 @@ eventPairs <- function(dat) {
 }
 
 
-pullLogs <- function(path, debug = debug, subsPath = subsPath) {
+pullLogs <- function(path, myDebug = debug) {
   
   # Get a list of log files- ideally I want to take the most recent one
   # Maybe create an archive for the the log files after I run this script?
@@ -89,7 +94,7 @@ pullLogs <- function(path, debug = debug, subsPath = subsPath) {
   
   
   # cached log file for testing
-  if (debug == TRUE) {
+  if (myDebug == TRUE) {
     logFilePath <- glue::glue("{path}/log.log")
   }
   
@@ -98,9 +103,10 @@ pullLogs <- function(path, debug = debug, subsPath = subsPath) {
   logfile <- logfile[str_detect(logfile, "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+")]
   
   # clean up
-  if (debug != TRUE) {
-    logFilePath %>% file.copy(to = archive)
-    logFilePath %>% file.copy(to = "C:/Users/bcart/Astronomy/ASI2600MM/ES127", overwrite = TRUE)
+  if (myDebug != TRUE) {
+
+    logFilePath %>% file.copy(to = subsPath, overwrite = FALSE)
+
     # logFilePath %>% file.remove()
   }
   return(logfile)
@@ -207,13 +213,18 @@ reportGen <- function(dat, endtime = endtime, starttime = starttime) {
 
 getMetadata <- function(path) {
   
-  metaDf <- path %>%
-    list.files(pattern = "ImageMetaData.csv", 
-               recursive = TRUE,
-               full.names = TRUE) %>%
-    readr::read_csv() %>%
-    select(FilterName, Duration, HFR, FWHM, GuidingRMSArcSec) %>%
-    group_by(FilterName) %>%
+  
+  metadatFiles <- list.files(path = path, 
+                                 pattern = "ImageMetaData.csv", 
+                                 recursive = TRUE, 
+                                 full.names = TRUE)
+  metadatFiles <- metadatFiles[!duplicated(metadatFiles)]
+  
+  metaDf <- lapply(metadatFiles, readr::read_csv) %>%
+    do.call("rbind", .) %>%
+    mutate(Object = basename(dirname(FilePath)))  %>%
+    select(Object, FilterName, Duration, HFR, FWHM, GuidingRMSArcSec) %>%
+    group_by(Object, FilterName) %>%
     summarize(Total_Subs = n(),
               Minutes = sum(Duration / 60),
               HFR = mean(HFR, na.rm = TRUE),
@@ -221,7 +232,9 @@ getMetadata <- function(path) {
               GuidingRMS = mean(GuidingRMSArcSec, na.rm = TRUE)) %>%
     mutate(FilterName = factor(FilterName,
                                c("L", "R", "G", "B", "H", "S", "O"))) %>%
-    arrange(FilterName)
+    arrange(Object, FilterName) %>%
+    group_by(Object) %>%
+    mutate(Object = ifelse(row_number() != 1, "", Object))
   
   tots <- data.frame(
     FilterName = c("", "Total exposures"),
@@ -232,9 +245,7 @@ getMetadata <- function(path) {
     GuidingRMS = c(NA_real_, mean(metaDf$GuidingRMS))
   )
   
-  metaDf <- data.frame(Object = c(basename(path), rep("", nrow(metaDf))),
-                       rbind(NA, metaDf)) %>%
-                       bind_rows(tots) %>%
+  metaDf  %>% bind_rows(tots) %>%
     mutate(HFR = ifelse(!is.na(HFR), format(round(HFR, 2), nsmall = 2), NA_character_)) %>%
     mutate(FWHM = ifelse(!is.na(FWHM), format(round(FWHM, 2), nsmall = 2), NA_character_)) %>%
     mutate(GuidingRMS = ifelse(!is.na(GuidingRMS), paste0(format(round(GuidingRMS, 2), nsmall = 2),'"'), NA_character_))
@@ -302,7 +313,7 @@ guideFiles %>%
 # Process logs --------------------------------------------------------------------
 
 # creates a clean delimited character vector of the logs
-logfile <- logPath %>% pullLogs(debug = debug)
+logfile <- logPath %>% pullLogs()
 
 
 
@@ -324,17 +335,17 @@ logReport <- read_delim(
 
 
 
-
-
-
-
 # Report on the night's subs ----------------------------------------------
 
 # n = 169, 338 minutes
 # This doesn't match with above report
 # it seems that the log doesn't catch some of the "end times" for captures,
 # so there are a bunch with ONLY START
-subsReport <- lapply(list.dirs(subsPath, full.names = TRUE, recursive = FALSE), getMetadata) %>%
+
+myPaths <- list.dirs(subsPath, full.names = TRUE, recursive = FALSE)
+
+
+subsReport <- lapply(subsPath, getMetadata) %>%
   do.call("rbind", .) %>%
   mutate_if(is.numeric, ~as.character(.)) %>%
   mutate_if(is.character, ~tidyr::replace_na(., ""))
