@@ -89,14 +89,12 @@ The following object is masked from 'package:magrittr':
 + }
 > 
 > objects %>% lapply(cleanup)
-character(0)
-[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/M16/M16_2025-07-14"
-character(0)
-[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/NGC6992/NGC6992_2025-07-14"
+[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/M15/M15_2025-07-15/flats/master/masterFlat_BIN-1_6248x4176_FILTER-B_mono.xisf"
+[2] "c:/users/bcart/astronomy/ASI2600MM/ES127/M15/M15_2025-07-15/flats/master/masterFlat_BIN-1_6248x4176_FILTER-G_mono.xisf"
+[3] "c:/users/bcart/astronomy/ASI2600MM/ES127/M15/M15_2025-07-15/flats/master/masterFlat_BIN-1_6248x4176_FILTER-L_mono.xisf"
+[4] "c:/users/bcart/astronomy/ASI2600MM/ES127/M15/M15_2025-07-15/flats/master/masterFlat_BIN-1_6248x4176_FILTER-R_mono.xisf"
+[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/M15/M15_2025-07-15"
 [[1]]
-[1] 0
-
-[[2]]
 [1] 0
 
 > file.remove("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat")
@@ -133,38 +131,5 @@ The following object is masked from 'package:graphics':
 
     text
 
-
-Attaching package: 'r2rtf'
-
-The following object is masked from 'package:pharmaRTF':
-
-    write_rtf
-
-Rows: 110 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 119 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Warning message:
-One or more parsing issues, call `problems()` on your data frame for details,
-e.g.:
-  dat <- vroom(...)
-  problems(dat) 
-> 
-> 
-> proc.time()
-   user  system elapsed 
-   3.45    0.82    4.26 
+Error: '' does not exist in current working directory ('C:/Program Files/N.I.N.A. - Nighttime Imaging 'N' Astronomy').
+Execution halted

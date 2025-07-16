@@ -17,7 +17,7 @@ library(pharmaRTF)
 
 # change this for production
 debug <- FALSE
-mac <- TRUE
+mac <- FALSE
 
 phd2Logs <- "C:/Users/bcart/Documents/PHD2"
 
