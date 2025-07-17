@@ -19,14 +19,14 @@ library(pharmaRTF)
 debug <- FALSE
 mac <- FALSE
 
-phd2Logs <- "C:/Users/bcart/Documents/PHD2"
+phd2Logs <- "C:/Users/Brian Carter/Documents/PHD2"
 
 # Path to the log file on the mele-astro mini computer
 # change for particular pc
 
 if (debug == FALSE) {
-  logPath <- "C:/Users/bcart/AppData/Local/NINA/Logs"
-  subsPath <- "C:/Users/bcart/Astronomy/ASI2600MM/ES127"
+  logPath <- "C:/Users/Brian Carter/AppData/Local/NINA/Logs"
+  subsPath <- "C:/Users/Brian Carter/Astronomy/ASI2600MM/ES127"
 } else {
   logPath <- "data"
   subsPath <- "D:/NAS/ASI2600MM/ES127"
@@ -37,8 +37,6 @@ if (mac == TRUE) {
   phd2Logs <- subsPath
 }
 
-
-# Path to my subs
 
 
 # Functions ---------------------------------------------------------------

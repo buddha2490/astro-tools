@@ -6,9 +6,9 @@ library(tidyr)
 # First run the report
 
 
-src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
+src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
 
-camera <- "c:/users/bcart/astronomy/ASI2600MM/ES127"
+camera <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
 
 objects <- list.dirs(camera, recursive = FALSE, full.names = TRUE) 
 
@@ -52,10 +52,10 @@ cleanup <- function(myObject) {
 }
 
 objects %>% lapply(cleanup)
-file.remove("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat")
-con <- file("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat")
+file.remove("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat")
+con <- file("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat")
 writeLines("", con)
 close(con)
 
-source("C:/Users/bcart/Astronomy/astro-tools/postprocessing/logFiles.R")
+source("C:/Users/Brian Carter/Astronomy/astro-tools/postprocessing/logFiles.R")
 

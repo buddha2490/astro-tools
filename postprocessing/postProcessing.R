@@ -1,7 +1,7 @@
 library(dplyr)
 library(magrittr)
 
-setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing")
+setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
 
 
 
@@ -41,7 +41,8 @@ processObjects <- function(myObject) {
   # Get the image metadata
   # This metadata file does not include calibration subs
   metadata <- file.path(path, "ImageMetaData.csv") %>%
-    readr::read_csv()
+    readr::read_csv() %>%
+    mutate(FilePath = stringr::str_replace(FilePath, "/ES127/ES127/", "/ES127/"))
   
 
   # create some directories
@@ -157,7 +158,7 @@ wbppFlats <- function(objectFlats) {
   
   exe <- '"C:\\Program Files\\PixInsight\\bin\\PixInsight.exe"  -n --automation-mode -r='
   
-  js1 <- '"C:\\Program Files\\PixInsight\\src\\scripts\\WeightedBatchPreprocessing\\WeightedBatchPreprocessing.js,automationMode=true,outputDirectory='
+  js1 <- '"C:\\Program Files\\PixInsight\\src\\scripts\\BatchPreprocessing\\WBPP.js,automationMode=true,outputDirectory='
   
   outputdir <- objectFlats
   
@@ -167,7 +168,7 @@ wbppFlats <- function(objectFlats) {
   
   foo <- glue::glue("{exe}{js1}{outputdir},dir={dir} {js2}")
 
-  wbpp <- file("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat", "a")
+  wbpp <- file("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat", "a")
   write(foo, wbpp, append = TRUE)
   close(wbpp)
   
@@ -210,9 +211,9 @@ countFlats <- function(objectFlats) {
 
 # Directories -------------------------------------------------------------
 
-src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
+src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
 
-camera <- "c:/users/bcart/astronomy/ASI2600MM/ES127"
+camera <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
 
 darks <- file.path(camera, "../Dark Library/") 
 

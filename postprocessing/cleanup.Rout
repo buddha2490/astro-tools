@@ -1,5 +1,5 @@
 
-R version 4.4.3 (2025-02-28 ucrt) -- "Trophy Case"
+R version 4.5.1 (2025-06-13 ucrt) -- "Great Square Root"
 Copyright (C) 2025 The R Foundation for Statistical Computing
 Platform: x86_64-w64-mingw32/x64
 
@@ -43,9 +43,9 @@ The following object is masked from 'package:magrittr':
 > # First run the report
 > 
 > 
-> src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
+> src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
 > 
-> camera <- "c:/users/bcart/astronomy/ASI2600MM/ES127"
+> camera <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
 > 
 > objects <- list.dirs(camera, recursive = FALSE, full.names = TRUE) 
 > 
@@ -89,21 +89,27 @@ The following object is masked from 'package:magrittr':
 + }
 > 
 > objects %>% lapply(cleanup)
-[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/M15/M15_2025-07-15/flats/master/masterFlat_BIN-1_6248x4176_FILTER-B_mono.xisf"
-[2] "c:/users/bcart/astronomy/ASI2600MM/ES127/M15/M15_2025-07-15/flats/master/masterFlat_BIN-1_6248x4176_FILTER-G_mono.xisf"
-[3] "c:/users/bcart/astronomy/ASI2600MM/ES127/M15/M15_2025-07-15/flats/master/masterFlat_BIN-1_6248x4176_FILTER-L_mono.xisf"
-[4] "c:/users/bcart/astronomy/ASI2600MM/ES127/M15/M15_2025-07-15/flats/master/masterFlat_BIN-1_6248x4176_FILTER-R_mono.xisf"
-[1] "c:/users/bcart/astronomy/ASI2600MM/ES127/M15/M15_2025-07-15"
+[1] "c:/users/Brian Carter/astronomy/ASI2600MM/ES127/M16/M16_2025-07-16/flats/master/masterFlat_BIN-1_6248x4176_FILTER-H_mono.xisf"
+[2] "c:/users/Brian Carter/astronomy/ASI2600MM/ES127/M16/M16_2025-07-16/flats/master/masterFlat_BIN-1_6248x4176_FILTER-O_mono.xisf"
+[3] "c:/users/Brian Carter/astronomy/ASI2600MM/ES127/M16/M16_2025-07-16/flats/master/masterFlat_BIN-1_6248x4176_FILTER-S_mono.xisf"
+[1] "c:/users/Brian Carter/astronomy/ASI2600MM/ES127/M16/M16_2025-07-16"
+[1] "c:/users/Brian Carter/astronomy/ASI2600MM/ES127/NGC6992/NGC6992_2025-07-16/flats/master/masterFlat_BIN-1_6248x4176_FILTER-H_mono.xisf"
+[2] "c:/users/Brian Carter/astronomy/ASI2600MM/ES127/NGC6992/NGC6992_2025-07-16/flats/master/masterFlat_BIN-1_6248x4176_FILTER-O_mono.xisf"
+[3] "c:/users/Brian Carter/astronomy/ASI2600MM/ES127/NGC6992/NGC6992_2025-07-16/flats/master/masterFlat_BIN-1_6248x4176_FILTER-S_mono.xisf"
+[1] "c:/users/Brian Carter/astronomy/ASI2600MM/ES127/NGC6992/NGC6992_2025-07-16"
 [[1]]
 [1] 0
 
-> file.remove("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat")
+[[2]]
+[1] 0
+
+> file.remove("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat")
 [1] TRUE
-> con <- file("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat")
+> con <- file("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat")
 > writeLines("", con)
 > close(con)
 > 
-> source("C:/Users/bcart/Astronomy/astro-tools/postprocessing/logFiles.R")
+> source("C:/Users/Brian Carter/Astronomy/astro-tools/postprocessing/logFiles.R")
 
 Attaching package: 'lubridate'
 
@@ -131,5 +137,5 @@ The following object is masked from 'package:graphics':
 
     text
 
-Error: '' does not exist in current working directory ('C:/Program Files/N.I.N.A. - Nighttime Imaging 'N' Astronomy').
+Error: 'data/log.log' does not exist in current working directory ('C:/Users/Brian Carter/Astronomy/astro-tools/postprocessing').
 Execution halted
