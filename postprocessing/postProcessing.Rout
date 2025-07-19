@@ -71,7 +71,8 @@ The following objects are masked from 'package:base':
 +   # Get the image metadata
 +   # This metadata file does not include calibration subs
 +   metadata <- file.path(path, "ImageMetaData.csv") %>%
-+     readr::read_csv()
++     readr::read_csv() %>%
++     mutate(FilePath = stringr::str_replace(FilePath, "/ES127/ES127/", "/ES127/"))
 +   
 + 
 +   # create some directories
@@ -187,7 +188,7 @@ The following objects are masked from 'package:base':
 +   
 +   exe <- '"C:\\Program Files\\PixInsight\\bin\\PixInsight.exe"  -n --automation-mode -r='
 +   
-+   js1 <- '"C:\\Program Files\\PixInsight\\src\\scripts\\WeightedBatchPreprocessing\\WeightedBatchPreprocessing.js,automationMode=true,outputDirectory='
++   js1 <- '"C:\\Program Files\\PixInsight\\src\\scripts\\BatchPreprocessing\\WBPP.js,automationMode=true,outputDirectory='
 +   
 +   outputdir <- objectFlats
 +   
@@ -251,7 +252,7 @@ The following objects are masked from 'package:base':
 > 
 > 
 > objects %>%  lapply(processObjects)
-Rows: 48 Columns: 34
+Rows: 67 Columns: 34
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (4): FilePath, FilterName, Binning, PierSide
@@ -266,7 +267,7 @@ using the `.groups` argument.
 using the `.groups` argument.
 `summarise()` has grouped output by 'flag', 'FilterName'. You can override
 using the `.groups` argument.
-Rows: 37 Columns: 34
+Rows: 54 Columns: 34
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (4): FilePath, FilterName, Binning, PierSide
@@ -275,8 +276,6 @@ dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-`summarise()` has grouped output by 'flag', 'FilterName'. You can override
-using the `.groups` argument.
 `summarise()` has grouped output by 'flag', 'FilterName'. You can override
 using the `.groups` argument.
 `summarise()` has grouped output by 'flag', 'FilterName'. You can override
@@ -303,4 +302,4 @@ using the `.groups` argument.
 > 
 > proc.time()
    user  system elapsed 
-   2.09    6.18   14.62 
+   2.46    8.84   20.62 
