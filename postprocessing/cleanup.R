@@ -9,6 +9,7 @@ library(tidyr)
 src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
 
 camera <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
+transfer <- "z:"
 
 objects <- list.dirs(camera, recursive = FALSE, full.names = TRUE) 
 
@@ -58,4 +59,21 @@ writeLines("", con)
 close(con)
 
 source("C:/Users/Brian Carter/Astronomy/astro-tools/postprocessing/logFiles.R")
+
+
+# transfer over to astro-ssd
+# 10 minutes for 355 files
+system.time({
+return_status <- file.copy(camera, transfer, recursive = TRUE)
+})
+
+# check and remove
+# Note: Sometimes multiple nights are in the transfer folder
+# that's why the inner join
+orig <- data.frame(files = list.files(camera, recursive = TRUE))
+storage <- data.frame(files = list.files(file.path(transfer, "ES127"), recursive = TRUE, include.dirs = TRUE))
+delete <- orig %>%
+  inner_join(storage)
+
+
 
