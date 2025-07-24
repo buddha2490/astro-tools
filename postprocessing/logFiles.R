@@ -17,7 +17,7 @@ library(pharmaRTF)
 
 # change this for production
 debug <- FALSE
-mac <- FALSE
+mac <- TRUE
 
 phd2Logs <- "C:/Users/Brian Carter/Documents/PHD2"
 
@@ -33,8 +33,14 @@ if (debug == FALSE) {
 }
 if (mac == TRUE) {
   logPath <- "/Volumes/Astro-SSD/Transfer"
-  subsPath <- "/Volumes/Astro-SSD/Transfer"
+  subsPath <- "/Volumes/Astro-SSD/Transfer/NGC7331_SN2025rbs/NGC7331_2025-07-21"
   phd2Logs <- subsPath
+  username <- Sys.getenv("username")
+  password <- Sys.getenv("password")
+  mbp13 <- Sys.getenv("mbp13")
+  laptop <- paste0("open 'smb://", username, ":", password, "@", mbp13, "/Astro-SSD'")
+  system(laptop) # MBP13 connection
+  rm(username, password, mbp13, laptop)
 }
 
 
@@ -209,7 +215,29 @@ reportGen <- function(dat, endtime = endtime, starttime = starttime) {
   return(report)
 }
 
-getMetadata <- function(path) {
+
+
+getMetaDataStartStop <- function(path) {
+  metadatFiles <- list.files(path = path, 
+                             pattern = "ImageMetaData.csv", 
+                             recursive = TRUE, 
+                             full.names = TRUE)
+  metadatFiles <- metadatFiles[!duplicated(metadatFiles)]
+  
+  metaDf <- lapply(metadatFiles, readr::read_csv) %>%
+    do.call("rbind", .) %>%
+    mutate(Object = basename(dirname(FilePath)))  %>%
+    mutate(start = ExposureStart) %>%
+    arrange(desc(ExposureStart)) %>%
+    slice(1)
+    
+  
+}
+
+
+
+
+processMetaData <- function(path) {
   
   
   metadatFiles <- list.files(path = path, 
@@ -326,11 +354,24 @@ logReport <- read_delim(
   eventPairs() %>%
   cleanup() %>%
   devFix(debug) %>%
-  times() %>%
+  times()
+
+logReshaped <- logReport %>%
+  select(ROLE, EVENT_ID, TYPE, DATE) %>%
+  pivot_wider(
+    id_cols     = c(EVENT_ID, ROLE),
+    names_from  = TYPE,
+    values_from = DATE
+  )
+
+logReport <- logReport %>%
   reportGen() %>%
   mutate_if(is.numeric, ~as.character(.)) %>%
   mutate_if(is.character, ~tidyr::replace_na(., "")) 
 
+
+
+openxlsx::write.xlsx(logReshaped, "data/reshaped.xlsx")
 
 
 # Report on the night's subs ----------------------------------------------
@@ -343,7 +384,7 @@ logReport <- read_delim(
 myPaths <- list.dirs(subsPath, full.names = TRUE, recursive = FALSE)
 
 
-subsReport <- lapply(subsPath, getMetadata) %>%
+subsReport <- lapply(subsPath, processMetaData) %>%
   do.call("rbind", .) %>%
   mutate_if(is.numeric, ~as.character(.)) %>%
   mutate_if(is.character, ~tidyr::replace_na(., ""))

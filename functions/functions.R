@@ -97,11 +97,11 @@ summaries <- function() {
        totals = totals)
 }
 saveWB <- function(images) {
-  username <- Sys.getenv("AstroPCUsername")
-  password <- Sys.getenv("AstroPCPassword")
-  mbp14 <- Sys.getenv("mbp14")
-  laptop <- paste0("open 'smb://", username, ":", password, "@", mbp14, "/briancarter/Astronomy'")
-  system(laptop) # MBP14 connection
+  username <- Sys.getenv("username")
+  password <- Sys.getenv("password")
+  mbp13 <- Sys.getenv("mbp13")
+  laptop <- paste0("open 'smb://", username, ":", password, "@", mbp13, "/Volumes/Astro-SSD'")
+  system(laptop) # MBP13 connection
   rm(username, password, mbp14, laptop)
   
   testit(5)
