@@ -30,12 +30,14 @@ if (os == "Windows" & debug == FALSE) {
   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
   logPath <- "C:/Users/Brian Carter/AppData/Local/NINA/Logs"
   subsPath <- "C:/Users/Brian Carter/Astronomy/ASI2600MM/ES127"
+  phd2Logs <- "C:/Users/Brian Carter/Documents/PHD2"
 } 
 
 if (os == "Windows" & debug == TRUE) {
   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
   logPath <- "data"
   subsPath <- "D:/NAS/ASI2600MM/ES127"
+  phd2Logs <- logPath
 }
 
 if (os == "Mac") {

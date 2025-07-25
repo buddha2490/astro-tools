@@ -68,9 +68,4 @@ dirs_to_transfer <- list.dirs(cameraSrc, recursive = FALSE) %>%
 
 
 
-system.time({
-return_status <- file.copy(dirs_to_transfer, transfer, recursive = TRUE, overwrite = FALSE)
-})
-
-
 

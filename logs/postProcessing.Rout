@@ -122,4 +122,4 @@ dttm  (2): ExposureStart, ExposureStartUTC
 > 
 > proc.time()
    user  system elapsed 
-   2.14   12.42   25.75 
+   1.79   10.00   18.01 

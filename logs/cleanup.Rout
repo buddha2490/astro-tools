@@ -57,7 +57,7 @@ The following object is masked from 'package:magrittr':
 > if (machine == "ES127") {
 +   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
 +   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
-+   cameraSrcSrc <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
++   cameraSrc <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
 +   transfer <- "z:"
 +   wbpp <- "C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat"
 + } else {
@@ -85,5 +85,82 @@ The following object is masked from 'package:magrittr':
 > 
 > list.dirs(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
 +   lapply(cleanup, os = os, machine = machine)
-Error: object 'cameraSrc' not found
+[[1]]
+[1] 0
+
+> 
+> file.remove(wbpp)
+[1] TRUE
+> con <- file(wbpp)
+> writeLines("", con)
+> close(con)
+> 
+> 
+> 
+> # Logs --------------------------------------------------------------------
+> 
+> glue::glue("{src}/logFiles.R") %>% source()
+
+Attaching package: 'lubridate'
+
+The following objects are masked from 'package:base':
+
+    date, intersect, setdiff, union
+
+
+Attaching package: 'huxtable'
+
+The following object is masked from 'package:dplyr':
+
+    add_rownames
+
+
+Attaching package: 'pharmaRTF'
+
+The following objects are masked from 'package:huxtable':
+
+    align, align<-, bold, bold<-, font, font_size, font_size<-, font<-,
+    header_rows, header_rows<-, italic, italic<-, set_align, set_bold,
+    set_font, set_font_size, set_header_rows, set_italic
+
+The following object is masked from 'package:graphics':
+
+    text
+
+Error in `filter()`:
+ℹ In argument: `DATE >= starttime & DATE <= endtime`.
+Caused by error:
+! `..1` must be of size 1742 or 1, not size 0.
+Backtrace:
+     ▆
+  1. ├─glue::glue("{src}/logFiles.R") %>% source()
+  2. ├─base::source(.)
+  3. │ ├─base::withVisible(eval(ei, envir))
+  4. │ └─base::eval(ei, envir)
+  5. │   └─base::eval(ei, envir)
+  6. ├─... %>% times()
+  7. ├─global times(.)
+  8. │ └─... %>% ungroup()
+  9. ├─dplyr::ungroup(.)
+ 10. ├─dplyr::mutate(...)
+ 11. ├─dplyr::group_by(., EVENT_ID)
+ 12. ├─dplyr::filter(., ROLE != "Annotation")
+ 13. ├─dplyr::filter(., DATE >= starttime & DATE <= endtime)
+ 14. ├─dplyr:::filter.data.frame(., DATE >= starttime & DATE <= endtime)
+ 15. │ └─dplyr:::filter_rows(.data, dots, by)
+ 16. │   └─dplyr:::filter_eval(...)
+ 17. │     ├─base::withCallingHandlers(...)
+ 18. │     └─mask$eval_all_filter(dots, env_filter)
+ 19. │       └─dplyr (local) eval()
+ 20. ├─dplyr:::dplyr_internal_error(...)
+ 21. │ └─rlang::abort(class = c(class, "dplyr:::internal_error"), dplyr_error_data = data)
+ 22. │   └─rlang:::signal_abort(cnd, .file)
+ 23. │     └─base::signalCondition(cnd)
+ 24. └─dplyr (local) `<fn>`(`<dpl:::__>`)
+ 25.   └─rlang::abort(message, class = error_class, parent = parent, call = error_call)
+Warning message:
+One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat <- vroom(...)
+  problems(dat) 
 Execution halted

@@ -420,6 +420,8 @@ times <- function(dat, os = os, machine = machine) {
              TYPE == "end") %>% 
     pull(DATE)
   
+  if (length(endtime) == 0) endtime <- as.POSIXct("2025-08-24 05:30:00", tz = "UTC")
+  
   dat %>%
     filter(DATE >= starttime & DATE <= endtime) %>%
     filter(ROLE != "Annotation") %>%
