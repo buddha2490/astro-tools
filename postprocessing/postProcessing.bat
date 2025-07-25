@@ -1,1 +1,1 @@
-"C:/Program Files/R/R-4.5.1/bin/R.exe" CMD BATCH --no-save --no-restore "C:/Users/Brian Carter/Astronomy/astro-tools/postprocessing/postProcessing.R"
+"C:/Program Files/R/R-4.5.1/bin/R.exe" CMD BATCH --no-save --no-restore "C:/Users/Brian Carter/Astronomy/astro-tools/postprocessing/postProcessing.R" "C:/Users/Brian Carter/Astronomy/astro-tools/logs/postProcessing.Rout"

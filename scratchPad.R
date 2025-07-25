@@ -8,9 +8,12 @@ library(readr)
 
 df <- read_csv("data/subframeselector output.csv", skip = 22) %>%
   mutate(Filename = basename(File)) %>%
-  mutate(Filter = substr(Filename, 36, 36)) %>%
+  mutate(Filter = substr(Filename, 26, 26)) %>%
   select(-Approved, -Locked) %>%
-  select(Index, Filter, File, SNR, FWHM, Eccentricity, Stars)
+  select(Index, Filter, Filename, File, SNR, FWHM, Eccentricity, Stars)
+
+
+head(df$Filename)
 
 
 # Lets remove anything over 2 SD
@@ -44,9 +47,17 @@ results <- lapply(unique(df$Filter), function(x) {
 
 table(results$Exclusion, results$Filter)
 
+
 drop <- results %>%
   filter(Exclusion != "None") %>%
-  pull(File)
+  select(File, Filter, Exclusion)
+
+for (i in 1:length(drop)) {
+  if (file.exists(drop$File[i])) file.remove(drop$File[i])
+}
+
+
+
 saveRDS(drop, "/Volumes/Astro-SSD/ES127/FilterList.RDS")
 
 

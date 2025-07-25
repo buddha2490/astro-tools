@@ -1,1 +1,3 @@
 
+"/Applications/PixInsight/PixInsight.app"  -n --automation-mode -r="/Applications/PixInsight/src/scripts/BatchPreprocessing/WBPP.js,automationMode = true,outputDirectory=/Users/briancarter/Astronomy/testing/IC 5146/IC 5146_2025-07-24/flats,dir=/Users/briancarter/Astronomy/testing/IC 5146/IC 5146_2025-07-24/flats" --force-exit
+"/Applications/PixInsight/PixInsight.app"  -n --automation-mode -r="/Applications/PixInsight/src/scripts/BatchPreprocessing/WBPP.js,automationMode = true,outputDirectory=/Users/briancarter/Astronomy/testing/IC 5146/IC 5146_2025-07-24/flats,dir=/Users/briancarter/Astronomy/testing/IC 5146/IC 5146_2025-07-24/flats" --force-exit

@@ -3,77 +3,69 @@ library(magrittr)
 library(tidyr)
 
 
-# First run the report
+
+os <- Sys.info()["sysname"]
+machine <- Sys.info()["nodename"]
+
+os <- ifelse(os == "Darwin", "Mac", "Windows") %>% as.character()
+machine <- ifelse(machine == "BRIANC-MacUS.attlocal.net", "MBP13",
+                  ifelse(machine == "Brians-MBP.attlocal.net", "MBP14",
+                         ifelse(machine == "ES127", "ES127", machine))) %>%
+  as.character()
 
 
-src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
 
-camera <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
-transfer <- "z:"
+# Environmental parameters ------------------------------------------------
 
-objects <- list.dirs(camera, recursive = FALSE, full.names = TRUE) 
-
-cleanup <- function(myObject) {
-  
-  sessions <- data.frame(sessions = list.dirs(myObject, recursive = FALSE, full.names = TRUE)) %>%
-    mutate(object = basename(myObject)) %>%
-    mutate(folder = basename(sessions)) %>%
-    mutate(dates = stringr::str_replace(folder, paste0(object, "_"), ""))  %>%
-    filter(dates == Sys.Date() - 1) %>%
-    pull(sessions)
-  
-  flatDir <- file.path(sessions, "flats")
-  masterDir <- file.path(flatDir, "master")
-  file.path(flatDir, "calibrated") %>% unlink(recursive = TRUE, force = TRUE)
-  file.path(flatDir, "logs") %>% unlink(recursive = TRUE, force = TRUE)
-  
-  # Count the types of flats
-  flats <- list.files(flatDir, pattern = "fits")
-  l <- ifelse(length(flats[grep("L", flats)]) >0, 1, 0)
-  r <- ifelse(length(flats[grep("R", flats)]) >0, 1, 0)
-  g <- ifelse(length(flats[grep("G", flats)]) >0, 1, 0)
-  b <- ifelse(length(flats[grep("B", flats)]) >0, 1, 0)
-  h <- ifelse(length(flats[grep("H", flats)]) >0, 1, 0)
-  s <- ifelse(length(flats[grep("S", flats)]) >0, 1, 0)
-  o <- ifelse(length(flats[grep("O", flats)]) >0, 1, 0)
-
-  totalFlats <- sum(l, r, g, b, h, s, o)
-
-  # Count the stacked flats
-  nMaster <- list.files(masterDir, pattern = ".xisf", full.names = TRUE)
- 
-  lapply(nMaster, function(x) file.copy(from = x, to = sessions))
-  print(nMaster); print(sessions);
-
-  xisf <- list.files(sessions, pattern = "masterFlat")
-  if (length(xisf) != 0) {
-    unlink(flatDir, recursive = TRUE, force = TRUE)
-  }
+if (machine == "ES127") {
+  setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
+  src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
+  cameraSrcSrc <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
+  transfer <- "z:"
+  wbpp <- "C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat"
+} else {
+  setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
+  src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
+  cameraSrc <- "/Users/briancarter/Astronomy/testing"
+  username <- Sys.getenv("username")
+  password <- Sys.getenv("password")
+  mbp13 <- "BRIANC-MacUS"
+  laptop <- paste0("open 'smb://", username, ":", password, "@", mbp13, "/Astro-SSD'")
+  system(laptop) # MBP13 connection
+  transfer <- "/Volumes/Astro-SSD/transfer"
+  rm(username, password, mbp13)
+  wbpp <- file.path(src, "wbpp.sh")
 
 }
 
-objects %>% lapply(cleanup)
-file.remove("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat")
-con <- file("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat")
+source("functions/functions.R")
+
+
+
+# Run the scripts ---------------------------------------------------------
+
+
+
+list.dirs(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
+  lapply(cleanup, os = os, machine = machine)
+
+file.remove(wbpp)
+con <- file(wbpp)
 writeLines("", con)
 close(con)
 
-source("C:/Users/Brian Carter/Astronomy/astro-tools/postprocessing/logFiles.R")
+
+
+# Logs --------------------------------------------------------------------
+
+glue::glue("{src}/logFiles.R") %>% source()
 
 
 # transfer over to astro-ssd
 # 10 minutes for 355 files
 system.time({
-return_status <- file.copy(camera, transfer, recursive = TRUE)
+return_status <- file.copy(cameraSrc, transfer, recursive = TRUE, overwrite = FALSE)
 })
-
-# check and remove
-# Note: Sometimes multiple nights are in the transfer folder
-# that's why the inner join
-orig <- data.frame(files = list.files(camera, recursive = TRUE))
-storage <- data.frame(files = list.files(file.path(transfer, "ES127"), recursive = TRUE, include.dirs = TRUE))
-delete <- orig %>%
-  inner_join(storage)
 
 
 

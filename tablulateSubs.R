@@ -70,6 +70,6 @@ rm(username, password, mbp13, laptop)
 
 
 # Pick an object path
-src <- "/Volumes/Astro-SSD/ES127/NGC7331_SN2025rbs"
+src <- "/Volumes/Astro-SSD/transfer/IC5146"
 
 tallySubs(src) 

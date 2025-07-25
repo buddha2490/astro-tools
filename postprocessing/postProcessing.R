@@ -1,227 +1,72 @@
 library(dplyr)
 library(magrittr)
 
-setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
 
 
 
-# Functions ---------------------------------------------------------------
+os <- Sys.info()["sysname"]
+machine <- Sys.info()["nodename"]
 
-# go get my darks
-getDarks <- function(temp = temp, gain = gain, duration = duration, copyto = sessions) {
+os <- ifelse(os == "Darwin", "Mac", "Windows") %>% as.character()
+machine <- ifelse(machine == "BRIANC-MacUS.attlocal.net", "MBP13",
+                  ifelse(machine == "Brians-MBP.attlocal.net", "MBP14",
+                         ifelse(machine == "ES127", "ES127", machine))) %>%
+  as.character()
+
+
+
+
+
+
+
+
+# Environmental parameters ------------------------------------------------
+
+if (machine == "ES127") {
+  setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
+  src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
+  camera <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
+  darks <- file.path(camera, "../Dark Library/") 
+  source("functions/functions.R")
   
-  biasfile <- glue::glue("{darks}/{temp}/Gain{gain}/masterBias_gain{gain}.xisf") %>% normalizePath()
   
-  darkfile <- glue::glue("{darks}/{temp}/Gain{gain}/masterDark_{duration}s.xisf") %>% normalizePath()
+} else {
+  setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
+  src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
+  camera <- file.path("/Users/briancarter/Astronomy/testing")
+  username <- Sys.getenv("username")
+  password <- Sys.getenv("password")
+  es127 <- paste0("open 'smb://", username, ":", password, "@", "ES127", "/Users/Brian Carter/Astronomy/ASI2600MM/Dark Library'")
+  system(es127) # mini computer connection
+  darks <- file.path("/Volumes/Dark Library")
   
-  biasCopyto <- glue::glue("{copyto}/flats") %>% normalizePath()
-  
-  file.copy(biasfile, biasCopyto)
-  
-  file.copy(darkfile, copyto)
+  source("functions/functions.R")
   
 }
-
-processObjects <- function(myObject) {
-  
-
-  # I only want to process the last night
-  # The most recent imaging session will be labeled with last nights' date
-  sessions <- data.frame(object = basename(dirname(myObject)))  %>%
-    mutate(folder = (myObject)) %>%
-    mutate(session = basename(myObject)) %>%
-    mutate(dates = stringr::str_replace(session, paste0(object, "_"), "")) 
-
-  date <- sessions$dates %>%  as.character()
-  
-  objectName <- sessions$object %>% as.character() 
-  
-  path <- sessions$folder[1]
-  
-  # Get the image metadata
-  # This metadata file does not include calibration subs
-  metadata <- file.path(path, "ImageMetaData.csv") %>%
-    readr::read_csv() %>%
-    mutate(FilePath = stringr::str_replace(FilePath, "/ES127/ES127/", "/ES127/"))
-  
-
-  # create some directories
-  objectFlats <- glue::glue(path, "/flats"); dir.create(objectFlats, showWarnings = FALSE)
-  objectFits <- glue::glue(path, "/checkFits"); dir.create(objectFits, showWarnings = FALSE)
-  objectMeta <- glue::glue(path, "/metadata"); dir.create(objectMeta, showWarnings = FALSE)
-  
-  # Move flats into the flats folder
-  #TODO: with mono, there are about 200 flats per object and this copy is a significant bottleneck
-  # see if I can leverage some system command
-  flatfiles <- list.files(path, pattern = "FLAT", full.names = TRUE)
-  if (length(flatfiles) > 0) {
-  returnStatus = sapply(flatfiles, function(x) file.copy(from = x, to = glue::glue(path, "/flats"), overwrite = T))
-  names(returnStatus) <- NULL
-  if (sum(returnStatus) == length(flatfiles)) {
-    sapply(flatfiles, file.remove)
-  }
-  }
-  
-  # grab some info from the file
-  # Figure out how many image loops I need
-  # i.e. if I have two filters, two sets of flats
-  # I need this metric for later
-  
-  imageCombo <- metadata %>%
-    group_by(CameraTargetTemp, Gain, Duration, FilterName) %>%
-    distinct(CameraTargetTemp, Gain, Duration, FilterName)
-  
-  
-  # Flag the fit files that need individual review
-  for (i in 1:nrow(imageCombo)) {
-    df <- filter(metadata, FilterName == imageCombo$FilterName[i])
-    
-    
-    measures <- c("DetectedStars", "HFR", "FWHM", "Eccentricity", "GuidingRMSArcSec")
-    metrics <- lapply(measures, function(x) {
-      sd(df[[x]], na.rm = TRUE)
-    })
-    names(metrics) <- c("stars", "HFR", "FWHM", "roundness", "guiding")
-    
-    # Flag files 
-    df <- df %>%
-      mutate(LowStars = ifelse(DetectedStars < mean(DetectedStars, na.rm = TRUE) - 2 * metrics$stars, 1, 0)) %>%
-      mutate(HighHFR = ifelse(HFR > mean(HFR, na.rm = TRUE) + 2 * metrics$HFR, 1, 0)) %>%
-      mutate(HighFWHM = ifelse(FWHM > mean(FWHM, na.rm = TRUE) + 2 * metrics$FWHM, 1, 0)) %>%
-      mutate(notRound = ifelse(Eccentricity > 0.6, 1, 0)) %>%
-      mutate(badGuiding = ifelse(GuidingRMSArcSec > 1, 1, 0)) %>%
-      mutate(Exclusion = ifelse(LowStars == 1, 1, ifelse(
-        HighHFR == 1, 2, ifelse(HighFWHM == 1, 3, ifelse(
-          notRound == 1, 4, ifelse(
-            badGuiding == 1, 5, 99)))))) %>%
-      mutate(Exclusion = factor(Exclusion, c(1:5, 99), c("Low star count", ">HFR", ">FWHM", 
-                                                         "Eccentricity > 0.6", "Poor Guiding", ""))) %>%
-      mutate(flag = ifelse(Exclusion == "", 0 , 1))
+                  
+                  
 
 
-    # Move flagged subs to a directory for individual review
-    flaggedSubs <- df %>%  
-      filter(flag == 1) %>%
-      select(FilePath, FilterName, DetectedStars, HFR, HFRStDev, FWHM, Eccentricity, GuidingRMSArcSec, Exclusion)
-    
-    lapply(flaggedSubs$FilePath, function(x) {
-      if (file.exists(x)) file.copy(x, glue::glue("{path}/checkFits"))
-      if (file.exists(x)) file.remove(x)
-    })
-    
-    # Generate summary report
-    df2 <- df %>%
-      mutate(flag = factor(flag, 0:1, c("Keep", "Flagged"))) %>%
-      group_by(flag, FilterName, Exclusion) %>%
-      summarize(Total_Subs = n(),
-                Stars =  mean(DetectedStars),
-                HFR = mean(HFR),
-                FWHM = mean(FWHM),
-                Eccentricity = mean(Eccentricity),
-                Guiding = mean(GuidingRMSArcSec),
-                TotalMinutes = sum(Duration) / 60,
-                TotalHours = TotalMinutes / 60)
-                
-    
-    formatVars <- c("HFR", "FWHM", "Eccentricity", "Guiding", "TotalMinutes", "TotalHours")
-    df2[,formatVars] <- lapply(df2[,formatVars], function(x) {
-      format(round(x, 3), nsmall = 3)
-    })
-    df2$Stars <- floor(df2$Stars)
-    
-    openxlsx::write.xlsx(df2, glue::glue("{objectMeta}/{basename(myObject)}.xlsx"))
-    readr::write_csv(df2, glue::glue("{objectMeta}/{basename(myObject)}.csv"))
-    
+# Run the scripts ---------------------------------------------------------
 
-  }
-  
-  # Copy over my darks
-  # Matches the dark to the temp/gain/duration
-  # Also gets a matched master bias to stack with the flats
-  for (i in 1:nrow(imageCombo)) {
-    getDarks(
-      temp = imageCombo$CameraTargetTemp[i],
-      gain = imageCombo$Gain[i],
-      duration = imageCombo$Duration[i],
-      copyto = path
-    )
-  }
-  
-  # Process my flats
-  # This creates a bat file that calls PixInsight
-  wbppFlats(objectFlats)
-  
-  
+# Past versions could only handle 1 night of data at a time and would fail if the object fold had two nights
+# This is fixed now - 25July2025
+folders <- list.dirs(camera, recursive = FALSE, full.names = TRUE)
+objects <- list.dirs(camera, recursive = TRUE, full.names = TRUE) %>%
+  stringr::str_remove("checkFits") %>%
+  stringr::str_remove("flats") %>%
+  stringr::str_remove("metadata") %>%
+  setdiff(folders)  %>%
+  setdiff(camera)  # remove the home folder, keep session-specific folders  
+
+objects %>%  lapply(bulkRename)
+objects %>% lapply(processObjects)
+
+
+# go ahead and run it if on the dev rig
+if (os == "Mac") {
+  glue::glue("/Users/briancarter/Astronomy/astro-tools/postprocessing/wbpp.sh") %>% system()
 }
-
-wbppFlats <- function(objectFlats) {
-  
-  exe <- '"C:\\Program Files\\PixInsight\\bin\\PixInsight.exe"  -n --automation-mode -r='
-  
-  js1 <- '"C:\\Program Files\\PixInsight\\src\\scripts\\BatchPreprocessing\\WBPP.js,automationMode=true,outputDirectory='
-  
-  outputdir <- objectFlats
-  
-  dir <- glue::glue(objectFlats, '"')
-  
-  js2 <- '--force-exit'
-  
-  foo <- glue::glue("{exe}{js1}{outputdir},dir={dir} {js2}")
-
-  wbpp <- file("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat", "a")
-  write(foo, wbpp, append = TRUE)
-  close(wbpp)
-  
-}
-
-testit <- function(x) {
-  p1 <- proc.time()
-  Sys.sleep(x)
-  proc.time() - p1
-}
-
-countFlats <- function(objectFlats) {
-  
-  nFlats <-list.files(objectFlats, pattern = "fits")
-  L <- nFlats[grep("L", nFlats)]
-  R <- nFlats[grep("R", nFlats)]
-  G <- nFlats[grep("G", nFlats)]
-  B <- nFlats[grep("B", nFlats)]
-  H <- nFlats[grep("H", nFlats)]
-  S <- nFlats[grep("S", nFlats)]
-  O <- nFlats[grep("O", nFlats)]
-  
-
-  
-  L <- ifelse(length(L) > 0, 1, 0)
-  R <- ifelse(length(R) > 0, 1, 0)
-  G <- ifelse(length(G) > 0, 1, 0)
-  B <- ifelse(length(B) > 0, 1, 0)
-  H <- ifelse(length(H) > 0, 1, 0)
-  S <- ifelse(length(S) > 0, 1, 0)
-  O <- ifelse(length(O) > 0, 1, 0)
-  
-  sum(L, R, G, B, H, S, O)
-
-  
-}
-
-
-
-
-# Directories -------------------------------------------------------------
-
-src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
-
-camera <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
-
-darks <- file.path(camera, "../Dark Library/") 
-
-objects <- list.dirs(camera, recursive = FALSE, full.names = TRUE) %>%
-  list.dirs(recursive = FALSE, full.names = TRUE)
-
-
-objects %>%  lapply(processObjects)
 
 
 
