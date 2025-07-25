@@ -63,8 +63,13 @@ glue::glue("{src}/logFiles.R") %>% source()
 
 # transfer over to astro-ssd
 # 10 minutes for 355 files
+dirs_to_transfer <- list.dirs(cameraSrc, recursive = FALSE) %>%
+  stringr::str_remove("Dark Library")
+
+
+
 system.time({
-return_status <- file.copy(cameraSrc, transfer, recursive = TRUE, overwrite = FALSE)
+return_status <- file.copy(dirs_to_transfer, transfer, recursive = TRUE, overwrite = FALSE)
 })
 
 
