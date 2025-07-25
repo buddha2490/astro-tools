@@ -14,12 +14,6 @@ machine <- ifelse(machine == "BRIANC-MacUS.attlocal.net", "MBP13",
   as.character()
 
 
-
-
-
-
-
-
 # Environmental parameters ------------------------------------------------
 
 if (machine == "ES127") {

@@ -1,0 +1,89 @@
+
+R version 4.5.1 (2025-06-13 ucrt) -- "Great Square Root"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: x86_64-w64-mingw32/x64
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(dplyr)
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+> library(magrittr)
+> library(tidyr)
+
+Attaching package: 'tidyr'
+
+The following object is masked from 'package:magrittr':
+
+    extract
+
+> 
+> 
+> 
+> os <- Sys.info()["sysname"]
+> machine <- Sys.info()["nodename"]
+> 
+> os <- ifelse(os == "Darwin", "Mac", "Windows") %>% as.character()
+> machine <- ifelse(machine == "BRIANC-MacUS.attlocal.net", "MBP13",
++                   ifelse(machine == "Brians-MBP.attlocal.net", "MBP14",
++                          ifelse(machine == "ES127", "ES127", machine))) %>%
++   as.character()
+> 
+> 
+> 
+> # Environmental parameters ------------------------------------------------
+> 
+> if (machine == "ES127") {
++   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
++   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
++   cameraSrcSrc <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
++   transfer <- "z:"
++   wbpp <- "C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat"
++ } else {
++   setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
++   src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
++   cameraSrc <- "/Users/briancarter/Astronomy/testing"
++   username <- Sys.getenv("username")
++   password <- Sys.getenv("password")
++   mbp13 <- "BRIANC-MacUS"
++   laptop <- paste0("open 'smb://", username, ":", password, "@", mbp13, "/Astro-SSD'")
++   system(laptop) # MBP13 connection
++   transfer <- "/Volumes/Astro-SSD/transfer"
++   rm(username, password, mbp13)
++   wbpp <- file.path(src, "wbpp.sh")
++ 
++ }
+> 
+> source("functions/functions.R")
+> 
+> 
+> 
+> # Run the scripts ---------------------------------------------------------
+> 
+> 
+> 
+> list.dirs(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
++   lapply(cleanup, os = os, machine = machine)
+Error: object 'cameraSrc' not found
+Execution halted

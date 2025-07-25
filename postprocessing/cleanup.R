@@ -20,7 +20,7 @@ machine <- ifelse(machine == "BRIANC-MacUS.attlocal.net", "MBP13",
 if (machine == "ES127") {
   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
-  cameraSrcSrc <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
+  cameraSrc <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
   transfer <- "z:"
   wbpp <- "C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat"
 } else {

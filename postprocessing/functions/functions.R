@@ -36,7 +36,9 @@ processObjects <- function(myObject, os = os, machine = machine) {
   # This metadata file does not include calibration subs
   metadata <- file.path(path, "ImageMetaData.csv") %>%
     readr::read_csv() %>%
-    mutate(FilePath = stringr::str_replace(FilePath, "/ES127/ES127/", "/ES127/"))
+    mutate(FilePath = stringr::str_replace(FilePath, "/ES127/ES127/", "/ES127/")) %>%
+    mutate(filename = basename(FilePath)) %>%
+    mutate(FilePath = stringr::str_replace(FilePath, filename, stringr::str_replace(filename, " ", "")))
   
   
   # create some directories
