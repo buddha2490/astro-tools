@@ -87,8 +87,20 @@ The following objects are masked from 'package:base':
 [[1]]
 NULL
 
+[[2]]
+NULL
+
 > objects %>% lapply(processObjects)
-Rows: 307 Columns: 34
+Rows: 342 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (4): FilePath, FilterName, Binning, PierSide
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 133 Columns: 34
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (4): FilePath, FilterName, Binning, PierSide
@@ -98,6 +110,9 @@ dttm  (2): ExposureStart, ExposureStartUTC
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 [[1]]
+[1] 0
+
+[[2]]
 [1] 0
 
 > 
@@ -122,4 +137,4 @@ dttm  (2): ExposureStart, ExposureStartUTC
 > 
 > proc.time()
    user  system elapsed 
-   1.79   10.00   18.01 
+   2.29   10.45   21.07 

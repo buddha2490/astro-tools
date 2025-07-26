@@ -45,13 +45,20 @@ if (machine == "ES127") {
 
 # Past versions could only handle 1 night of data at a time and would fail if the object fold had two nights
 # This is fixed now - 25July2025
+# Note: 26July - R is picking up the xisf file as directories
 folders <- list.dirs(camera, recursive = FALSE, full.names = TRUE)
-objects <- list.dirs(camera, recursive = TRUE, full.names = TRUE) %>%
-  stringr::str_remove("checkFits") %>%
-  stringr::str_remove("flats") %>%
-  stringr::str_remove("metadata") %>%
-  setdiff(folders)  %>%
-  setdiff(camera)  # remove the home folder, keep session-specific folders  
+objects <- data.frame(dir = list.dirs(camera, recursive = TRUE, full.names = TRUE)) %>%
+  filter(!stringr::str_detect(dir, "checkFits")) %>%
+  filter(!stringr::str_detect(dir, "flats")) %>%
+  filter(!stringr::str_detect(dir, "metadata")) %>%
+  filter(!stringr::str_detect(dir, "calibrated")) %>%
+  filter(!stringr::str_detect(dir, "logs")) %>%
+  filter(!stringr::str_detect(dir, "Flat_BIN")) %>%
+  filter(dir %in% setdiff(dir, folders)) %>%
+  filter(dir %in% setdiff(dir, camera)) %>%
+  pull(dir)
+
+
 
 objects %>%  lapply(bulkRename)
 objects %>% lapply(processObjects)
