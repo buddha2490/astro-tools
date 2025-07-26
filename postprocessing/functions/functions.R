@@ -538,6 +538,74 @@ cleanupLogs <- function(dat, os = os, machine = machine) {
 }
 
 
-
+logChart <- function(df) {
+  
+  df <- logReshaped %>%
+    mutate(
+      start = as.POSIXct(start, format = "%Y-%m-%d %H:%M:%OS", tz = "UTC"),
+      end = as.POSIXct(end, format = "%Y-%m-%d %H:%M:%OS", tz = "UTC")
+    ) %>%
+    filter(!is.na(start) & !is.na(end))
+  
+  gantt_plot <- ggplot(df, aes(x = start, xend = end, y = ROLE, yend = ROLE)) +
+    geom_segment(color = "royalblue", size = 4) +
+    scale_x_datetime(
+      labels = scales::time_format("%H:%M:%S"),
+      breaks = seq(min(df$start), max(df$end), by = "1 hour")
+    ) +
+    labs(x = "Time (HH:MM:SS)", y = "Event", title = "NINA Imaging Analysis") +
+    theme_minimal(base_size = 12) +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      axis.text.y = element_text(size = 8),
+      axis.title.y = element_text(size = 10),
+      plot.margin = margin(5, 5, 5, 5),
+      panel.spacing.y = unit(0.1, "lines")
+    ) +
+    scale_y_discrete(expand = expansion(mult = c(0.02, 0.02)))
+  
+  # Summarize durations
+  summary_table <- df %>%
+    mutate(duration = as.numeric(difftime(end, start, units = "secs"))) %>%
+    group_by(ROLE) %>%
+    summarise(
+      N = as.numeric(n()),
+      total_time_mins = round(sum(duration) / 60, 1),
+      .groups = "drop"
+    )
+  
+  # Add total event and sequence time rows
+  total_event_time <- round(sum(summary_table$total_time_mins), 1) %>% format(nsmall = 1)
+  sequence_time <- round(as.numeric(difftime(max(df$end), min(df$start), units = "mins")), 1) %>%
+    format(nsmall = 1)
+  
+  summary_table <- summary_table %>%
+    mutate(percent = paste0(round(100 * as.numeric(total_time_mins) / as.numeric(sequence_time), 1), "%"))  %>%
+    mutate(total_time_mins = as.character(total_time_mins))
+  
+  
+  summary_table2 <- data.frame(ROLE = c("Total event time", "Total sequence time"),
+                               total_time_mins = c(total_event_time, sequence_time))
+  
+  
+  summary_table <- bind_rows(
+    summary_table,
+    summary_table2
+  ) %>%
+    mutate_if(is.numeric, ~as.character(.)) %>%
+    mutate_if(is.character, ~tidyr::replace_na(., ""))
+  
+  names(summary_table) <- c("Event", "N", "Total time\n(mins)", "%")
+  
+  # Format table as grob
+  table_grob <- tableGrob(summary_table, rows = NULL, theme = ttheme_default(base_size = 10))
+  
+  # Combine plot and table
+  final_plot <- gantt_plot / table_grob + plot_layout(heights = c(1.5, 1))
+  
+  # Save as PNG (8.5 x 11 inches)
+  ggsave(glue::glue("{subsPath}/Imaging summary - {Sys.Date()}.png"), final_plot, width = 11, height = 8.5, units = "in", dpi = 300)
+  
+}
 
 

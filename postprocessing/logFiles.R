@@ -5,6 +5,12 @@ library(lubridate)
 library(tidyr)
 library(huxtable)
 library(pharmaRTF)
+library(readxl)
+library(ggplot2)
+library(scales)
+library(gridExtra)
+library(grid)
+library(patchwork)
 
 
 debug <- FALSE
@@ -108,6 +114,7 @@ logReport <- logReport %>%
 # Save reshaped version for later
 openxlsx::write.xlsx(logReshaped, glue::glue("{subsPath}/NINA Logs - Reshaped.xlsx"))
 
+logRespahed %>% logChart()
 
 
 # Report on the night's subs ----------------------------------------------

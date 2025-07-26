@@ -62,7 +62,7 @@ tallySubs <- function(src) {
 # Run in ------------------------------------------------------------------
 username <- Sys.getenv("username")
 password <- Sys.getenv("password")
-mbp13 <- Sys.getenv("mbp13")
+mbp13 <- "BRIANC-Macus"
 laptop <- paste0("open 'smb://", username, ":", password, "@", mbp13, "/Astro-SSD'")
 system(laptop) # MBP13 connection
 rm(username, password, mbp13, laptop)
@@ -70,6 +70,6 @@ rm(username, password, mbp13, laptop)
 
 
 # Pick an object path
-src <- "/Volumes/Astro-SSD/transfer/IC5146"
+src <- "/Volumes/Astro-SSD/In Progress/IC5146"
 
 tallySubs(src) 
