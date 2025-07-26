@@ -320,8 +320,14 @@ eventPairs <- function(dat, os = os, machine = machine) {
   
 }
 
-
-pullLogs <- function(path, myDebug = debug, os = os, machine = machine) {
+pullLogs <- function(path, myDebug = debug, os = os, machine = machine, guest = FALSE) {
+  
+  
+  # TEMP for guest
+  if (guest == TRUE) {
+    logFilePath <- path
+  } else {
+  
   
   # Get a list of log files- ideally I want to take the most recent one
   # Maybe create an archive for the the log files after I run this script?
@@ -351,6 +357,7 @@ pullLogs <- function(path, myDebug = debug, os = os, machine = machine) {
     logFilePath <- glue::glue("{path}/log.log")
   }
   
+  }
   # Read file and keep only the time entries
   logfile <- read_lines(logFilePath)
   logfile <- logfile[str_detect(logfile, "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+")]
@@ -406,21 +413,30 @@ devFix <- function(dat, debug = debug, os = os, machine = machine) {
 
 times <- function(dat, os = os, machine = machine) {
   
+  dat$DATE <- as.POSIXlt(format(dat$DATE, "%Y-%m-%d %H:%M:%S"), tz = "America/New_York")
+  dat$DATE <- as.POSIXct(dat$DATE)
+  
+  
+  
   # There's a lot of trash in these logs.  I have an annotation for start/end the sequence.
   # I can use these to subset to only the active sequence section
   starttime <<- dat %>% 
     filter(ROLE == "Annotation" & 
              str_detect(MESSAGE, "START SEQUENCE NOW") == TRUE &
              TYPE == "start") %>% 
-    pull(DATE)
+    pull(DATE) 
+  attr(starttime, "tzone") <- "America/New_York"
   
   endtime <<- dat %>%
     filter(ROLE == "Annotation" & 
-             str_detect(MESSAGE, "END SEQUENCE NOW") == TRUE &
+             str_detect(MESSAGE, "STOP SEQUENCE NOW") == TRUE &
              TYPE == "end") %>% 
     pull(DATE)
+  attr(endtime, "tzone") <- "America/New_York"
   
-  if (length(endtime) == 0) endtime <- as.POSIXct("2025-08-24 05:30:00", tz = "UTC")
+  # API for light/dark times for Atlanta
+  if (length(starttime) == 0) starttime = getDarkTimesAPI()$getDark %>% as.POSIXct() - 86400
+  if (length(endtime) == 0) endtime <- getDarkTimesAPI()$getLight %>% as.POSIXct() 
   
   dat %>%
     filter(DATE >= starttime & DATE <= endtime) %>%
@@ -537,23 +553,40 @@ cleanupLogs <- function(dat, os = os, machine = machine) {
   
 }
 
-
-logChart <- function(df) {
+logChart <- function(df = logReshaped) {
   
-  df <- logReshaped %>%
-    mutate(
-      start = as.POSIXct(start, format = "%Y-%m-%d %H:%M:%OS", tz = "UTC"),
-      end = as.POSIXct(end, format = "%Y-%m-%d %H:%M:%OS", tz = "UTC")
-    ) %>%
+  df <- df %>%
     filter(!is.na(start) & !is.na(end))
+
+  date <- as.Date(df$start[1]) %>% as.character()
   
+  # Add the dark and light times
+  
+  starttime = getDarkTimesAPI()$getDark %>% as.POSIXct() - 86400
+  endtime <- getDarkTimesAPI()$getLight %>% as.POSIXct() 
+  
+  df <- data.frame(EVENT_ID = 0, ROLE = "Astronomical\nDusk-Dawn", start = starttime, end = endtime) %>%
+    bind_rows(df)
+  
+  
+  # Labels
+  x <- "Time (HH:MM:SS)"
+  y <- "Event"
+  title <- glue::glue("NINA Imaging Analysis - {date}")
+  
+  df$start <- as.POSIXct(df$start, tz = "America/New_York")
+  df$end <- as.POSIXct(df$end, tz = "America/New_York")
+  
+  df$start <- as.POSIXct(format(df$start, "%Y-%m-%d %H:%M:%S"), tz = "America/New_York")
+  df$end   <- as.POSIXct(format(df$end,   "%Y-%m-%d %H:%M:%S"), tz = "America/New_York")
+    
   gantt_plot <- ggplot(df, aes(x = start, xend = end, y = ROLE, yend = ROLE)) +
     geom_segment(color = "royalblue", size = 4) +
     scale_x_datetime(
-      labels = scales::time_format("%H:%M:%S"),
+      labels = time_format("%H:%M:%S", tz = "America/New_York"),
       breaks = seq(min(df$start), max(df$end), by = "1 hour")
     ) +
-    labs(x = "Time (HH:MM:SS)", y = "Event", title = "NINA Imaging Analysis") +
+    labs(x = x, y = y, title = title) +
     theme_minimal(base_size = 12) +
     theme(
       axis.text.x = element_text(angle = 45, hjust = 1),
@@ -572,7 +605,10 @@ logChart <- function(df) {
       N = as.numeric(n()),
       total_time_mins = round(sum(duration) / 60, 1),
       .groups = "drop"
-    )
+    ) %>%
+    filter(total_time_mins != 0) %>%
+    filter(ROLE != "Astronomical\nDusk-Dawn") %>%
+    arrange(desc(total_time_mins))
   
   # Add total event and sequence time rows
   total_event_time <- round(sum(summary_table$total_time_mins), 1) %>% format(nsmall = 1)
@@ -584,7 +620,7 @@ logChart <- function(df) {
     mutate(total_time_mins = as.character(total_time_mins))
   
   
-  summary_table2 <- data.frame(ROLE = c("Total event time", "Total sequence time"),
+  summary_table2 <- data.frame(ROLE = c("Total event time", "Total darkness time"),
                                total_time_mins = c(total_event_time, sequence_time))
   
   
@@ -593,19 +629,144 @@ logChart <- function(df) {
     summary_table2
   ) %>%
     mutate_if(is.numeric, ~as.character(.)) %>%
-    mutate_if(is.character, ~tidyr::replace_na(., ""))
+    mutate_if(is.character, ~tidyr::replace_na(., "")) 
   
   names(summary_table) <- c("Event", "N", "Total time\n(mins)", "%")
   
   # Format table as grob
-  table_grob <- tableGrob(summary_table, rows = NULL, theme = ttheme_default(base_size = 10))
+  table_grob <- tableGrob(summary_table, rows = NULL, theme = ttheme_default(base_size = 8))
   
   # Combine plot and table
-  final_plot <- gantt_plot / table_grob + plot_layout(heights = c(1.5, 1))
+  final_plot <- gantt_plot / table_grob + plot_layout(heights = c(1.5, 1.5))
   
   # Save as PNG (8.5 x 11 inches)
   ggsave(glue::glue("{subsPath}/Imaging summary - {Sys.Date()}.png"), final_plot, width = 11, height = 8.5, units = "in", dpi = 300)
   
 }
 
+cleanTime <- function(time) {
+  
+  utc_time_clean <- sub("(\\+|\\-)(\\d{2}):(\\d{2})", "\\1\\2\\3", time)
+  
+  utc_posix <- as.POSIXct(utc_time_clean, format = "%Y-%m-%dT%H:%M:%S%z", tz = "UTC")
+  
+  format(utc_posix, tz = "America/New_York", usetz = TRUE)
+  
+}
+
+getDarkTimesAPI <- function(lat = 33, lng = -84) {
+  require(httr)
+  require(jsonlite)
+
+  date <- "today"  
+  # Create the API URL
+  url <- "https://api.sunrise-sunset.org/json"
+  params <- list(
+    lat = lat,
+    lng = lng,
+    date = Sys.Date(),
+    formatted = 0  # Use 0 for ISO 8601 format (UTC)
+  )
+  
+  # Make the GET request
+  response <- GET(url, query = params)
+  
+  # Parse the content
+  content <- content(response, as = "text", encoding = "UTF-8")
+  json_data <- fromJSON(content)
+  
+  getDark <- json_data$results$nautical_twilight_end   %>% cleanTime() 
+  getLight <- json_data$results$nautical_twilight_begin %>% cleanTime()
+  
+  data.frame(getDark = getDark,
+             getLight = getLight)
+  
+}
+
+logChartDev <- function(df = logReshaped) {
+  
+  df <- df %>%
+    filter(!is.na(start) & !is.na(end))
+  
+  date <- as.Date(df$start[1]) %>% as.character()
+  
+  # Add the dark and light times
+  
+  starttime = getDarkTimesAPI()$getDark %>% as.POSIXct() - 86400
+  endtime <- getDarkTimesAPI()$getLight %>% as.POSIXct() 
+  
+  df <- data.frame(EVENT_ID = 0, ROLE = "Astronomical\nDusk-Dawn", start = starttime, end = endtime) %>%
+    bind_rows(df)
+  
+  
+  # Labels
+  x <- "Time (HH:MM:SS)"
+  y <- "Event"
+  title <- glue::glue("NINA Imaging Analysis - {date}")
+  
+  df$start <- as.POSIXct(df$start, tz = "America/New_York")
+  df$end <- as.POSIXct(df$end, tz = "America/New_York")
+  
+  df$start <- as.POSIXct(format(df$start, "%Y-%m-%d %H:%M:%S"), tz = "America/New_York")
+  df$end   <- as.POSIXct(format(df$end,   "%Y-%m-%d %H:%M:%S"), tz = "America/New_York")
+  
+  gantt_plot <- ggplot(df, aes(x = start, xend = end, y = ROLE, yend = ROLE)) +
+    geom_segment(color = "royalblue", size = 4) +
+    scale_x_datetime(
+      labels = time_format("%H:%M:%S", tz = "America/New_York"),
+      breaks = seq(min(df$start), max(df$end), by = "1 hour")
+    ) +
+    labs(x = x, y = y, title = title) +
+    theme_minimal(base_size = 12) +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      axis.text.y = element_text(size = 8),
+      axis.title.y = element_text(size = 10),
+      plot.margin = margin(5, 5, 5, 5),
+      panel.spacing.y = unit(0.1, "lines")
+    ) +
+    scale_y_discrete(expand = expansion(mult = c(0.02, 0.02)))
+  
+  # Summarize durations
+  summary_table <- df %>%
+    mutate(duration = as.numeric(difftime(end, start, units = "secs"))) %>%
+    group_by(ROLE) %>%
+    summarise(
+      N = as.numeric(n()),
+      total_time_mins = round(sum(duration) / 60, 1),
+      .groups = "drop"
+    ) %>%
+    filter(total_time_mins != 0) %>%
+    filter(ROLE != "Astronomical\nDusk-Dawn") %>%
+    arrange(desc(total_time_mins))
+  
+  # Add total event and sequence time rows
+  total_event_time <- round(sum(summary_table$total_time_mins), 1) %>% format(nsmall = 1)
+  sequence_time <- round(as.numeric(difftime(max(df$end), min(df$start), units = "mins")), 1) %>%
+    format(nsmall = 1)
+  
+  summary_table <- summary_table %>%
+    mutate(percent = paste0(round(100 * as.numeric(total_time_mins) / as.numeric(sequence_time), 1), "%"))  %>%
+    mutate(total_time_mins = as.character(total_time_mins))
+  
+  
+  summary_table2 <- data.frame(ROLE = c("Total event time", "Total darkness time"),
+                               total_time_mins = c(total_event_time, sequence_time))
+  
+  
+  summary_table <- bind_rows(
+    summary_table,
+    summary_table2
+  ) %>%
+    mutate_if(is.numeric, ~as.character(.)) %>%
+    mutate_if(is.character, ~tidyr::replace_na(., "")) 
+  
+  names(summary_table) <- c("Event", "N", "Total time\n(mins)", "%")
+
+  # Return these object
+  list(summary_table = summary_table,
+       plot = gantt_plot) %>%
+    return()
+  
+}
 

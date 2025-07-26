@@ -3,14 +3,15 @@ library(stringr)
 library(readr)
 library(lubridate)
 library(tidyr)
-library(huxtable)
-library(pharmaRTF)
 library(readxl)
 library(ggplot2)
 library(scales)
 library(gridExtra)
 library(grid)
 library(patchwork)
+library(cowplot)
+library(ggplotify)
+
 
 
 debug <- FALSE
@@ -80,9 +81,9 @@ guideFiles %>%
 # Process logs --------------------------------------------------------------------
 
 # creates a clean delimited character vector of the logs
-logfile <- logPath %>% pullLogs()
+#logPath <- file.path("../data/sample logs/chris/20250725-230954-3.1.2.9001.11348-202507.log") %>% normalizePath()
 
-
+logfile <- logPath %>% pullLogs(guest = FALSE)
 
 logReport <- read_delim(
   paste(logfile, collapse = "\n"),
@@ -112,96 +113,85 @@ logReport <- logReport %>%
   mutate_if(is.character, ~tidyr::replace_na(., "")) 
 
 # Save reshaped version for later
-openxlsx::write.xlsx(logReshaped, glue::glue("{subsPath}/NINA Logs - Reshaped.xlsx"))
+#openxlsx::write.xlsx(logReshaped, glue::glue("{subsPath}/NINA Logs - Reshaped.xlsx"))
 
-logRespahed %>% logChart()
+logAnalysis <- logReshaped %>% logChartDev()
 
 
 # Report on the night's subs ----------------------------------------------
-
-# n = 169, 338 minutes
-# This doesn't match with above report
-# it seems that the log doesn't catch some of the "end times" for captures,
-# so there are a bunch with ONLY START
 
 myPaths <- list.dirs(subsPath, full.names = TRUE, recursive = FALSE)
 
 
 subsReport <- lapply(subsPath, processMetaData) %>%
   do.call("rbind", .) %>%
+  ungroup() %>%
   mutate_if(is.numeric, ~as.character(.)) %>%
   mutate_if(is.character, ~tidyr::replace_na(., ""))
 
-cols <- c("Object", "Filter", "Total Subs",
-          "Total Minutes",
+cols <- c("Object", "Filter", "N",
+          "Minutes",
           "HFR\n(mean)", "FWHM\n(mean)",
-          "Guiding RMS\n(mean)")
+          "Guiding\n(mean)")
 names(subsReport) <- cols
 
-# RTF Report --------------------------------------------------------------
-
-report1 <- subsReport %>%
-  huxtable() %>%
-  set_all_padding(0.0) %>%
-  huxtable::set_bold(1, 1:ncol(.)) %>%
-  huxtable::set_top_padding(6) %>%
-  huxtable::set_bottom_padding(6) %>%
-  huxtable::set_top_border(1, 1:ncol(.), 1) %>%
-  huxtable::set_bottom_border(1, 1:ncol(.), 1) %>%
-  huxtable::set_width(1.5) %>%
-  huxtable::set_font("arial") %>%
-  huxtable::set_font_size(10) %>%
-  huxtable::map_align(huxtable::by_cols(from = 2, "center"))
-
-report2 <- logReport %>%
-  mutate_if(is.character, ~ifelse(stringr::str_detect(., "NA"), "", .)) %>%
-  huxtable() %>%
-  set_all_padding(0.0) %>%
-  huxtable::set_bold(1, 1:ncol(.)) %>%
-  huxtable::set_top_padding(6) %>%
-  huxtable::set_bottom_padding(6) %>%
-  huxtable::set_top_border(1, 1:ncol(.), 1) %>%
-  huxtable::set_bottom_border(1, 1:ncol(.), 1) %>%
-  huxtable::set_width(1.5) %>%
-  huxtable::set_font("arial") %>%
-  huxtable::set_font_size(10) %>%
-  huxtable::map_align(huxtable::by_cols(from = 2, "center"))
 
 
+# Create smaller, compact table themes
+compact_theme <- ttheme_default(
+  base_size = 8,
+  core = list(
+    bg_params = list(fill = "white"),
+    padding = unit(c(1, 1), "mm")
+  ),
+  colhead = list(bg_params = list(fill = "white")),
+  rowhead = list(bg_params = list(fill = "white"))
+)
 
+rownames(logAnalysis$summary_table) <- NULL
+table1_grob <- logAnalysis$summary_table %>% tableGrob(rows = NULL, theme = compact_theme)
+table2_grob <- subsReport %>% tableGrob(rows = NULL, theme = compact_theme)
 
-# Export the table --------------------------------------------------------
-telescope <- subsPath %>% basename()
-camera <- subsPath %>% dirname() %>% basename()
-title1 <- glue::glue("Imaging report for {Sys.Date() - 1}")
-title2 <- glue::glue("{telescope} --- {camera}")
+# Wrap each table in a ggplot and set the background to white
+table1_plot <- as.ggplot(table1_grob) +
+  theme(
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA)
+  )
 
-# Create the RTF document with both tables
-doc1 <- report1 %>%
-  rtf_doc(header_rows = 1) %>%
-  add_titles(hf_line(title1, bold = TRUE, font = "arial", font_size = 12)) %>%
-  add_titles(hf_line(title2, bold = TRUE, font = "arial", font_size = 12)) %>%
-  add_titles(hf_line(""))
+table2_plot <- as.ggplot(table2_grob) +
+  theme(
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA)
+  )
 
-pagesize(doc1) <- c(height = 8.5, width = 11)
-margins(doc1) <- c(top = 0.25, bottom = 0.25, left = 0.25, right = 0.25)
+# Combine tables side by side
+tables_combined <- plot_grid(
+  table1_plot, table2_plot,
+  nrow = 1,
+  align = "h",
+  rel_widths = c(0.75, 1.25)
+)
 
+# Final combined layout with Gantt plot on top
+final_plot <- plot_grid(
+  gantt_plot,
+  tables_combined,
+  ncol = 1,
+  rel_heights = c(1.5, 1),
+  align = "v"
+)
 
-
-doc2 <- report2 %>%
-  rtf_doc(header_rows = 1) %>%
-  add_titles(hf_line(title1, bold = TRUE, font = "arial", font_size = 12)) %>%
-  add_titles(hf_line(title2, bold = TRUE, font = "arial", font_size = 12)) %>%
-  add_titles(hf_line(""))
-
-pagesize(doc2) <- c(height = 8.5, width = 11)
-margins(doc2) <- c(top = 0.25, bottom = 0.25, left = 0.25, right = 0.25)
-
-write_rtf(doc1, file = glue::glue("{subsPath}/NINA Subs report - {Sys.Date()-1}.rtf"))
-write_rtf(doc2, file = glue::glue("{subsPath}/NINA Logs report - {Sys.Date()-1}.rtf"))
-
-# cleanLogFolder(logPath)
-
+# Export with white background
+ggsave(
+  glue::glue("{subsPath}/Imaging summary - {Sys.Date()}.png"),
+  final_plot,
+  width = 11,
+  height = 8.5,
+  units = "in",
+  dpi = 300,
+  bg = "white"  # critical for white output
+)
 
 
 
