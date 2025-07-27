@@ -295,22 +295,27 @@ renameFlats <- function(flatsList) {
 
 # Log files
 
-eventPairs <- function(dat, os = os, machine = machine) {
+eventPairs <- function(dat) {
   
   starts <- dat %>%
-    filter(str_detect(MESSAGE, "^Starting Category:")) %>%
+    filter(str_detect(MESSAGE, "^Starting Category:") |
+           MESSAGE == "Meridian Flip - Initializing Meridian Flip.") %>%
     mutate(
       ROLE = str_match(MESSAGE, "Item: ([^,]+)")[,2],
       EVENT_ID = row_number(),  # temporary unique ID
       TYPE = "start"
-    )
+    ) %>%
+    mutate(ROLE = ifelse(is.na(ROLE) & MESSAGE == "Meridian Flip - Initializing Meridian Flip.", "MeridianFlip", ROLE))
   
   finishes <- dat %>%
-    filter(str_detect(MESSAGE, "^Finishing Category:")) %>%
+    filter(str_detect(MESSAGE, "^Finishing Category:") |
+            MESSAGE == "Meridian Flip - Exiting meridian flip") %>%
     mutate(
       ROLE = str_match(MESSAGE, "Item: ([^,]+)")[,2],
       TYPE = "end"
-    )
+    ) %>%
+    mutate(ROLE = ifelse(is.na(ROLE) & MESSAGE == "Meridian Flip - Exiting meridian flip", "MeridianFlip", ROLE))
+  
   
   bind_rows(starts, finishes) %>%
     arrange(DATE) %>%
@@ -372,50 +377,13 @@ pullLogs <- function(path, myDebug = debug, os = os, machine = machine, guest = 
   return(logfile)
 }
 
-devFix <- function(dat, debug = debug, os = os, machine = machine) {
-  
-  # The dev logs I have need to be editted a bit to match
-  # the standardized versions from my current sequence
-  # I want to cut out prep time or time that the application is idle.
-  # the start and stop of the actual sequence I want to review
-  # are flagged with annotations
-  
-  if(debug == TRUE) {
-    start <- dat[148:149,]  # "WaitforTIme" - will just replace
-    
-    
-    foo <- dat %>%
-      filter(ROLE == "Annotation" & 
-               str_detect(MESSAGE, "This group here will be executed in parallel.") == TRUE) 
-    
-    foo <- foo %>%
-      mutate(MESSAGE = stringr::str_replace(MESSAGE,
-                                            "This group here will be executed in parallel.",
-                                            "START SEQUENCE NOW")) 
-    start$MESSAGE <- foo$MESSAGE
-    start$ROLE <- "Annotation"
-    start$DATE[1] <- start$DATE[2] # simulate them as equal
-    dat[148:149,] <- start
-    
-    end <- dat[1710:1711,]
-    
-    foo <- foo %>%
-      mutate(MESSAGE = stringr::str_replace(MESSAGE,
-                                            "START SEQUENCE NOW",
-                                            "END SEQUENCE NOW"))
-    end$MESSAGE <- foo$MESSAGE
-    end$ROLE <- "Annotation"
-    dat[1710:1711,] <- end
-    
-  }
-  return(dat)
-}
-
 times <- function(dat, os = os, machine = machine) {
   
   dat$DATE <- as.POSIXlt(format(dat$DATE, "%Y-%m-%d %H:%M:%S"), tz = "America/New_York")
   dat$DATE <- as.POSIXct(dat$DATE)
   
+  
+  thisNight <<- as.Date(dat$DATE[1])
   
   
   # There's a lot of trash in these logs.  I have an annotation for start/end the sequence.
@@ -445,6 +413,32 @@ times <- function(dat, os = os, machine = machine) {
     mutate(TIME = ifelse(TYPE == "end", difftime(DATE, lag(DATE), units = "secs"), 0)) %>%
     ungroup()
   
+}
+
+addSubsToSequence <- function(path = subsPath) {
+  
+  dirs <- list.dirs(path, recursive = TRUE) %>%
+    setdiff(path) %>%
+    setdiff(list.dirs(path, recursive = FALSE))
+  
+ foo <-  lapply(dirs, function(x) {
+    readr::read_csv(glue::glue("{x}/ImageMetaData.csv"))
+  }) %>%
+    do.call("rbind", .) %>%
+    mutate(File = basename(FilePath)) %>%
+    filter(File %in% basename(list.files(path, pattern = "fit",  recursive = TRUE))) %>%
+    arrange((ExposureStart)) %>%
+    mutate(ROLE = basename(dirname(dirname(FilePath)))) %>%
+    group_by(ROLE) %>%
+    summarize(start = min(ExposureStart, na.rm = TRUE),
+              end = max(ExposureStart, na.rm = TRUE)) %>%
+    ungroup() %>%
+    mutate(start = as.POSIXct(as.character(start), tz = "America/New_York")) %>%
+    mutate(end = as.POSIXct(as.character(end), tz = "America/New_York"))
+ 
+
+  
+ return(foo)
 }
 
 reportGen <- function(dat, endtime = endtime, starttime = starttime, os = os, machine = machine) {
@@ -550,7 +544,6 @@ cleanupLogs <- function(dat, os = os, machine = machine) {
     )) %>%
     mutate(ROLE = ifelse(ROLE == "TakeExposure" & stringr::str_detect(MESSAGE, "FLAT") == TRUE, "Flats", ROLE))
   
-  
 }
 
 logChart <- function(df = logReshaped) {
@@ -565,10 +558,20 @@ logChart <- function(df = logReshaped) {
   starttime = getDarkTimesAPI()$getDark %>% as.POSIXct() - 86400
   endtime <- getDarkTimesAPI()$getLight %>% as.POSIXct() 
   
+  allRoles <- allRoles %>% sort()
+  objects <- setdiff(df$ROLE, allRoles)
+  levels <- c(allRoles, objects, "Astronomical\nDusk-Dawn")
+  
+  
   df <- data.frame(EVENT_ID = 0, ROLE = "Astronomical\nDusk-Dawn", start = starttime, end = endtime) %>%
-    bind_rows(df)
+    bind_rows(df) %>%
+    mutate(ROLE = factor(ROLE, levels) %>% droplevels())
+    
+  # Color code my events
+  df$color <- ifelse(df$ROLE == "Astronomical\nDusk-Dawn", "black",
+                     ifelse(df$ROLE %in% objects, "red", "royalblue"))
   
-  
+
   # Labels
   x <- "Time (HH:MM:SS)"
   y <- "Event"
@@ -580,8 +583,10 @@ logChart <- function(df = logReshaped) {
   df$start <- as.POSIXct(format(df$start, "%Y-%m-%d %H:%M:%S"), tz = "America/New_York")
   df$end   <- as.POSIXct(format(df$end,   "%Y-%m-%d %H:%M:%S"), tz = "America/New_York")
     
+  
   gantt_plot <- ggplot(df, aes(x = start, xend = end, y = ROLE, yend = ROLE)) +
-    geom_segment(color = "royalblue", size = 4) +
+    geom_segment(aes(color = color), size = 4, show.legend = FALSE) +
+    scale_color_identity() +
     scale_x_datetime(
       labels = time_format("%H:%M:%S", tz = "America/New_York"),
       breaks = seq(min(df$start), max(df$end), by = "1 hour")
@@ -654,29 +659,38 @@ cleanTime <- function(time) {
   
 }
 
-getDarkTimesAPI <- function(lat = 33, lng = -84) {
+getDarkTimesAPI <- function(lat = 33, lng = -84, date = thisNight) {
   require(httr)
   require(jsonlite)
 
-  date <- "today"  
   # Create the API URL
   url <- "https://api.sunrise-sunset.org/json"
-  params <- list(
+  params1 <- list(
     lat = lat,
     lng = lng,
-    date = Sys.Date(),
+    date = thisNight,
+    formatted = 0  # Use 0 for ISO 8601 format (UTC)
+  )
+  params2 <- list(
+    lat = lat,
+    lng = lng,
+    date = thisNight + 1,
     formatted = 0  # Use 0 for ISO 8601 format (UTC)
   )
   
   # Make the GET request
-  response <- GET(url, query = params)
+  response1 <- GET(url, query = params1)
+  response2 <- GET(url, query = params2)
   
   # Parse the content
-  content <- content(response, as = "text", encoding = "UTF-8")
-  json_data <- fromJSON(content)
+  content1 <- content(response1, as = "text", encoding = "UTF-8")
+  json_data1 <- fromJSON(content1)
   
-  getDark <- json_data$results$nautical_twilight_end   %>% cleanTime() 
-  getLight <- json_data$results$nautical_twilight_begin %>% cleanTime()
+  content2 <- content(response2, as = "text", encoding = "UTF-8")
+  json_data2 <- fromJSON(content2)
+  
+  getDark <- json_data2$results$nautical_twilight_end   %>% cleanTime() 
+  getLight <- json_data2$results$nautical_twilight_begin %>% cleanTime()
   
   data.frame(getDark = getDark,
              getLight = getLight)
@@ -695,8 +709,18 @@ logChartDev <- function(df = logReshaped) {
   starttime = getDarkTimesAPI()$getDark %>% as.POSIXct() - 86400
   endtime <- getDarkTimesAPI()$getLight %>% as.POSIXct() 
   
+  allRoles <- allRoles %>% sort()
+  objects <- setdiff(df$ROLE, allRoles)
+  levels <- c(allRoles, objects, "Astronomical\nDusk-Dawn")
+  
+  
   df <- data.frame(EVENT_ID = 0, ROLE = "Astronomical\nDusk-Dawn", start = starttime, end = endtime) %>%
-    bind_rows(df)
+    bind_rows(df) %>%
+    mutate(ROLE = factor(ROLE, levels) %>% droplevels())
+  
+  # Color code my events
+  df$color <- ifelse(df$ROLE == "Astronomical\nDusk-Dawn", "black",
+                     ifelse(df$ROLE %in% objects, "red", "royalblue"))
   
   
   # Labels
@@ -711,7 +735,8 @@ logChartDev <- function(df = logReshaped) {
   df$end   <- as.POSIXct(format(df$end,   "%Y-%m-%d %H:%M:%S"), tz = "America/New_York")
   
   gantt_plot <- ggplot(df, aes(x = start, xend = end, y = ROLE, yend = ROLE)) +
-    geom_segment(color = "royalblue", size = 4) +
+    geom_segment(aes(color = color), size = 4, show.legend = FALSE) +
+    scale_color_identity() +
     scale_x_datetime(
       labels = time_format("%H:%M:%S", tz = "America/New_York"),
       breaks = seq(min(df$start), max(df$end), by = "1 hour")
@@ -729,6 +754,7 @@ logChartDev <- function(df = logReshaped) {
   
   # Summarize durations
   summary_table <- df %>%
+    filter(!ROLE %in% objects) %>%
     mutate(duration = as.numeric(difftime(end, start, units = "secs"))) %>%
     group_by(ROLE) %>%
     summarise(

@@ -78,10 +78,12 @@ guideFiles %>%
 }
 
 
+
+
 # Process logs --------------------------------------------------------------------
 
 # creates a clean delimited character vector of the logs
-#logPath <- file.path("../data/sample logs/chris/20250725-230954-3.1.2.9001.11348-202507.log") %>% normalizePath()
+#logPath <- file.path("../data/sample logs/chris/20250726-210820-3.1.2.9001.11544-202507.log") %>% normalizePath()
 
 logfile <- logPath %>% pullLogs(guest = FALSE)
 
@@ -92,11 +94,18 @@ logReport <- read_delim(
   trim_ws = TRUE,
   col_types = cols(.default = "c")
 )  %>%
+  mutate(index = row_number()) %>%
   mutate(DATE = ymd_hms(DATE, tz = "UTC", quiet = TRUE)) %>%
   eventPairs() %>%
   cleanupLogs() %>%
-  devFix(debug) %>%
+  filter(!is.na(EVENT_ID)) %>%
+  filter(!is.na(DATE)) %>%
   times()
+
+allRoles <- logReport %>%
+  distinct(ROLE) %>%
+  pull(ROLE) %>%
+  as.character()
 
 logReshaped <- logReport %>%
   select(ROLE, EVENT_ID, TYPE, DATE) %>%
@@ -105,7 +114,8 @@ logReshaped <- logReport %>%
     names_from  = TYPE,
     values_from = DATE
   ) %>%
-  filter(!is.na(start) & !is.na(end))
+  filter(!is.na(start) & !is.na(end)) %>%
+  bind_rows(addSubsToSequence())
 
 logReport <- logReport %>%
   reportGen() %>%
@@ -116,6 +126,8 @@ logReport <- logReport %>%
 #openxlsx::write.xlsx(logReshaped, glue::glue("{subsPath}/NINA Logs - Reshaped.xlsx"))
 
 logAnalysis <- logReshaped %>% logChartDev()
+chart <- logAnalysis$plot
+
 
 
 # Report on the night's subs ----------------------------------------------
@@ -167,7 +179,8 @@ table2_plot <- as.ggplot(table2_grob) +
 
 # Combine tables side by side
 tables_combined <- plot_grid(
-  table1_plot, table2_plot,
+  table1_plot, 
+  table2_plot,
   nrow = 1,
   align = "h",
   rel_widths = c(0.75, 1.25)
@@ -175,7 +188,7 @@ tables_combined <- plot_grid(
 
 # Final combined layout with Gantt plot on top
 final_plot <- plot_grid(
-  gantt_plot,
+  chart,
   tables_combined,
   ncol = 1,
   rel_heights = c(1.5, 1),
