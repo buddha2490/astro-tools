@@ -734,24 +734,58 @@ logChartDev <- function(df = logReshaped) {
   df$start <- as.POSIXct(format(df$start, "%Y-%m-%d %H:%M:%S"), tz = "America/New_York")
   df$end   <- as.POSIXct(format(df$end,   "%Y-%m-%d %H:%M:%S"), tz = "America/New_York")
   
-  gantt_plot <- ggplot(df, aes(x = start, xend = end, y = ROLE, yend = ROLE)) +
-    geom_segment(aes(color = color), size = 4, show.legend = FALSE) +
-    scale_color_identity() +
-    scale_x_datetime(
-      labels = time_format("%H:%M:%S", tz = "America/New_York"),
-      breaks = seq(min(df$start), max(df$end), by = "1 hour")
-    ) +
-    labs(x = x, y = y, title = title) +
-    theme_minimal(base_size = 12) +
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1),
-      axis.text.y = element_text(size = 8),
-      axis.title.y = element_text(size = 10),
-      plot.margin = margin(5, 5, 5, 5),
-      panel.spacing.y = unit(0.1, "lines")
-    ) +
-    scale_y_discrete(expand = expansion(mult = c(0.02, 0.02)))
+  df <- df %>%
+    mutate(
+      ROLE = factor(ROLE, levels = unique(ROLE)),
+      ROLE = fct_rev(ROLE),
+      # compute midpoint and duration in seconds for geom_tile
+      mid = start + (end - start) / 2,
+      dur = as.numeric(difftime(end, start, units = "secs"))
+    )
   
+  
+  gantt_plot <- ggplot(df, aes(x = mid, y = ROLE)) +
+    # rectangles from start→end
+    geom_tile(aes(width = dur, height = 0.6, fill = color),
+              color = NA,       # no border
+              show.legend = FALSE) +
+    scale_fill_identity() +
+    
+    # subtle vertical gridlines at each hour
+    geom_vline(
+      xintercept = seq(min(df$start), max(df$end), by = "1 hour"),
+      color      = "gray90",
+      size       = 0.5
+    ) +
+    
+    # clean time axis
+    scale_x_datetime(
+      date_breaks = "1 hour",
+      date_labels = "%H:%M",
+      expand      = c(0, 0)
+    ) +
+    
+    # labels
+    labs(
+      title    = glue("NINA Imaging Analysis — {date}"),
+      subtitle = "Gantt‑style timeline of imaging events",
+      x        = "Time (HH:MM)",
+      y        = NULL
+    ) +
+    
+    # polished theme
+    theme_minimal(base_size = 14) +
+    theme(
+      plot.title         = element_text(face = "bold", size = 16, hjust = 0.5),
+      plot.subtitle      = element_text(size = 12, hjust = 0.5, margin = margin(b = 10)),
+      axis.text.x        = element_text(angle = 45, hjust = 1, vjust = 1),
+      axis.text.y        = element_text(size = 10, face = "bold"),
+      panel.grid.major.y = element_blank(),
+      panel.grid.minor   = element_blank(),
+      panel.background   = element_rect(fill = "gray98", color = NA),
+      plot.background    = element_rect(fill = "white",  color = NA),
+      plot.margin        = margin(10, 10, 10, 10)
+    )
   # Summarize durations
   summary_table <- df %>%
     filter(!ROLE %in% objects) %>%
