@@ -241,7 +241,7 @@ logChartDev <- function(dat) {
     format(nsmall = 1)
   
   summary_table <- summary_table %>%
-    mutate(percent = paste0(round(100 * as.numeric(total_time_mins) / as.numeric(sequence_time), 1), "%"))  %>%
+    mutate(percent = paste0(round(100 * as.numeric(total_time_mins) / as.numeric(total_event_time), 1), "%"))  %>%
     mutate(total_time_mins = as.character(total_time_mins))
   
   

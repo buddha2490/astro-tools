@@ -548,109 +548,6 @@ cleanupLogs <- function(dat, os = os, machine = machine) {
   
 }
 
-logChart <- function(df = logReshaped) {
-  
-  df <- df %>%
-    filter(!is.na(start) & !is.na(end))
-
-  date <- as.Date(df$start[1]) %>% as.character()
-  
-  # Add the dark and light times
-  
-  starttime = getDarkTimesAPI()$getDark %>% as.POSIXct() - 86400
-  endtime <- getDarkTimesAPI()$getLight %>% as.POSIXct() 
-  
-  allRoles <- allRoles %>% sort()
-  objects <- setdiff(df$ROLE, allRoles)
-  levels <- c(allRoles, objects, "Astronomical\nDusk-Dawn")
-  
-  
-  df <- data.frame(EVENT_ID = 0, ROLE = "Astronomical\nDusk-Dawn", start = starttime, end = endtime) %>%
-    bind_rows(df) %>%
-    mutate(ROLE = factor(ROLE, levels) %>% droplevels())
-    
-  # Color code my events
-  df$color <- ifelse(df$ROLE == "Astronomical\nDusk-Dawn", "black",
-                     ifelse(df$ROLE %in% objects, "red", "royalblue"))
-  
-
-  # Labels
-  x <- "Time (HH:MM:SS)"
-  y <- "Event"
-  title <- glue::glue("NINA Imaging Analysis - {date}")
-  
-  df$start <- as.POSIXct(df$start, tz = "America/New_York")
-  df$end <- as.POSIXct(df$end, tz = "America/New_York")
-  
-  df$start <- as.POSIXct(format(df$start, "%Y-%m-%d %H:%M:%S"), tz = "America/New_York")
-  df$end   <- as.POSIXct(format(df$end,   "%Y-%m-%d %H:%M:%S"), tz = "America/New_York")
-    
-  
-  gantt_plot <- ggplot(df, aes(x = start, xend = end, y = ROLE, yend = ROLE)) +
-    geom_segment(aes(color = color), size = 4, show.legend = FALSE) +
-    scale_color_identity() +
-    scale_x_datetime(
-      labels = time_format("%H:%M:%S", tz = "America/New_York"),
-      breaks = seq(min(df$start), max(df$end), by = "1 hour")
-    ) +
-    labs(x = x, y = y, title = title) +
-    theme_minimal(base_size = 12) +
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1),
-      axis.text.y = element_text(size = 8),
-      axis.title.y = element_text(size = 10),
-      plot.margin = margin(5, 5, 5, 5),
-      panel.spacing.y = unit(0.1, "lines")
-    ) +
-    scale_y_discrete(expand = expansion(mult = c(0.02, 0.02)))
-  
-  # Summarize durations
-  summary_table <- df %>%
-    mutate(duration = as.numeric(difftime(end, start, units = "secs"))) %>%
-    group_by(ROLE) %>%
-    summarise(
-      N = as.numeric(n()),
-      total_time_mins = round(sum(duration) / 60, 1),
-      .groups = "drop"
-    ) %>%
-    filter(total_time_mins != 0) %>%
-    filter(ROLE != "Astronomical\nDusk-Dawn") %>%
-    arrange(desc(total_time_mins))
-  
-  # Add total event and sequence time rows
-  total_event_time <- round(sum(summary_table$total_time_mins), 1) %>% format(nsmall = 1)
-  sequence_time <- round(as.numeric(difftime(max(df$end), min(df$start), units = "mins")), 1) %>%
-    format(nsmall = 1)
-  
-  summary_table <- summary_table %>%
-    mutate(percent = paste0(round(100 * as.numeric(total_time_mins) / as.numeric(sequence_time), 1), "%"))  %>%
-    mutate(total_time_mins = as.character(total_time_mins))
-  
-  
-  summary_table2 <- data.frame(ROLE = c("Total event time", "Total darkness time"),
-                               total_time_mins = c(total_event_time, sequence_time))
-  
-  
-  summary_table <- bind_rows(
-    summary_table,
-    summary_table2
-  ) %>%
-    mutate_if(is.numeric, ~as.character(.)) %>%
-    mutate_if(is.character, ~tidyr::replace_na(., "")) 
-  
-  names(summary_table) <- c("Event", "N", "Total time\n(mins)", "%")
-  
-  # Format table as grob
-  table_grob <- tableGrob(summary_table, rows = NULL, theme = ttheme_default(base_size = 8))
-  
-  # Combine plot and table
-  final_plot <- gantt_plot / table_grob + plot_layout(heights = c(1.5, 1.5))
-  
-  # Save as PNG (8.5 x 11 inches)
-  ggsave(glue::glue("{subsPath}/Imaging summary - {Sys.Date()}.png"), final_plot, width = 11, height = 8.5, units = "in", dpi = 300)
-  
-}
-
 cleanTime <- function(time) {
   
   utc_time_clean <- sub("(\\+|\\-)(\\d{2}):(\\d{2})", "\\1\\2\\3", time)
@@ -808,13 +705,12 @@ logChartDev <- function(df = logReshaped) {
     format(nsmall = 1)
   
   summary_table <- summary_table %>%
-    mutate(percent = paste0(round(100 * as.numeric(total_time_mins) / as.numeric(sequence_time), 1), "%"))  %>%
+    mutate(percent = paste0(round(100 * as.numeric(total_time_mins) / as.numeric(total_event_time), 1), "%"))  %>%
     mutate(total_time_mins = as.character(total_time_mins))
   
   
   summary_table2 <- data.frame(ROLE = c("Total event time", "Total darkness time"),
                                total_time_mins = c(total_event_time, sequence_time))
-  
   
   summary_table <- bind_rows(
     summary_table,
