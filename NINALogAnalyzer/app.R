@@ -102,6 +102,7 @@ server <- function(input, output, session) {
     file.copy(input$logfileInput$datapath, dest, overwrite = TRUE)
     
     raw_lines <- pullLogs(path = "www")
+    
     dat <- read_delim(
       paste(raw_lines, collapse = "\n"),
       delim     = "|",
@@ -120,17 +121,19 @@ server <- function(input, output, session) {
     
     df_wide <- dat %>%
       select(ROLE, EVENT_ID, TYPE, DATE) %>%
+      mutate(DATE = as.POSIXct(DATE, tz = "America/New_York")) %>%
+      ungroup() %>%
       pivot_wider(
         id_cols     = c(EVENT_ID, ROLE),
         names_from  = TYPE,
-        values_from = DATE
+        values_from = DATE,
+        values_fn = mean
       ) %>%
-      filter(!is.na(start) & !is.na(end))
+      filter(!is.na(start) & !is.na(end)) 
     
     allRoles <<- df_wide %>% distinct(ROLE) %>% pull(ROLE) %>% as.character()
     df_wide
   })
-  
   # --- Step 2: Time‐range slider ---
   output$sliderUI <- renderUI({
     df <- rawParsed()

@@ -1,0 +1,12 @@
+name: NINALogAnalyzer
+title: NINALogAnalyzer
+username: bcarter2490
+account: bcarter2490
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 15133279
+bundleId: 10688726
+url: https://bcarter2490.shinyapps.io/NINALogAnalyzer/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
