@@ -419,7 +419,9 @@ addSubsToSequence <- function(path = subsPath) {
   
   dirs <- list.dirs(path, recursive = TRUE) %>%
     setdiff(path) %>%
-    setdiff(list.dirs(path, recursive = FALSE))
+    setdiff(list.dirs(path, recursive = FALSE)) %>%
+    stringr::str_remove("/checkFits") %>%
+    unique()
   
  foo <-  lapply(dirs, function(x) {
     readr::read_csv(glue::glue("{x}/ImageMetaData.csv"))
