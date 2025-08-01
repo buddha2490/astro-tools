@@ -8,11 +8,12 @@
 
 
 
+install.packages(c("RPostgres"))
 
 
 
 library(DBI)
-library(PostgreSQL)
+library(RPostgreSQL)
 
 
 username <- Sys.getenv("username")
@@ -27,7 +28,7 @@ foo <- dbConnect(dbDriver("PostgreSQL"),
                  sslmode = "require")
 con <- DBI::dbConnect(
   RPostgres::Postgres(),
-  host     = "bdcpi.local",   # or "bdcpi.local"
+  host     = "bdcpi",   # or "bdcpi.local"
   port     = 5432,
   dbname   = "briancarter",          # don't leave dbname commented out
   user     = "briancarter",
@@ -35,6 +36,8 @@ con <- DBI::dbConnect(
   sslmode  = "require"         # matches a hostssl policy; remove if you allow non-SSL
 )
 
+
+dbListTables(con)
 
 dbListTables(con)
 dbCreateTable(con, "astroDB", data.frame())
