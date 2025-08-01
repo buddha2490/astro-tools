@@ -1,0 +1,346 @@
+========== 2025-08-01 15:33:37 backup start ==========
+========== 2025-08-01 15:40:14 backup start ==========
+2025/08/01 15:40:15 [45337] building file list
+2025/08/01 15:40:15 [45337] .d..t....... ./
+2025/08/01 15:40:15 [45337] >f++++++++++ .DS_Store
+2025/08/01 15:40:17 [45337] cd++++++++++ .Spotlight-V100/
+2025/08/01 15:40:17 [45337] >f++++++++++ .Spotlight-V100/VolumeConfiguration.plist
+2025/08/01 15:40:17 [45337] cd++++++++++ .Spotlight-V100/Store-V2/
+2025/08/01 15:40:17 [45337] cd++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/
+2025/08/01 15:40:17 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/.store.db
+2025/08/01 15:40:17 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.directoryStoreFile
+2025/08/01 15:40:17 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.directoryStoreFile.shadow
+2025/08/01 15:40:17 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.indexArrays
+2025/08/01 15:40:17 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.indexBigDates
+2025/08/01 15:40:17 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.indexCompactDirectory
+2025/08/01 15:40:17 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.indexDirectory
+2025/08/01 15:40:17 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.indexGroups
+2025/08/01 15:40:17 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.indexHead
+2025/08/01 15:40:17 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.indexId
+2025/08/01 15:40:17 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.indexIds
+2025/08/01 15:40:17 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.indexPositions
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.indexPostings
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.indexUpdates
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.ivf-vector-indexes
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.shadowIndexGroups
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/0.shadowIndexHead
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/Cab.created
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/Cab.modified
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/CrystalGlow.created
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/Glow.created
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/Lion.created
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-1.map.buckets
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-1.map.data
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-1.map.header
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-1.map.header.shadow
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-1.map.offsets
+2025/08/01 15:40:18 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-2.map.buckets
+2025/08/01 15:40:19 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-2.map.data
+2025/08/01 15:40:19 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-2.map.header
+2025/08/01 15:40:19 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-2.map.header.shadow
+2025/08/01 15:40:19 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-2.map.offsets
+2025/08/01 15:40:19 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-3.map.buckets
+2025/08/01 15:40:19 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-3.map.data
+2025/08/01 15:40:19 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-3.map.header
+2025/08/01 15:40:19 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-3.map.header.shadow
+2025/08/01 15:40:19 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-3.map.offsets
+2025/08/01 15:40:19 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-4.map.buckets
+2025/08/01 15:40:19 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-4.map.data
+2025/08/01 15:40:19 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-4.map.header
+2025/08/01 15:40:19 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-4.map.header.shadow
+2025/08/01 15:40:20 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-4.map.offsets
+2025/08/01 15:40:20 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-5.map.buckets
+2025/08/01 15:40:20 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-5.map.data
+2025/08/01 15:40:20 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-5.map.header
+2025/08/01 15:40:20 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-5.map.header.shadow
+2025/08/01 15:40:20 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-5.map.offsets
+2025/08/01 15:40:20 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-6.map.buckets
+2025/08/01 15:40:20 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-6.map.header
+2025/08/01 15:40:20 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-6.map.header.shadow
+2025/08/01 15:40:20 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/dbStr-6.map.offsets
+2025/08/01 15:40:20 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/errorFile
+2025/08/01 15:40:20 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/indexState
+2025/08/01 15:40:20 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/journalAttr.0
+2025/08/01 15:40:20 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/journalAttr.1
+2025/08/01 15:40:20 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/journalExclusion
+2025/08/01 15:40:21 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.directoryStoreFile
+2025/08/01 15:40:21 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.directoryStoreFile.shadow
+2025/08/01 15:40:21 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.indexArrays
+2025/08/01 15:40:21 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.indexBigDates
+2025/08/01 15:40:21 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.indexCompactDirectory
+2025/08/01 15:40:21 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.indexDirectory
+2025/08/01 15:40:21 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.indexGroups
+2025/08/01 15:40:21 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.indexHead
+2025/08/01 15:40:21 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.indexId
+2025/08/01 15:40:21 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.indexIds
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.indexPositionTable
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.indexPositions
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.indexPostings
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.indexTermIds
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.indexUpdates
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.ivf-vector-indexes
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.shadowIndexArrays
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.shadowIndexCompactDirectory
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.shadowIndexDirectory
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.shadowIndexGroups
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.shadowIndexHead
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.shadowIndexPositionTable
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/live.0.shadowIndexTermIds
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/mds64-crash-state-reverse-store-v2
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/mds64-crash-state-v2
+2025/08/01 15:40:22 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/permStore
+2025/08/01 15:40:23 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/psid.db
+2025/08/01 15:40:24 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/reverseDirectoryStore
+2025/08/01 15:40:24 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/reverseDirectoryStore.shadow
+2025/08/01 15:40:24 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/reverseStore.updates
+2025/08/01 15:40:24 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/shutdown_time
+2025/08/01 15:40:24 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/store.db
+2025/08/01 15:40:24 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/store.updates
+2025/08/01 15:40:24 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/store_generation
+2025/08/01 15:40:24 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/tmp.Cab
+2025/08/01 15:40:24 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/tmp.Glow
+2025/08/01 15:40:24 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/tmp.Lion
+2025/08/01 15:40:24 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/tmp.Star
+2025/08/01 15:40:24 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/tmp.spotlight.loc
+2025/08/01 15:40:24 [45337] >f++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/tmp.spotlight.state
+2025/08/01 15:40:24 [45337] cd++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/journals.assisted_import_post/
+2025/08/01 15:40:24 [45337] cd++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/journals.assisted_import_pre/
+2025/08/01 15:40:24 [45337] cd++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/journals.corespotlight/
+2025/08/01 15:40:24 [45337] cd++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/journals.health_check/
+2025/08/01 15:40:24 [45337] cd++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/journals.live/
+2025/08/01 15:40:24 [45337] cd++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/journals.live_priority/
+2025/08/01 15:40:24 [45337] cd++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/journals.live_system/
+2025/08/01 15:40:24 [45337] cd++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/journals.live_user/
+2025/08/01 15:40:24 [45337] cd++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/journals.migration/
+2025/08/01 15:40:24 [45337] cd++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/journals.migration_secondchance/
+2025/08/01 15:40:24 [45337] cd++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/journals.repair/
+2025/08/01 15:40:24 [45337] cd++++++++++ .Spotlight-V100/Store-V2/497838D7-046F-4A4C-9477-6C655CA4DF83/journals.scan/
+2025/08/01 15:40:24 [45337] cd++++++++++ .TemporaryItems/
+2025/08/01 15:40:24 [45337] cd++++++++++ .TemporaryItems/folders.501/
+2025/08/01 15:40:24 [45337] cd++++++++++ .TemporaryItems/folders.501/TemporaryItems/
+2025/08/01 15:40:24 [45337] cd++++++++++ .Trashes/
+2025/08/01 15:40:24 [45337] >f++++++++++ .Trashes/._501
+2025/08/01 15:40:24 [45337] cd++++++++++ .Trashes/501/
+2025/08/01 15:40:24 [45337] cd++++++++++ .fseventsd/
+2025/08/01 15:40:24 [45337] >f++++++++++ .fseventsd/fseventsd-uuid
+2025/08/01 15:40:24 [45337] cd++++++++++ ASI2600MC/
+2025/08/01 15:40:24 [45337] >f++++++++++ ASI2600MC/.DS_Store
+2025/08/01 15:40:24 [45337] >f++++++++++ ASI2600MC/._.DS_Store
+2025/08/01 15:40:24 [45337] >f++++++++++ ASI2600MC/._Galaxies
+2025/08/01 15:40:24 [45337] >f++++++++++ ASI2600MC/._Messier Globs
+2025/08/01 15:40:24 [45337] >f++++++++++ ASI2600MC/._Messier Objects
+2025/08/01 15:40:24 [45337] >f++++++++++ ASI2600MC/._Nebulae
+2025/08/01 15:40:24 [45337] cd++++++++++ ASI2600MC/Dark Library/
+2025/08/01 15:40:24 [45337] >f++++++++++ ASI2600MC/Dark Library/.DS_Store
+2025/08/01 15:40:24 [45337] cd++++++++++ ASI2600MC/Dark Library/-10/
+2025/08/01 15:40:24 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/.DS_Store
+2025/08/01 15:40:24 [45337] cd++++++++++ ASI2600MC/Dark Library/-10/Gain0/
+2025/08/01 15:40:24 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain0/._masterBias_gain0.xisf
+2025/08/01 15:40:24 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain0/._masterDark_120s.xisf
+2025/08/01 15:40:26 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain0/masterBias_gain0.xisf
+2025/08/01 15:40:30 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain0/masterDark_120s.xisf
+2025/08/01 15:40:35 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain0/masterDark_180s.xisf
+2025/08/01 15:40:39 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain0/masterDark_240s.xisf
+2025/08/01 15:40:43 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain0/masterDark_300s.xisf
+2025/08/01 15:40:47 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain0/masterDark_600s.xisf
+2025/08/01 15:40:51 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain0/masterDark_60s.xisf
+2025/08/01 15:40:51 [45337] cd++++++++++ ASI2600MC/Dark Library/-10/Gain100/
+2025/08/01 15:40:51 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/.DS_Store
+2025/08/01 15:40:51 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/._.DS_Store
+2025/08/01 15:40:51 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/._fits
+2025/08/01 15:40:55 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/masterBias_gain100.xisf
+2025/08/01 15:40:59 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/masterDark_120s.xisf
+2025/08/01 15:41:04 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/masterDark_180s.xisf
+2025/08/01 15:41:08 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/masterDark_240s.xisf
+2025/08/01 15:41:12 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/masterDark_300s.xisf
+2025/08/01 15:41:16 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/masterDark_30s.xisf
+2025/08/01 15:41:20 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/masterDark_600s.xisf
+2025/08/01 15:41:24 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/masterDark_60s.xisf
+2025/08/01 15:41:24 [45337] cd++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/
+2025/08/01 15:41:24 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/._masterDark_120s.fit
+2025/08/01 15:41:24 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/._masterDark_180s.fit
+2025/08/01 15:41:24 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/._masterDark_240s.fit
+2025/08/01 15:41:24 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/._masterDark_300s.fit
+2025/08/01 15:41:24 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/._masterDark_30s.fit
+2025/08/01 15:41:24 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/._masterDark_600s.fit
+2025/08/01 15:41:24 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/._masterDark_60s.fit
+2025/08/01 15:41:27 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/masterBias_gain100.fit
+2025/08/01 15:41:29 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/masterDark_120s.fit
+2025/08/01 15:41:30 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/masterDark_180s.fit
+2025/08/01 15:41:31 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/masterDark_240s.fit
+2025/08/01 15:41:32 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/masterDark_300s.fit
+2025/08/01 15:41:33 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/masterDark_30s.fit
+2025/08/01 15:41:34 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/masterDark_600s.fit
+2025/08/01 15:41:35 [45337] >f++++++++++ ASI2600MC/Dark Library/-10/Gain100/fits/masterDark_60s.fit
+2025/08/01 15:41:35 [45337] cd++++++++++ ASI2600MC/Dark Library/-20/
+2025/08/01 15:41:35 [45337] cd++++++++++ ASI2600MC/Dark Library/-20/Gain0/
+2025/08/01 15:41:37 [45337] >f++++++++++ ASI2600MC/Dark Library/-20/Gain0/masterBias_gain0.xisf
+2025/08/01 15:41:41 [45337] >f++++++++++ ASI2600MC/Dark Library/-20/Gain0/masterDark_120s.xisf
+2025/08/01 15:41:45 [45337] >f++++++++++ ASI2600MC/Dark Library/-20/Gain0/masterDark_180s.xisf
+2025/08/01 15:41:50 [45337] >f++++++++++ ASI2600MC/Dark Library/-20/Gain0/masterDark_300s.xisf
+2025/08/01 15:41:53 [45337] >f++++++++++ ASI2600MC/Dark Library/-20/Gain0/masterDark_600s.xisf
+2025/08/01 15:41:58 [45337] >f++++++++++ ASI2600MC/Dark Library/-20/Gain0/masterDark_60s.xisf
+2025/08/01 15:41:58 [45337] cd++++++++++ ASI2600MC/Dark Library/-20/Gain100/
+2025/08/01 15:42:01 [45337] >f++++++++++ ASI2600MC/Dark Library/-20/Gain100/masterBias_gain100.xisf
+2025/08/01 15:42:06 [45337] >f++++++++++ ASI2600MC/Dark Library/-20/Gain100/masterDark_120s.xisf
+2025/08/01 15:42:10 [45337] >f++++++++++ ASI2600MC/Dark Library/-20/Gain100/masterDark_180s.xisf
+2025/08/01 15:42:14 [45337] >f++++++++++ ASI2600MC/Dark Library/-20/Gain100/masterDark_300s.xisf
+2025/08/01 15:42:18 [45337] >f++++++++++ ASI2600MC/Dark Library/-20/Gain100/masterDark_600s.xisf
+2025/08/01 15:42:22 [45337] >f++++++++++ ASI2600MC/Dark Library/-20/Gain100/masterDark_60s.xisf
+2025/08/01 15:42:22 [45337] cd++++++++++ ASI2600MC/Dark Library/0/
+2025/08/01 15:42:22 [45337] cd++++++++++ ASI2600MC/Dark Library/0/Gain0/
+2025/08/01 15:42:26 [45337] >f++++++++++ ASI2600MC/Dark Library/0/Gain0/masterBias.xisf
+2025/08/01 15:42:30 [45337] >f++++++++++ ASI2600MC/Dark Library/0/Gain0/masterDark_120s.xisf
+2025/08/01 15:42:34 [45337] >f++++++++++ ASI2600MC/Dark Library/0/Gain0/masterDark_180s.xisf
+2025/08/01 15:42:38 [45337] >f++++++++++ ASI2600MC/Dark Library/0/Gain0/masterDark_240s.xisf
+2025/08/01 15:42:42 [45337] >f++++++++++ ASI2600MC/Dark Library/0/Gain0/masterDark_300s.xisf
+2025/08/01 15:42:46 [45337] >f++++++++++ ASI2600MC/Dark Library/0/Gain0/masterDark_30s.xisf
+2025/08/01 15:42:50 [45337] >f++++++++++ ASI2600MC/Dark Library/0/Gain0/masterDark_60s.xisf
+2025/08/01 15:42:50 [45337] cd++++++++++ ASI2600MC/Dark Library/0/Gain100/
+2025/08/01 15:42:55 [45337] >f++++++++++ ASI2600MC/Dark Library/0/Gain100/masterBias.xisf
+2025/08/01 15:42:59 [45337] >f++++++++++ ASI2600MC/Dark Library/0/Gain100/masterDark_120s.xisf
+2025/08/01 15:43:03 [45337] >f++++++++++ ASI2600MC/Dark Library/0/Gain100/masterDark_180s.xisf
+2025/08/01 15:43:07 [45337] >f++++++++++ ASI2600MC/Dark Library/0/Gain100/masterDark_240s.xisf
+2025/08/01 15:43:11 [45337] >f++++++++++ ASI2600MC/Dark Library/0/Gain100/masterDark_300s.xisf
+2025/08/01 15:43:15 [45337] >f++++++++++ ASI2600MC/Dark Library/0/Gain100/masterDark_30s.xisf
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Dark Library/0/Gain100/masterDark_60s.xisf
+2025/08/01 15:43:19 [45337] cd++++++++++ ASI2600MC/Galaxies/
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/._IC342
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/._NGC281
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/._NGC4631
+2025/08/01 15:43:19 [45337] cd++++++++++ ASI2600MC/Galaxies/IC342/
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/.DS_Store
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/._.DS_Store
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/._IC342_2025-02-22
+2025/08/01 15:43:19 [45337] cd++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._AcquisitionDetails.csv
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0000(1).fits
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0000.fits
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0001.fits
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0002.fits
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0003.fits
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0004.fits
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0005.fits
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0006.fits
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0007.fits
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0008.fits
+2025/08/01 15:43:19 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0009.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0018.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0019.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0020.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0021.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0022.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0023.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0024.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0025.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0026.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0027.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0028.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0029.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0030.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0031.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0032.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0033.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0034.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0035.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0036.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0037.fits
+2025/08/01 15:43:23 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0038.fits
+2025/08/01 15:43:24 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0039.fits
+2025/08/01 15:43:24 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0040.fits
+2025/08/01 15:43:24 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0041.fits
+2025/08/01 15:43:24 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0042.fits
+2025/08/01 15:43:24 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0043.fits
+2025/08/01 15:43:24 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._IC342_2025-02-22_UVIR_300.00_0044.fits
+2025/08/01 15:43:24 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._ImageMetaData.csv
+2025/08/01 15:43:24 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/._masterDark_300s.xisf
+2025/08/01 15:43:24 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/AcquisitionDetails.csv
+2025/08/01 15:43:24 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0000(1).fits
+2025/08/01 15:43:25 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0000.fits
+2025/08/01 15:43:27 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0001.fits
+2025/08/01 15:43:28 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0002.fits
+2025/08/01 15:43:29 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0003.fits
+2025/08/01 15:43:30 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0004.fits
+2025/08/01 15:43:31 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0005.fits
+2025/08/01 15:43:32 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0006.fits
+2025/08/01 15:43:33 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0007.fits
+2025/08/01 15:43:34 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0008.fits
+2025/08/01 15:43:36 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0009.fits
+2025/08/01 15:43:37 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0018.fits
+2025/08/01 15:43:38 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0019.fits
+2025/08/01 15:43:39 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0020.fits
+2025/08/01 15:43:40 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0021.fits
+2025/08/01 15:43:41 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0022.fits
+2025/08/01 15:43:42 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0023.fits
+2025/08/01 15:43:43 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0024.fits
+2025/08/01 15:43:44 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0025.fits
+2025/08/01 15:43:46 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0026.fits
+2025/08/01 15:43:47 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0027.fits
+2025/08/01 15:43:48 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0028.fits
+2025/08/01 15:43:49 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0029.fits
+2025/08/01 15:43:50 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0030.fits
+2025/08/01 15:43:51 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0031.fits
+2025/08/01 15:43:52 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0032.fits
+2025/08/01 15:43:53 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0033.fits
+2025/08/01 15:43:54 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0034.fits
+2025/08/01 15:43:55 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0035.fits
+2025/08/01 15:43:57 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0036.fits
+2025/08/01 15:43:58 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0037.fits
+2025/08/01 15:43:59 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0038.fits
+2025/08/01 15:44:00 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0039.fits
+2025/08/01 15:44:01 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0040.fits
+2025/08/01 15:44:02 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0041.fits
+2025/08/01 15:44:03 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0042.fits
+2025/08/01 15:44:04 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0043.fits
+2025/08/01 15:44:06 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/IC342_2025-02-22_UVIR_300.00_0044.fits
+2025/08/01 15:44:06 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/ImageMetaData.csv
+2025/08/01 15:44:07 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/masterDark_300s.xisf
+2025/08/01 15:44:11 [45337] >f++++++++++ ASI2600MC/Galaxies/IC342/IC342_2025-02-22/masterFlat_UVIR.xisf
+2025/08/01 15:44:11 [45337] cd++++++++++ ASI2600MC/Galaxies/MarkarianChain/
+2025/08/01 15:44:11 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/.DS_Store
+2025/08/01 15:44:11 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/._.DS_Store
+2025/08/01 15:44:11 [45337] cd++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/
+2025/08/01 15:44:11 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/AcquisitionDetails.csv
+2025/08/01 15:44:11 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/ImageMetaData.csv
+2025/08/01 15:44:15 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0000.fits
+2025/08/01 15:44:16 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0001.fits
+2025/08/01 15:44:17 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0002.fits
+2025/08/01 15:44:19 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0003.fits
+2025/08/01 15:44:20 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0004.fits
+2025/08/01 15:44:21 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0005.fits
+2025/08/01 15:44:22 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0006.fits
+2025/08/01 15:44:23 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0007.fits
+2025/08/01 15:44:24 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0008.fits
+2025/08/01 15:44:25 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0009.fits
+2025/08/01 15:44:27 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0010.fits
+2025/08/01 15:44:28 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0011.fits
+2025/08/01 15:44:29 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0012.fits
+2025/08/01 15:44:30 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0013.fits
+2025/08/01 15:44:31 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0014.fits
+2025/08/01 15:44:32 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0015.fits
+2025/08/01 15:44:33 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0016.fits
+2025/08/01 15:44:35 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0017.fits
+2025/08/01 15:44:36 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0018.fits
+2025/08/01 15:44:37 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0019.fits
+2025/08/01 15:44:38 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0020.fits
+2025/08/01 15:44:39 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0021.fits
+2025/08/01 15:44:40 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0022.fits
+2025/08/01 15:44:41 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0023.fits
+2025/08/01 15:44:42 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0024.fits
+2025/08/01 15:44:44 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0025.fits
+2025/08/01 15:44:45 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0026.fits
+2025/08/01 15:44:46 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0027.fits
+2025/08/01 15:44:47 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0028.fits
+2025/08/01 15:44:48 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_FLAT_UVIR_0.10_0029.fits
+2025/08/01 15:44:49 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_LIGHT_UVIR_60.00_0000.fits
+2025/08/01 15:44:50 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_LIGHT_UVIR_60.00_0001.fits
+2025/08/01 15:44:51 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_LIGHT_UVIR_60.00_0002.fits
+2025/08/01 15:44:53 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_LIGHT_UVIR_60.00_0003.fits
+2025/08/01 15:44:54 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_LIGHT_UVIR_60.00_0004.fits
+2025/08/01 15:44:55 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_LIGHT_UVIR_60.00_0005.fits
+2025/08/01 15:44:56 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_LIGHT_UVIR_60.00_0006.fits
+2025/08/01 15:44:57 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_LIGHT_UVIR_60.00_0007.fits
+2025/08/01 15:44:58 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_LIGHT_UVIR_60.00_0008.fits
+2025/08/01 15:44:59 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_LIGHT_UVIR_60.00_0009.fits
+2025/08/01 15:45:00 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/MarkarianChain_2025-05-23_LIGHT_UVIR_60.00_0010.fits
+2025/08/01 15:45:02 [45337] >f++++++++++ ASI2600MC/Galaxies/MarkarianChain/MarkarianChain_2025-05-23/masterBias_gain100.xisf
