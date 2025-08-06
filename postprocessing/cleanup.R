@@ -10,7 +10,8 @@ machine <- Sys.info()["nodename"]
 os <- ifelse(os == "Darwin", "Mac", "Windows") %>% as.character()
 machine <- ifelse(machine == "BRIANC-MacUS.attlocal.net", "MBP13",
                   ifelse(machine == "Brians-MBP.attlocal.net", "MBP14",
-                         ifelse(machine == "ES127", "ES127", machine))) %>%
+                         ifelse(machine == "Office-Mac.attlocal.net", "OfficeMac", 
+                            ifelse(machine == "ES127", "ES127", machine)))) %>%
   as.character()
 
 
@@ -26,16 +27,9 @@ if (machine == "ES127") {
 } else {
   setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
   src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-  cameraSrc <- "/Users/briancarter/Astronomy/testing"
-  username <- Sys.getenv("username")
-  password <- Sys.getenv("password")
-  mbp13 <- "BRIANC-MacUS"
-  laptop <- paste0("open 'smb://", username, ":", password, "@", mbp13, "/Astro-SSD'")
-  system(laptop) # MBP13 connection
+  cameraSrc <- "/Volumes/Astro-SSD/testing/data/subs"
   transfer <- "/Volumes/Astro-SSD/transfer"
-  rm(username, password, mbp13)
   wbpp <- file.path(src, "wbpp.sh")
-
 }
 
 source("functions/functions.R")
@@ -44,11 +38,10 @@ source("functions/functions.R")
 
 # Run the scripts ---------------------------------------------------------
 
-
-
 list.dirs(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
   lapply(cleanup, os = os, machine = machine)
 
+# reinitialize the wbpp script for next time!
 file.remove(wbpp)
 con <- file(wbpp)
 writeLines("", con)
@@ -79,6 +72,8 @@ returnStatus <- sapply(dirs_to_transfer, function(x) {
 })
 
 for (i in 1:length(returnStatus)) {
-  if (returnStatus[i] == TRUE) {unlink(dirs_to_transfer[i])}
+  if (returnStatus[i] == TRUE) {unlink(dirs_to_transfer[i], recursive = TRUE, force = TRUE)}
 }
 
+png <- list.files(file.path(cameraSrc), pattern = ".png", recursive = TRUE, full.names = TRUE)
+sapply(png, file.remove)

@@ -24,10 +24,9 @@ machine <- Sys.info()["nodename"]
 os <- ifelse(os == "Darwin", "Mac", "Windows") %>% as.character()
 machine <- ifelse(machine == "BRIANC-MacUS.attlocal.net", "MBP13",
                   ifelse(machine == "Brians-MBP.attlocal.net", "MBP14",
-                         ifelse(machine == "Office-Mac.attlocal.net", "OfficeMac", 
-                                ifelse(machine == "ES127", "ES127", machine)))) %>%
+                         ifelse(machine == "Brians-Mac-mini.attlocal.net", "OfficeMac", 
+                         ifelse(machine == "ES127", "ES127", machine)))) %>%
   as.character()
-
 
 
 
@@ -52,24 +51,13 @@ if (os == "Windows" & debug == TRUE) {
 
 if (os == "Mac") {
   setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-  logPath <- "/Volumes/Astro-SSD/testing/data/logs"
-  subsPath <- "/Volumes/Astro-SSD/testing/data/subs"
+  logPath <-"/Users/briancarter/Astronomy/testing"
+  subsPath <- "/Users/briancarter/Astronomy/testing"
   phd2Logs <- logPath
 }
 
 source("functions/functions.R")
 
-
-
-# session paths -----------------------------------------------------------
- sessions <- data.frame(path = list.dirs(subsPath, recursive = TRUE, full.names = TRUE)) %>%
-  filter(stringr::str_detect(path, "checkFits"))  %>%
-  mutate(path = dirname(path)) %>%
-  pull(path)
-
-# create a metadata folder
-sapply(sessions, function(x) dir.create(file.path(x, "metadata"), showWarnings = FALSE))
-sessions <- file.path(sessions, "metadata")
 
 # Guide logs --------------------------------------------------------------
 
@@ -79,14 +67,10 @@ guideFiles <- data.frame(file = list.files(phd2Logs, pattern = ".txt", full.name
   distinct(file, .keep_all = TRUE) %>%
   filter(stringr::str_detect(file, "GuideLog") == TRUE)
 
-
-# Copies guide log into each session folder
-sapply(sessions, function(x) {
-  guideFiles %>%
-    slice(1) %>%
-    pull(file) %>%
-    file.copy(file.path(x, "PHD2_GuideLog.txt"))
-})
+guideFiles %>%
+  slice(1) %>%
+  pull(file) %>%
+  file.copy(subsPath)
 
 if (os == "Windows" &  debug == FALSE) {
 guideFiles %>%
@@ -98,15 +82,12 @@ guideFiles %>%
 
 
 
-# Process NINA logs --------------------------------------------------------------------
+# Process logs --------------------------------------------------------------------
+
+# creates a clean delimited character vector of the logs
+#logPath <- file.path("../data/sample logs/chris/20250726-210820-3.1.2.9001.11544-202507.log") %>% normalizePath()
 
 logfile <- logPath %>% pullLogs(guest = FALSE)
-
-# Copy raw NINA logs into each session folder
-sapply(sessions, function(x) {
-  file.copy(logFilePath, file.path(x, "NINA_Log.txt"))
-})
-
 
 logReport <- read_delim(
   paste(logfile, collapse = "\n"),
@@ -138,8 +119,37 @@ logReshaped <- logReport %>%
   filter(!is.na(start) & !is.na(end)) %>%
   bind_rows(addSubsToSequence())
 
+
+logReport <- logReport %>%
+  reportGen() %>%
+  mutate_if(is.numeric, ~as.character(.)) %>%
+  mutate_if(is.character, ~tidyr::replace_na(., "")) 
+
+# Save reshaped version for later
+#openxlsx::write.xlsx(logReshaped, glue::glue("{subsPath}/NINA Logs - Reshaped.xlsx"))
+
 logAnalysis <- logReshaped %>% logChartDev()
 chart <- logAnalysis$plot
+
+
+
+# other conditnuous data --------------------------------------------------
+
+myPaths <- list.dirs(subsPath, full.names = TRUE, recursive = FALSE)
+
+otherData <- subsPath %>% getAllMetaData() %>%
+  mutate(
+    ExposureStart = as.POSIXct(ExposureStart, tz = "UTC"),
+    # guard against zeros/negatives for log
+    FWHM = ifelse(FWHM <= 0, NA, FWHM),
+    GuidingRMSArcSec = ifelse(GuidingRMSArcSec <= 0, NA, GuidingRMSArcSec),
+    log_FWHM = log10(FWHM),
+    log_Guiding = log10(GuidingRMSArcSec)
+  ) %>%
+  plotOtherData()
+
+
+
 
 
 
@@ -152,8 +162,7 @@ subsReport <- lapply(subsPath, processMetaData) %>%
   do.call("rbind", .) %>%
   ungroup() %>%
   mutate_if(is.numeric, ~as.character(.)) %>%
-  mutate_if(is.character, ~tidyr::replace_na(., "")) %>%
-  mutate(Object = stringr::str_replace_all(Object, " ", ""))
+  mutate_if(is.character, ~tidyr::replace_na(., ""))
 
 cols <- c("Object", "Filter", "N",
           "Minutes",

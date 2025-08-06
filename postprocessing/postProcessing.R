@@ -10,7 +10,8 @@ machine <- Sys.info()["nodename"]
 os <- ifelse(os == "Darwin", "Mac", "Windows") %>% as.character()
 machine <- ifelse(machine == "BRIANC-MacUS.attlocal.net", "MBP13",
                   ifelse(machine == "Brians-MBP.attlocal.net", "MBP14",
-                         ifelse(machine == "ES127", "ES127", machine))) %>%
+                         ifelse(machine == "Office-Mac.attlocal.net", "OfficeMac",
+                            ifelse(machine == "ES127", "ES127", machine)))) %>%
   as.character()
 
 
@@ -27,7 +28,7 @@ if (machine == "ES127") {
 } else {
   setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
   src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-  camera <- file.path("/Users/briancarter/Astronomy/testing")
+  camera <- file.path("/Volumes/Astro-SSD/testing/data/subs")
   username <- Sys.getenv("username")
   password <- Sys.getenv("password")
   es127 <- paste0("open 'smb://", username, ":", password, "@", "ES127", "/Users/Brian Carter/Astronomy/ASI2600MM/Dark Library'")

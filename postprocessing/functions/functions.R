@@ -32,6 +32,20 @@ processObjects <- function(myObject, os = os, machine = machine) {
   
   path <- sessions$folder[1]
   
+  # Change the file paths in the metadata folder
+  # Only necessary in dev (mac)
+  # function will be useful later.
+  homePath <- stringr::str_replace(path, file.path(sessions$object[1], sessions$session[1]), "")
+  file.path(path, "ImageMetaData.csv") %>%
+    readr::read_csv() %>%
+    mutate(FilePath = stringr::str_replace(FilePath, 
+                                            dirname(dirname(dirname(FilePath))), 
+                                            homePath)) %>%
+    readr::write_csv(file.path(path, "ImageMetaData.csv"))
+  
+
+  
+  
   # Get the image metadata
   # This metadata file does not include calibration subs
   metadata <- file.path(path, "ImageMetaData.csv") %>%
@@ -135,7 +149,7 @@ wbppFlats <- function(objectFlats) {
     wbpp <- file("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat", "a")
   }
   
-  if (os == "Mac" & machine == "MBP14") {
+  if (os == "Mac") {
     exe <- '"/Applications/PixInsight/PixInsight.app/Contents/MacOS/PixInsight"  -n --automation-mode -r='
     
     js1 <- '"/Applications/Pixinsight/src/scripts/BatchPreprocessing/FBPP.js,automationMode=true,outputDirectory='
@@ -214,26 +228,17 @@ cleanup <- function(myObject, os = os, machine = machine) {
     mutate(object = basename(myObject)) %>%
     mutate(folder = basename(sessions)) %>%
     mutate(dates = stringr::str_replace(folder, paste0(object, "_"), ""))  %>%
-    filter(dates == Sys.Date() - 1) %>%
     pull(sessions)
   
   flatDir <- file.path(sessions, "flats")
   masterDir <- file.path(flatDir, "master")
+  fakeDir <- file.path(flatDir, "fake") # testing purposes
   file.path(flatDir, "calibrated") %>% unlink(recursive = TRUE, force = TRUE)
   file.path(flatDir, "logs") %>% unlink(recursive = TRUE, force = TRUE)
+  fakeDir %>% unlink(recursive = TRUE, force = TRUE) # testing purposes
   
-  # Count the types of flats
-  # flats <- list.files(flatDir, pattern = "fits")
-  # l <- ifelse(length(flats[grep("L", flats)]) >0, 1, 0)
-  # r <- ifelse(length(flats[grep("R", flats)]) >0, 1, 0)
-  # g <- ifelse(length(flats[grep("G", flats)]) >0, 1, 0)
-  # b <- ifelse(length(flats[grep("B", flats)]) >0, 1, 0)
-  # h <- ifelse(length(flats[grep("H", flats)]) >0, 1, 0)
-  # s <- ifelse(length(flats[grep("S", flats)]) >0, 1, 0)
-  # o <- ifelse(length(flats[grep("O", flats)]) >0, 1, 0)
-  # 
-  # totalFlats <- sum(l, r, g, b, h, s, o)
-  # 
+  
+  
    #  Process the stacked flats
   nMaster <- list.files(masterDir, pattern = ".xisf", full.names = TRUE)
   renameStatus <- renameFlats(nMaster)
@@ -325,7 +330,7 @@ eventPairs <- function(dat) {
   
 }
 
-pullLogs <- function(path, myDebug = debug, os = os, machine = machine, guest = FALSE) {
+pullLogs <- function(path, myDebug = debug, guest = FALSE) {
   
   
   # TEMP for guest
@@ -341,7 +346,8 @@ pullLogs <- function(path, myDebug = debug, os = os, machine = machine, guest = 
     filter(stringr::str_detect(files, "robocopy") == FALSE)
   
   # This is the most recent log file, assuming it is the correct one
-  logFilePath <- allFiles %>%
+  # output to global environment for later copy
+  logFilePath <<- allFiles %>%
     arrange(desc(mtime)) %>%
     slice(1) %>%
     pull(files) %>%
@@ -368,12 +374,7 @@ pullLogs <- function(path, myDebug = debug, os = os, machine = machine, guest = 
   logfile <- logfile[str_detect(logfile, "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+")]
   
   # clean up
-  if (myDebug != TRUE) {
-    
-    logFilePath %>% file.copy(to = subsPath, overwrite = FALSE)
-    
-    # logFilePath %>% file.remove()
-  }
+
   return(logfile)
 }
 
@@ -415,32 +416,28 @@ times <- function(dat, os = os, machine = machine) {
   
 }
 
-addSubsToSequence <- function(path = subsPath) {
+addSubsToSequence <- function(paths = dirname(sessions)) {
   
-  dirs <- list.dirs(path, recursive = TRUE) %>%
-    setdiff(path) %>%
-    setdiff(list.dirs(path, recursive = FALSE)) %>%
-    stringr::str_remove("/checkFits") %>%
-    unique()
-  
- foo <-  lapply(dirs, function(x) {
-    readr::read_csv(glue::glue("{x}/ImageMetaData.csv"))
-  }) %>%
+ lapply(paths, function(x) {
+    meta <- file.path(x, "metadata")
+    from <- file.path(x, "ImageMetaData.csv")
+    if (file.exists(from)) {
+    file.copy(from, meta, overwrite = TRUE)
+    file.remove(from)
+    }
+    readr::read_csv(file.path(meta, "ImageMetaData.csv")) 
+  })  %>%
     do.call("rbind", .) %>%
     mutate(File = basename(FilePath)) %>%
-    filter(File %in% basename(list.files(path, pattern = "fit",  recursive = TRUE))) %>%
     arrange((ExposureStart)) %>%
     mutate(ROLE = basename(dirname(dirname(FilePath)))) %>%
+    mutate(ROLE = stringr::str_replace_all(ROLE, " ", "")) %>%
     group_by(ROLE) %>%
-    summarize(start = min(ExposureStart, na.rm = TRUE),
-              end = max(ExposureStart, na.rm = TRUE)) %>%
+    summarize(start = min((ExposureStart), na.rm = TRUE),
+              end = max((ExposureStart), na.rm = TRUE)) %>%
     ungroup() %>%
     mutate(start = as.POSIXct(as.character(start), tz = "America/New_York")) %>%
     mutate(end = as.POSIXct(as.character(end), tz = "America/New_York"))
- 
-
-  
- return(foo)
 }
 
 reportGen <- function(dat, endtime = endtime, starttime = starttime, os = os, machine = machine) {
@@ -495,7 +492,22 @@ getMetaDataStartStop <- function(path, os = os, machine = machine) {
   
 }
 
-processMetaData <- function(path, os = os, machine = machine) {
+
+getAllMetaData <- function(path) {
+  
+  metadatFiles <- list.files(path = path, 
+                             pattern = "ImageMetaData.csv", 
+                             recursive = TRUE, 
+                             full.names = TRUE) %>%
+    lapply(readr::read_csv) %>%
+    do.call("rbind", .) %>%
+    mutate(Object = basename(dirname(FilePath)))  %>%
+    select(Object, FilterName, Duration, HFR, FWHM, GuidingRMSArcSec,
+           ExposureStart, FocuserTemp)
+}
+
+
+processMetaData <- function(path) {
   
   
   metadatFiles <- list.files(path = path, 
@@ -727,4 +739,10 @@ logChartDev <- function(df = logReshaped) {
     return()
   
 }
+
+
+
+
+
+
 
