@@ -4,6 +4,8 @@ library(magrittr)
 
 
 
+debug <- FALSE
+
 os <- Sys.info()["sysname"]
 machine <- Sys.info()["nodename"]
 
@@ -17,13 +19,20 @@ machine <- ifelse(machine == "BRIANC-MacUS.attlocal.net", "MBP13",
 
 # Environmental parameters ------------------------------------------------
 
-if (machine == "ES127") {
+if (machine == "ES127" & debug != TRUE) {
   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
   camera <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
   darks <- file.path(camera, "../Dark Library/") 
   source("functions/functions.R")
   
+  
+} else if (machine == "ES127" & debug == TRUE) {
+  setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
+  src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
+  camera <- "D:/NAS/testing/subs"
+  darks <-  "c:/users/Brian Carter/astronomy/ASI2600MM/Dark Library/"
+  source("functions/functions.R")
   
 } else {
   setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
@@ -71,6 +80,10 @@ if (os == "Mac") {
 }
 
 
+# There are some weird errors, but everything runs with below.
+if (os == "Windows" & debug == TRUE) {
+  glue::glue("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat") %>% sys::exec_wait()
+}
 
   
 

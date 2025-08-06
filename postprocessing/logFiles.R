@@ -15,8 +15,6 @@ library(forcats)
 library(glue)
 
 
-debug <- FALSE
-
 
 os <- Sys.info()["sysname"]
 machine <- Sys.info()["nodename"]
@@ -45,8 +43,8 @@ if (os == "Windows" & debug == FALSE) {
 
 if (os == "Windows" & debug == TRUE) {
   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
-  logPath <- "data"
-  subsPath <- "D:/NAS/ASI2600MM/ES127"
+  logPath <- "D:/NAS/testing/logs"
+  subsPath <- "D:/NAS/testing/subs"
   phd2Logs <- logPath
 }
 
@@ -104,7 +102,7 @@ logfile <- logPath %>% pullLogs(guest = FALSE)
 
 # Copy raw NINA logs into each session folder
 sapply(sessions, function(x) {
-  file.copy(logFilePath, file.path(x, "NINA_Log.txt"))
+  file.copy(logFilePath, file.path(x))
 })
 
 

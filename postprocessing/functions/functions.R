@@ -330,7 +330,7 @@ eventPairs <- function(dat) {
   
 }
 
-pullLogs <- function(path, myDebug = debug, guest = FALSE) {
+pullLogs <- function(path, guest = FALSE) {
   
   
   # TEMP for guest
@@ -362,12 +362,7 @@ pullLogs <- function(path, myDebug = debug, guest = FALSE) {
   lapply(allFiles$files, file.copy, to = archive)
   lapply(allFiles$files, file.remove) # removes the old stuff into archive, if any
   
-  
-  # cached log file for testing
-  if (myDebug == TRUE) {
-    logFilePath <- glue::glue("{path}/log.log")
-  }
-  
+
   }
   # Read file and keep only the time entries
   logfile <- read_lines(logFilePath)
@@ -418,14 +413,15 @@ times <- function(dat, os = os, machine = machine) {
 
 addSubsToSequence <- function(paths = dirname(sessions)) {
   
- lapply(paths, function(x) {
+lapply(paths, function(x) {
     meta <- file.path(x, "metadata")
     from <- file.path(x, "ImageMetaData.csv")
     if (file.exists(from)) {
     file.copy(from, meta, overwrite = TRUE)
     file.remove(from)
     }
-    readr::read_csv(file.path(meta, "ImageMetaData.csv")) 
+    readr::read_csv(file.path(meta, "ImageMetaData.csv")) %>%
+    mutate()
   })  %>%
     do.call("rbind", .) %>%
     mutate(File = basename(FilePath)) %>%
@@ -433,12 +429,13 @@ addSubsToSequence <- function(paths = dirname(sessions)) {
     mutate(ROLE = basename(dirname(dirname(FilePath)))) %>%
     mutate(ROLE = stringr::str_replace_all(ROLE, " ", "")) %>%
     group_by(ROLE) %>%
-    summarize(start = min((ExposureStart), na.rm = TRUE),
-              end = max((ExposureStart), na.rm = TRUE)) %>%
+    summarize(start = min((ExposureStartUTC), na.rm = TRUE),
+              end = max((ExposureStartUTC), na.rm = TRUE)) %>%
     ungroup() %>%
-    mutate(start = as.POSIXct(as.character(start), tz = "America/New_York")) %>%
-    mutate(end = as.POSIXct(as.character(end), tz = "America/New_York"))
-}
+    mutate(start =  as.POSIXct(format(start, tz = "America/New_York", usetz = TRUE))) %>%
+    mutate(end =  as.POSIXct(format(end, tz = "America/New_York", usetz = TRUE)))
+
+ }
 
 reportGen <- function(dat, endtime = endtime, starttime = starttime, os = os, machine = machine) {
   

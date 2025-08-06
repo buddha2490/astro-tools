@@ -3,6 +3,7 @@ library(magrittr)
 library(tidyr)
 
 
+debug <- FALSE
 
 os <- Sys.info()["sysname"]
 machine <- Sys.info()["nodename"]
@@ -18,12 +19,18 @@ machine <- ifelse(machine == "BRIANC-MacUS.attlocal.net", "MBP13",
 
 # Environmental parameters ------------------------------------------------
 
-if (machine == "ES127") {
-  setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
-  src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
-  cameraSrc <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
-  transfer <- "z:/transfer"
-  wbpp <- "C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat"
+if (os == "Windows" & debug == FALSE) {
+  setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
+  src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
+  cameraSrc <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127" # subspath
+  transfer <- "z:/transfer" # transfer path
+  wbpp <- "C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat" # wbpp
+} else if  (os == "Windows" & debug == TRUE) {
+  setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
+  src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
+  cameraSrc <- "D:/NAS/testing/subs"
+  transfer <- "z:/transfer" # transfer path
+  wbpp <- file.path(src, "wbpp.sh")
 } else {
   setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
   src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
@@ -31,6 +38,11 @@ if (machine == "ES127") {
   transfer <- "/Volumes/Astro-SSD/transfer"
   wbpp <- file.path(src, "wbpp.sh")
 }
+
+
+
+
+
 
 source("functions/functions.R")
 
