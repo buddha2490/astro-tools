@@ -1,0 +1,1 @@
+"/Applications/PixInsight/PixInsight.app/Contents/MacOS/PixInsight"  -n --automation-mode -r="/Applications/Pixinsight/src/scripts/BatchPreprocessing/FBPP.js,automationMode=true,outputDirectory=/Volumes/Astro-SSD/transfer,dir=/Volumes/Astro-SSD/Transfer/M27/M27_2025-07-25" --force-exit
