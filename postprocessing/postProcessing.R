@@ -35,9 +35,9 @@ if (machine == "ES127" & debug != TRUE) {
   source("functions/functions.R")
   
 } else {
-  setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-  src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-  camera <- file.path("/Volumes/Astro-SSD/testing/data/subs")
+  setwd("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
+  src <- file.path("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
+  camera <- file.path("/Volumes/Office-SSD/Astronomy/testing/data/subs")
   username <- Sys.getenv("username")
   password <- Sys.getenv("password")
   es127 <- paste0("open 'smb://", username, ":", password, "@", "ES127", "/Users/Brian Carter/Astronomy/ASI2600MM/Dark Library'")
@@ -76,7 +76,7 @@ objects %>% lapply(processObjects)
 
 # go ahead and run it if on the dev rig
 if (os == "Mac") {
-  glue::glue("/Users/briancarter/Astronomy/astro-tools/postprocessing/wbpp.sh") %>% system()
+  glue::glue("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing/wbpp.sh") %>% system()
 }
 
 

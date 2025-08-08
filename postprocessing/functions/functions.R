@@ -154,8 +154,8 @@ wbppFlats <- function(objectFlats) {
     
     js1 <- '"/Applications/Pixinsight/src/scripts/BatchPreprocessing/FBPP.js,automationMode=true,outputDirectory='
     
-    wbpp <- file("/Users/briancarter/Astronomy/astro-tools/postprocessing/wbpp.sh", "a")
-    system('chmod 777 "/Users/briancarter/Astronomy/astro-tools/postprocessing/wbpp.sh"')
+    wbpp <- file("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing/wbpp.sh", "a")
+    system('chmod 777 "/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing/wbpp.sh"')
     
   }
   
@@ -413,34 +413,21 @@ times <- function(dat, os = os, machine = machine) {
 
 addSubsToSequence <- function(paths = dirname(sessions)) {
   
-<<<<<<< HEAD
-  dirs <- list.dirs(path, recursive = TRUE) %>%
-    setdiff(path) %>%
-    setdiff(list.dirs(path, recursive = FALSE)) %>% 
+  dirs <- list.dirs(paths, recursive = TRUE) %>%
+    setdiff(list.dirs(paths, recursive = FALSE)) %>% 
     data.frame(file = . )  %>%
     filter(!stringr::str_detect(file, "flats") & 
              !stringr::str_detect(file, "checkFits") & 
              !stringr::str_detect(file, "master") & 
              !stringr::str_detect(file, "logs") & 
              !stringr::str_detect(file, "calibrated")) %>%
-    unique()
+    unique() %>%
+    pull()
 
   
  foo <-  lapply(dirs, function(x) {
     readr::read_csv(glue::glue("{x}/ImageMetaData.csv"))
   }) %>%
-=======
-lapply(paths, function(x) {
-    meta <- file.path(x, "metadata")
-    from <- file.path(x, "ImageMetaData.csv")
-    if (file.exists(from)) {
-    file.copy(from, meta, overwrite = TRUE)
-    file.remove(from)
-    }
-    readr::read_csv(file.path(meta, "ImageMetaData.csv")) %>%
-    mutate()
-  })  %>%
->>>>>>> 4d18086c8fec7c49d85015f19184feccfad9903a
     do.call("rbind", .) %>%
     mutate(File = basename(FilePath)) %>%
     arrange((ExposureStart)) %>%

@@ -32,10 +32,10 @@ if (os == "Windows" & debug == FALSE) {
   transfer <- "z:/transfer" # transfer path
   wbpp <- file.path(src, "wbpp.sh")
 } else {
-  setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-  src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-  cameraSrc <- "/Volumes/Astro-SSD/testing/data/subs"
-  transfer <- "/Volumes/Astro-SSD/transfer"
+  setwd("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
+  src <- file.path("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
+  cameraSrc <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
+  transfer <- "/Volumes/Office-SSD/Astronomy/transfer"
   wbpp <- file.path(src, "wbpp.sh")
 }
 
