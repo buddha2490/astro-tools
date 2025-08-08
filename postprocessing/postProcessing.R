@@ -10,11 +10,13 @@ os <- Sys.info()["sysname"]
 machine <- Sys.info()["nodename"]
 
 os <- ifelse(os == "Darwin", "Mac", "Windows") %>% as.character()
-machine <- ifelse(machine == "BRIANC-MacUS.attlocal.net", "MBP13",
-                  ifelse(machine == "Brians-MBP.attlocal.net", "MBP14",
-                         ifelse(machine == "Office-Mac.attlocal.net", "OfficeMac",
-                            ifelse(machine == "ES127", "ES127", machine)))) %>%
+machine <- ifelse(
+  stringr::str_detect(machine, "BRIANC-MacUS") == TRUE, "MBP13", ifelse(
+    stringr::str_detect(machine, "Brians-MacBook-Pro") == TRUE, "MBP14", ifelse(
+      stringr::str_detect(machine, "Office-Mac") == TRUE, "OfficeMac",
+      ifelse(machine == "ES127", "ES127", machine)))) %>%
   as.character()
+
 
 
 # Environmental parameters ------------------------------------------------
@@ -34,7 +36,7 @@ if (machine == "ES127" & debug != TRUE) {
   darks <-  "c:/users/Brian Carter/astronomy/ASI2600MM/Dark Library/"
   source("functions/functions.R")
   
-} else {
+} else if (machine == "OfficeMac") {
   setwd("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
   src <- file.path("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
   camera <- file.path("/Volumes/Office-SSD/Astronomy/testing/data/subs")
@@ -43,8 +45,9 @@ if (machine == "ES127" & debug != TRUE) {
   es127 <- paste0("open 'smb://", username, ":", password, "@", "ES127", "/Users/Brian Carter/Astronomy/ASI2600MM/Dark Library'")
   system(es127) # mini computer connection
   darks <- file.path("/Volumes/Dark Library")
-  
   source("functions/functions.R")
+  
+} else if (machine == "MBP14") {
   
 }
                   

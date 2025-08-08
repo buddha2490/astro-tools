@@ -20,10 +20,11 @@ os <- Sys.info()["sysname"]
 machine <- Sys.info()["nodename"]
 
 os <- ifelse(os == "Darwin", "Mac", "Windows") %>% as.character()
-machine <- ifelse(machine == "BRIANC-MacUS.attlocal.net", "MBP13",
-                  ifelse(machine == "Brians-MBP.attlocal.net", "MBP14",
-                         ifelse(machine == "Office-Mac.attlocal.net", "OfficeMac", 
-                                ifelse(machine == "ES127", "ES127", machine)))) %>%
+machine <- ifelse(
+  stringr::str_detect(machine, "BRIANC-MacUS") == TRUE, "MBP13", ifelse(
+    stringr::str_detect(machine, "Brians-MacBook-Pro") == TRUE, "MBP14", ifelse(
+      stringr::str_detect(machine, "Office-Mac") == TRUE, "OfficeMac",
+      ifelse(machine == "ES127", "ES127", machine)))) %>%
   as.character()
 
 
