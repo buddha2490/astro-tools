@@ -4,19 +4,22 @@ library(magrittr)
 
 
 
+debug <- FALSE
+
 os <- Sys.info()["sysname"]
 machine <- Sys.info()["nodename"]
 
 os <- ifelse(os == "Darwin", "Mac", "Windows") %>% as.character()
 machine <- ifelse(machine == "BRIANC-MacUS.attlocal.net", "MBP13",
                   ifelse(machine == "Brians-MBP.attlocal.net", "MBP14",
-                         ifelse(machine == "ES127", "ES127", machine))) %>%
+                         ifelse(machine == "Office-Mac.attlocal.net", "OfficeMac",
+                            ifelse(machine == "ES127", "ES127", machine)))) %>%
   as.character()
 
 
 # Environmental parameters ------------------------------------------------
 
-if (machine == "ES127") {
+if (machine == "ES127" & debug != TRUE) {
   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
   camera <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
@@ -24,10 +27,17 @@ if (machine == "ES127") {
   source("functions/functions.R")
   
   
+} else if (machine == "ES127" & debug == TRUE) {
+  setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
+  src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
+  camera <- "D:/NAS/testing/subs"
+  darks <-  "c:/users/Brian Carter/astronomy/ASI2600MM/Dark Library/"
+  source("functions/functions.R")
+  
 } else {
   setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
   src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-  camera <- file.path("/Users/briancarter/Astronomy/testing")
+  camera <- file.path("/Volumes/Astro-SSD/testing/data/subs")
   username <- Sys.getenv("username")
   password <- Sys.getenv("password")
   es127 <- paste0("open 'smb://", username, ":", password, "@", "ES127", "/Users/Brian Carter/Astronomy/ASI2600MM/Dark Library'")
@@ -70,6 +80,10 @@ if (os == "Mac") {
 }
 
 
+# There are some weird errors, but everything runs with below.
+if (os == "Windows" & debug == TRUE) {
+  glue::glue("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat") %>% sys::exec_wait()
+}
 
   
 

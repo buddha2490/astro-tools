@@ -5,8 +5,8 @@ set -euo pipefail
 
 # ---- config ----
 SOURCE="/Volumes/Astro-SSD/"
-DEST="/Volumes/shared/astro-ssd/"
-LOG="${HOME}/astro-tools/logs/astro_backup.log"
+DEST="/Volumes/Office-HDD/Astro-SSD"
+LOG="/Users/briancarter/astronomy/astro-tools/logs/astro_backup.log"
 LOCK="/tmp/astro_backup.lock"
 PATH="/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
