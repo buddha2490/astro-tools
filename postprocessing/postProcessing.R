@@ -78,13 +78,19 @@ objects <- data.frame(dir = list.dirs(camera, recursive = TRUE, full.names = TRU
 
 
 objects %>%  lapply(bulkRename)
-objects %>% lapply(processObjects)
 
+# MBP14 - /volumes/office-ssd/astronomy/testing: 271.737 elapsed
+system.time({
+objects %>% lapply(processObjects)
+})
 
 # go ahead and run it if on the dev rig
+# MBP14 - /volumes/office-ssd/astronomy/testing: 271.737 elapsed
+system.time({
 if (os == "Mac") {
   glue::glue("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing/wbpp.sh") %>% system()
 }
+})
 
 
 # There are some weird errors, but everything runs with below.

@@ -49,13 +49,20 @@ if (os == "Windows" & debug == TRUE) {
   phd2Logs <- logPath
 }
 
-if (os == "Mac") {
+if (machine == "OfficeMac") {
   setwd("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
   logPath <- "/Volumes/Office-SSD/Astronomy/testing/data/logs"
   subsPath <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
   phd2Logs <- logPath
 }
-
+  
+if (machine == "MBP14") {
+  setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
+  logPath <- "/Volumes/Office-SSD/Astronomy/testing/data/logs"
+  subsPath <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
+  phd2Logs <- logPath
+}  
+    
 source("functions/functions.R")
 
 

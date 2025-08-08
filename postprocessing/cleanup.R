@@ -32,14 +32,19 @@ if (os == "Windows" & debug == FALSE) {
   cameraSrc <- "D:/NAS/testing/subs"
   transfer <- "z:/transfer" # transfer path
   wbpp <- file.path(src, "wbpp.sh")
-} else {
+} else if (machine == "OfficeMac") {
   setwd("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
   src <- file.path("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
   cameraSrc <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
   transfer <- "/Volumes/Office-SSD/Astronomy/transfer"
   wbpp <- file.path(src, "wbpp.sh")
+} else if (machine == "MBP14") {
+  setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
+  src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
+  cameraSrc <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
+  transfer <- "/Volumes/Office-SSD/Astronomy/transfer"
+  wbpp <- file.path(src, "wbpp.sh")
 }
-
 
 
 
