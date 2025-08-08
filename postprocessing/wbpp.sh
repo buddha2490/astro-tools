@@ -1,1 +1,3 @@
 
+"/Applications/PixInsight/PixInsight.app/Contents/MacOS/PixInsight"  -n --automation-mode -r="/Applications/Pixinsight/src/scripts/BatchPreprocessing/FBPP.js,automationMode=true,outputDirectory=/Volumes/Office-SSD/Astronomy/testing/data/subs/IC5146/IC5146_2025-07-25/flats,dir=/Volumes/Office-SSD/Astronomy/testing/data/subs/IC5146/IC5146_2025-07-25/flats" --force-exit
+"/Applications/PixInsight/PixInsight.app/Contents/MacOS/PixInsight"  -n --automation-mode -r="/Applications/Pixinsight/src/scripts/BatchPreprocessing/FBPP.js,automationMode=true,outputDirectory=/Volumes/Office-SSD/Astronomy/testing/data/subs/M27/M27_2025-07-25/flats,dir=/Volumes/Office-SSD/Astronomy/testing/data/subs/M27/M27_2025-07-25/flats" --force-exit

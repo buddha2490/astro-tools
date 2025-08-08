@@ -98,19 +98,10 @@ tallySubs <- function(src, astrobin = FALSE) {
 
 
 
-# Run in ------------------------------------------------------------------
-username <- Sys.getenv("username")
-password <- Sys.getenv("password")
-mbp13 <- "BRIANC-Macus"
-laptop <- paste0("open 'smb://", username, ":", password, "@", mbp13, "/Astro-SSD'")
-system(laptop) # MBP13 connection
-rm(username, password, mbp13, laptop)
-
-
-
+# Run ------------------------------------------------------------------
 
 # Pick an object path
-src <- "/Volumes/Astro-SSD/In Progress/M16"
+src <- "/Volumes/Office-SSD/Astronomy/transfer/NGC206"
 
 tallySubs(src, astrobin = TRUE)
 tallySubs(src, astrobin = FALSE)
