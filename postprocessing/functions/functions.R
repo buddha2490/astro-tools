@@ -419,9 +419,15 @@ addSubsToSequence <- function(path = subsPath) {
   
   dirs <- list.dirs(path, recursive = TRUE) %>%
     setdiff(path) %>%
-    setdiff(list.dirs(path, recursive = FALSE)) %>%
-    stringr::str_remove("/checkFits") %>%
+    setdiff(list.dirs(path, recursive = FALSE)) %>% 
+    data.frame(file = . )  %>%
+    filter(!stringr::str_detect(file, "flats") & 
+             !stringr::str_detect(file, "checkFits") & 
+             !stringr::str_detect(file, "master") & 
+             !stringr::str_detect(file, "logs") & 
+             !stringr::str_detect(file, "calibrated")) %>%
     unique()
+
   
  foo <-  lapply(dirs, function(x) {
     readr::read_csv(glue::glue("{x}/ImageMetaData.csv"))
@@ -495,7 +501,22 @@ getMetaDataStartStop <- function(path, os = os, machine = machine) {
   
 }
 
-processMetaData <- function(path, os = os, machine = machine) {
+
+getAllMetaData <- function(path) {
+  
+  metadatFiles <- list.files(path = path, 
+                             pattern = "ImageMetaData.csv", 
+                             recursive = TRUE, 
+                             full.names = TRUE) %>%
+    lapply(readr::read_csv) %>%
+    do.call("rbind", .) %>%
+    mutate(Object = basename(dirname(FilePath)))  %>%
+    select(Object, FilterName, Duration, HFR, FWHM, GuidingRMSArcSec,
+           ExposureStart, FocuserTemp)
+}
+
+
+processMetaData <- function(path) {
   
   
   metadatFiles <- list.files(path = path, 
@@ -727,4 +748,10 @@ logChartDev <- function(df = logReshaped) {
     return()
   
 }
+
+
+
+
+
+
 
