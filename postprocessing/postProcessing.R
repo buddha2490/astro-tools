@@ -42,13 +42,17 @@ if (machine == "ES127" & debug != TRUE) {
   camera <- file.path("/Volumes/Office-SSD/Astronomy/testing/data/subs")
   username <- Sys.getenv("username")
   password <- Sys.getenv("password")
-  es127 <- paste0("open 'smb://", username, ":", password, "@", "ES127", "/Users/Brian Carter/Astronomy/ASI2600MM/Dark Library'")
-  system(es127) # mini computer connection
-  darks <- file.path("/Volumes/Dark Library")
+  darks <- file.path("/Volumes/Office-SSD/Astronomy/ASI2600MM/Dark Library")
   source("functions/functions.R")
   
 } else if (machine == "MBP14") {
-  
+  setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
+  src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
+  camera <- file.path("/Volumes/Office-SSD/Astronomy/testing/data/subs")
+  username <- Sys.getenv("username")
+  password <- Sys.getenv("password")
+  darks <- file.path("/Volumes/Office-SSD/Astronomy/ASI2600MM/Dark Library")
+  source("functions/functions.R")
 }
                   
                   
