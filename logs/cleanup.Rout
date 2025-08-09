@@ -40,40 +40,52 @@ The following object is masked from 'package:magrittr':
 
 > 
 > 
+> debug <- FALSE
 > 
 > os <- Sys.info()["sysname"]
 > machine <- Sys.info()["nodename"]
 > 
 > os <- ifelse(os == "Darwin", "Mac", "Windows") %>% as.character()
-> machine <- ifelse(machine == "BRIANC-MacUS.attlocal.net", "MBP13",
-+                   ifelse(machine == "Brians-MBP.attlocal.net", "MBP14",
-+                          ifelse(machine == "ES127", "ES127", machine))) %>%
+> machine <- ifelse(
++   stringr::str_detect(machine, "BRIANC-MacUS") == TRUE, "MBP13", ifelse(
++     stringr::str_detect(machine, "Brians-MacBook-Pro") == TRUE, "MBP14", ifelse(
++       stringr::str_detect(machine, "Office-Mac") == TRUE, "OfficeMac",
++       ifelse(machine == "ES127", "ES127", machine)))) %>%
 +   as.character()
 > 
 > 
 > 
 > # Environmental parameters ------------------------------------------------
 > 
-> if (machine == "ES127") {
-+   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
-+   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
-+   cameraSrc <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
-+   transfer <- "z:/transfer"
-+   wbpp <- "C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat"
-+ } else {
+> if (os == "Windows" & debug == FALSE) {
++   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
++   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
++   cameraSrc <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127" # subspath
++   transfer <- "z:/Processing Space" # transfer path
++   wbpp <- "C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat" # wbpp
++ } else if  (os == "Windows" & debug == TRUE) {
++   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
++   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
++   cameraSrc <- "D:/NAS/testing/subs"
++   transfer <- "z:/Processing Space" # transfer path
++   wbpp <- file.path(src, "wbpp.sh")
++ } else if (machine == "OfficeMac") {
++   setwd("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
++   src <- file.path("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
++   cameraSrc <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
++   transfer <- "/Volumes/Office-SSD/Astronomy/Processing Space"
++   wbpp <- file.path(src, "wbpp.sh")
++ } else if (machine == "MBP14") {
 +   setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
 +   src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-+   cameraSrc <- "/Users/briancarter/Astronomy/testing"
-+   username <- Sys.getenv("username")
-+   password <- Sys.getenv("password")
-+   mbp13 <- "BRIANC-MacUS"
-+   laptop <- paste0("open 'smb://", username, ":", password, "@", mbp13, "/Astro-SSD'")
-+   system(laptop) # MBP13 connection
-+   transfer <- "/Volumes/Astro-SSD/transfer"
-+   rm(username, password, mbp13)
++   cameraSrc <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
++   transfer <- "/Volumes/Office-SSD/Astronomy/Processing Space"
 +   wbpp <- file.path(src, "wbpp.sh")
-+ 
 + }
+> 
+> 
+> 
+> 
 > 
 > source("functions/functions.R")
 > 
@@ -81,116 +93,9 @@ The following object is masked from 'package:magrittr':
 > 
 > # Run the scripts ---------------------------------------------------------
 > 
-> 
-> 
 > list.dirs(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
 +   lapply(cleanup, os = os, machine = machine)
-[[1]]
-[1] 0
-
-> 
-> file.remove(wbpp)
-[1] TRUE
-> con <- file(wbpp)
-> writeLines("", con)
-> close(con)
-> 
-> 
-> 
-> # Logs --------------------------------------------------------------------
-> 
-> glue::glue("{src}/logFiles.R") %>% source()
-
-Attaching package: 'lubridate'
-
-The following objects are masked from 'package:base':
-
-    date, intersect, setdiff, union
-
-
-Attaching package: 'scales'
-
-The following object is masked from 'package:readr':
-
-    col_factor
-
-
-Attaching package: 'gridExtra'
-
-The following object is masked from 'package:dplyr':
-
-    combine
-
-
-Attaching package: 'cowplot'
-
-The following object is masked from 'package:patchwork':
-
-    align_plots
-
-The following object is masked from 'package:lubridate':
-
-    stamp
-
-Rows: 83 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Loading required package: httr
-Loading required package: jsonlite
-Rows: 83 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-`summarise()` has grouped output by 'Object'. You can override using the
-`.groups` argument.
-Warning messages:
-1: One or more parsing issues, call `problems()` on your data frame for details,
-e.g.:
-  dat <- vroom(...)
-  problems(dat) 
-2: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-ℹ Please use `linewidth` instead. 
-> 
-> 
-> # transfer over to astro-ssd
-> # 10 minutes for 355 files
-> dirs_to_transfer <- list.dirs(cameraSrc, recursive = FALSE) %>%
-+   stringr::str_remove("Dark Library")
-> 
-> files_to_transfer <- list.files(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
-+   setdiff(dirs_to_transfer)
-> 
-> sapply(files_to_transfer, function(x) {
-+   file.copy(x, transfer, recursive = TRUE)
-+ })
-c:/users/Brian Carter/astronomy/ASI2600MM/ES127/20250728-094916-3.1.2.9001.11884-202507.log 
-                                                                                       TRUE 
-           c:/users/Brian Carter/astronomy/ASI2600MM/ES127/Imaging summary - 2025-07-29.png 
-                                                                                       TRUE 
-        c:/users/Brian Carter/astronomy/ASI2600MM/ES127/PHD2_GuideLog_2025-07-28_095015.txt 
-                                                                                       TRUE 
-> 
-> 
-> returnStatus <- sapply(dirs_to_transfer, function(x) {
-+   file.copy(x, transfer, recursive = TRUE)
-+ })
-> 
-> for (i in 1:length(returnStatus)) {
-+   if (returnStatus[i] == TRUE) {unlink(dirs_to_transfer[i])}
-+ }
-> 
-> 
-> proc.time()
-   user  system elapsed 
-   6.59   20.18  135.89 
+Error in UseMethod("filter") : 
+  no applicable method for 'filter' applied to an object of class "NULL"
+Calls: %>% ... FUN -> %>% -> file.path -> pull -> mutate -> filter
+Execution halted

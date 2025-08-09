@@ -246,6 +246,7 @@ cleanup <- function(myObject, os = os, machine = machine) {
   
   # copy the files
   # should fail safe if the flats didn't rename correctly
+  if (!is.null(renameStatus)) {
   copyFiles <- c(
     renameStatus %>%
       filter(returnStatus == "TRUE") %>%
@@ -258,15 +259,17 @@ cleanup <- function(myObject, os = os, machine = machine) {
       pull(foo) %>%
       file.path()
    ) 
-  
   lapply(copyFiles, function(x) file.copy(from = x, to = sessions, overwrite = TRUE))
-
   xisf <- list.files(sessions, pattern = "masterFlat")
-
+  
   if (length(xisf) == length(copyFiles)) {
     unlink(flatDir, recursive = TRUE, force = TRUE)
   }
-}
+  }
+  }
+  
+
+
 
 renameFlats <- function(flatsList) {
   if (length(flatsList) == 0) {

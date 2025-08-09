@@ -34,19 +34,24 @@ The following objects are masked from 'package:base':
 > 
 > 
 > 
+> debug <- FALSE
+> 
 > os <- Sys.info()["sysname"]
 > machine <- Sys.info()["nodename"]
 > 
 > os <- ifelse(os == "Darwin", "Mac", "Windows") %>% as.character()
-> machine <- ifelse(machine == "BRIANC-MacUS.attlocal.net", "MBP13",
-+                   ifelse(machine == "Brians-MBP.attlocal.net", "MBP14",
-+                          ifelse(machine == "ES127", "ES127", machine))) %>%
+> machine <- ifelse(
++   stringr::str_detect(machine, "BRIANC-MacUS") == TRUE, "MBP13", ifelse(
++     stringr::str_detect(machine, "Brians-MacBook-Pro") == TRUE, "MBP14", ifelse(
++       stringr::str_detect(machine, "Office-Mac") == TRUE, "OfficeMac",
++       ifelse(machine == "ES127", "ES127", machine)))) %>%
 +   as.character()
+> 
 > 
 > 
 > # Environmental parameters ------------------------------------------------
 > 
-> if (machine == "ES127") {
+> if (machine == "ES127" & debug != TRUE) {
 +   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
 +   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
 +   camera <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
@@ -54,18 +59,30 @@ The following objects are masked from 'package:base':
 +   source("functions/functions.R")
 +   
 +   
-+ } else {
-+   setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-+   src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-+   camera <- file.path("/Users/briancarter/Astronomy/testing")
-+   username <- Sys.getenv("username")
-+   password <- Sys.getenv("password")
-+   es127 <- paste0("open 'smb://", username, ":", password, "@", "ES127", "/Users/Brian Carter/Astronomy/ASI2600MM/Dark Library'")
-+   system(es127) # mini computer connection
-+   darks <- file.path("/Volumes/Dark Library")
-+   
++ } else if (machine == "ES127" & debug == TRUE) {
++   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
++   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
++   camera <- "D:/NAS/testing/subs"
++   darks <-  "c:/users/Brian Carter/astronomy/ASI2600MM/Dark Library/"
 +   source("functions/functions.R")
 +   
++ } else if (machine == "OfficeMac") {
++   setwd("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
++   src <- file.path("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
++   camera <- file.path("/Volumes/Office-SSD/Astronomy/testing/data/subs")
++   username <- Sys.getenv("username")
++   password <- Sys.getenv("password")
++   darks <- file.path("/Volumes/Office-SSD/Astronomy/ASI2600MM/Dark Library")
++   source("functions/functions.R")
++   
++ } else if (machine == "MBP14") {
++   setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
++   src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
++   camera <- file.path("/Volumes/Office-SSD/Astronomy/testing/data/subs")
++   username <- Sys.getenv("username")
++   password <- Sys.getenv("password")
++   darks <- file.path("/Volumes/Office-SSD/Astronomy/ASI2600MM/Dark Library")
++   source("functions/functions.R")
 + }
 >                   
 >                   
@@ -94,8 +111,15 @@ The following objects are masked from 'package:base':
 [[1]]
 NULL
 
-> objects %>% lapply(processObjects)
-Rows: 83 Columns: 34
+[[2]]
+NULL
+
+> 
+> # MBP14 - /volumes/office-ssd/astronomy/testing: 271.737 elapsed
+> system.time({
++ objects %>% lapply(processObjects)
++ })
+Rows: 202 Columns: 34
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (4): FilePath, FilterName, Binning, PierSide
@@ -104,17 +128,51 @@ dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-[[1]]
-[1] 0
+Rows: 202 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (4): FilePath, FilterName, Binning, PierSide
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
 
-> 
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 115 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (4): FilePath, FilterName, Binning, PierSide
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 115 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (4): FilePath, FilterName, Binning, PierSide
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+   user  system elapsed 
+   1.42   10.32   20.47 
 > 
 > # go ahead and run it if on the dev rig
-> if (os == "Mac") {
-+   glue::glue("/Users/briancarter/Astronomy/astro-tools/postprocessing/wbpp.sh") %>% system()
+> # MBP14 - /volumes/office-ssd/astronomy/testing: 271.737 elapsed
+> system.time({
++ if (os == "Mac") {
++   glue::glue("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing/wbpp.sh") %>% system()
 + }
++ })
+   user  system elapsed 
+      0       0       0 
 > 
 > 
+> # There are some weird errors, but everything runs with below.
+> if (os == "Windows" & debug == TRUE) {
++   glue::glue("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat") %>% sys::exec_wait()
++ }
 > 
 >   
 > 
@@ -129,4 +187,4 @@ dttm  (2): ExposureStart, ExposureStartUTC
 > 
 > proc.time()
    user  system elapsed 
-   1.46    2.59    9.43 
+   2.59   10.75   24.25 
