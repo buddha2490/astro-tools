@@ -24,25 +24,25 @@ if (os == "Windows" & debug == FALSE) {
   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
   cameraSrc <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127" # subspath
-  transfer <- "z:/Processing Space" # transfer path
+  transfer <- "z:/In Progress" # transfer path
   wbpp <- "C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat" # wbpp
 } else if  (os == "Windows" & debug == TRUE) {
   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
   cameraSrc <- "D:/NAS/testing/subs"
-  transfer <- "z:/Processing Space" # transfer path
+  transfer <- "z:/In Progress" # transfer path
   wbpp <- file.path(src, "wbpp.sh")
 } else if (machine == "OfficeMac") {
   setwd("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
   src <- file.path("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
   cameraSrc <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
-  transfer <- "/Volumes/Office-SSD/Astronomy/Processing Space"
+  transfer <- "/Volumes/Office-SSD/Astronomy/In Progress"
   wbpp <- file.path(src, "wbpp.sh")
 } else if (machine == "MBP14") {
   setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
   src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
   cameraSrc <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
-  transfer <- "/Volumes/Office-SSD/Astronomy/Processing Space"
+  transfer <- "/Volumes/Office-SSD/Astronomy/In Progress"
   wbpp <- file.path(src, "wbpp.sh")
 }
 

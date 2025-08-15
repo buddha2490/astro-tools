@@ -95,7 +95,146 @@ The following object is masked from 'package:magrittr':
 > 
 > list.dirs(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
 +   lapply(cleanup, os = os, machine = machine)
-Error in UseMethod("filter") : 
-  no applicable method for 'filter' applied to an object of class "NULL"
-Calls: %>% ... FUN -> %>% -> file.path -> pull -> mutate -> filter
-Execution halted
+[[1]]
+[1] 0
+
+[[2]]
+[1] 0
+
+> 
+> # reinitialize the wbpp script for next time!
+> file.remove(wbpp)
+[1] TRUE
+> con <- file(wbpp)
+> writeLines("", con)
+> close(con)
+> 
+> 
+> 
+> # Logs --------------------------------------------------------------------
+> 
+> glue::glue("{src}/logFiles.R") %>% source()
+
+Attaching package: 'lubridate'
+
+The following objects are masked from 'package:base':
+
+    date, intersect, setdiff, union
+
+
+Attaching package: 'scales'
+
+The following object is masked from 'package:readr':
+
+    col_factor
+
+
+Attaching package: 'gridExtra'
+
+The following object is masked from 'package:dplyr':
+
+    combine
+
+
+Attaching package: 'cowplot'
+
+The following object is masked from 'package:patchwork':
+
+    align_plots
+
+The following object is masked from 'package:lubridate':
+
+    stamp
+
+Rows: 171 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (4): FilePath, FilterName, Binning, PierSide
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 52 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (4): FilePath, FilterName, Binning, PierSide
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Loading required package: httr
+Loading required package: jsonlite
+Rows: 171 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (4): FilePath, FilterName, Binning, PierSide
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 52 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (4): FilePath, FilterName, Binning, PierSide
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+`summarise()` has grouped output by 'Object'. You can override using the
+`.groups` argument.
+Warning messages:
+1: One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat <- vroom(...)
+  problems(dat) 
+2: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead. 
+> 
+> 
+> # transfer over to astro-ssd
+> # 10 minutes for 355 files
+> dirs_to_transfer <- list.dirs(cameraSrc, recursive = FALSE) %>%
++   stringr::str_remove("Dark Library")
+> 
+> files_to_transfer <- list.files(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
++   setdiff(dirs_to_transfer)
+> 
+> sapply(files_to_transfer, function(x) {
++   file.copy(x, transfer, recursive = TRUE)
++ })
+c:/users/Brian Carter/astronomy/ASI2600MM/ES127/Imaging summary - 2025-08-15.png 
+                                                                            TRUE 
+Warning message:
+In file.copy(x, transfer, recursive = TRUE) :
+  'recursive' will be ignored as 'to' is not a single existing directory
+> 
+> 
+> returnStatus <- sapply(dirs_to_transfer, function(x) {
++   file.copy(x, transfer, recursive = TRUE)
++ })
+Warning messages:
+1: In file.copy(x, transfer, recursive = TRUE) :
+  'recursive' will be ignored as 'to' is not a single existing directory
+2: In file.copy(x, transfer, recursive = TRUE) :
+  cannot overwrite a non-directory with a directory
+3: In file.copy(x, transfer, recursive = TRUE) :
+  'recursive' will be ignored as 'to' is not a single existing directory
+4: In file.copy(x, transfer, recursive = TRUE) :
+  cannot overwrite a non-directory with a directory
+> 
+> for (i in 1:length(returnStatus)) {
++   if (returnStatus[i] == TRUE) {unlink(dirs_to_transfer[i], recursive = TRUE, force = TRUE)}
++ }
+> 
+> png <- list.files(file.path(cameraSrc), pattern = ".png", recursive = TRUE, full.names = TRUE)
+> sapply(png, file.remove)
+c:/users/Brian Carter/astronomy/ASI2600MM/ES127/Imaging summary - 2025-08-15.png 
+                                                                            TRUE 
+> 
+> proc.time()
+   user  system elapsed 
+  10.73   10.56   40.18 
