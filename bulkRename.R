@@ -1,10 +1,10 @@
 library(dplyr)
 
 
-src <- "/Volumes/Astro-SSD/Transfer/NGC7331_SN2025rbs/NGC7331_SN2025rbs_2025-07-21"
+src <- "/Volumes/Office-SSD/Astronomy/In Progress/M31StarCloud/M31StarCloud_2025-08-14"
 
-keyword <- "NGC7331_SN2025rbs"
-replacement <- "NGC7331"
+keyword <- "M31StarCloud"
+replacement <- "NGC206"
 
 fit <- list.files(src, recursive = TRUE, pattern = "fit")
 lapply(fit, function(x) {
@@ -15,6 +15,12 @@ lapply(fit, function(x) {
   
 })
 
-list.files(src)
+# change the names in the metadata file too
+readr::read_csv(file.path(src, "ImageMetaData.csv")) %>%
+  mutate(FilePath = stringr::str_replace_all(FilePath, keyword, replacement)) %>%
+  readr::write_csv(file.path(src, "ImageMetaData.csv"))
+
+
+
 
 # Bulk_rename()

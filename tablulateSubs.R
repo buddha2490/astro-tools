@@ -5,105 +5,79 @@ options(dplyr.summarise.inform = FALSE)
 # Functions ---------------------------------------------------------------
 
 
-
-eachFilter <- function(x) {
+astroBinSubs <- function(myObject) {
   
-  data.frame(file = x) %>%
-    mutate(filter = substr(x, 1, 1)) %>%
-    mutate(secs = stringr::str_replace(file, paste0(filter, "_"), "")) %>%
-    mutate(secs = as.numeric(secs))
-}
-
-replace <- function(x, object) {
-  string <- substr(x,
-                   1,
-                   paste0(object, "_",Sys.Date(),"_LIGHT_") %>% nchar())
+  astroDB <- connectDB()
+  df <- tbl(astroDB, "astroSubs")
   
-  stringr::str_replace(x, string, "")   %>%
-    stringr::str_replace(".fits", "") %>% 
-    substr(1, (nchar(.) - 5))
+  labels <- c("Antlia 3nm Narrowband H-alpha 36 mm",
+              "Antlia 3nm Narrowband Oxygen III 36 mm",
+              "Antlia 3nm Narrowband Sulfur II 36 mm",
+              "ZWO Blue 36 mm",
+              "ZWO Green 36 mm",
+              "ZWO Luminance 36 mm",
+              "ZWO Red 36 mm")
   
-}
-
-tallySubs <- function(src, astrobin = FALSE) {
-  
-  object <- basename(src)
-  if (object == "NGC7331_SN2025rbs") {object <- "NGC7331"}
-  
-  files <- list.files(src,
-                      recursive = TRUE,
-                      pattern = "fit") %>%
-    basename()
-  
-  filelist <- list()
-  filelist$l <- files[stringr::str_detect(files, "_L_") == TRUE] %>% replace(object)
-  filelist$r <- files[stringr::str_detect(files, "_R_") == TRUE] %>% replace(object)
-  filelist$g <- files[stringr::str_detect(files, "_G_") == TRUE] %>% replace(object)
-  filelist$b <- files[stringr::str_detect(files, "_B_") == TRUE] %>% replace(object)
-  filelist$s <- files[stringr::str_detect(files, "_S_") == TRUE] %>% replace(object)
-  filelist$h <- files[stringr::str_detect(files, "_H_") == TRUE] %>% replace(object)
-  filelist$o <- files[stringr::str_detect(files, "_O_") == TRUE] %>% replace(object)
-  
-  
-  
-  if (astrobin == TRUE) {
-
-  lapply(filelist, eachFilter) %>%
-    do.call("rbind", .) %>%
-    mutate(filter = factor(filter,
-                           levels = c("L", "R", "G", "B", "H", "S", "O"))) %>%
-    group_by(filter, secs) %>%
-    summarize(N = n(),
-           mins = sum(secs) / 60) %>%
-    arrange(filter) %>%
+  df %>% 
+    dplyr::filter(Object == myObject) %>%
+    dplyr::filter(Status != "Excluded") %>%
+    group_by(Date, FilterName, Duration) %>%
+    summarize(Number = n()) %>%
     ungroup() %>%
-    mutate(total_mins = cumsum(mins)) %>%
-    mutate(mins = format(round(mins, 1), nsmall = 1)) %>%
-    mutate(total_mins = format(round(total_mins, 1), nsmall = 1)) %>%
-          select(Filter = filter,
-                 N,
-                 Exposure = secs,
-                 `Duration\n(mins)` = mins,
-                 `Cumulative\n(mins)` = total_mins)  %>%
-          gt(rowname_col = "row") %>%
-          tab_header(
-            title = md(glue::glue("Sub tally for {object} grouped by filter and sub duration")),
-            subtitle = md("Data displayed for Astrobin upload")
-          )
-             
-  } else {
-
-  lapply(filelist, eachFilter) %>%
-    do.call("rbind", .) %>%
-    mutate(filter = factor(filter,
-                           levels = c("L", "R", "G", "B", "H", "S", "O"))) %>%
-    group_by(filter) %>%
-    summarize(N = n(),
-              mins = sum(secs) / 60) %>%
-    arrange(filter) %>%
+    select(Date, Filter = FilterName, Number, Duration) %>%
+    collect() %>%
+    mutate(Filter = factor(Filter,
+                           levels = c("H", "O", "S", "B", "G", "L", "R",
+                                      "HO", "UVIR"),
+                           labels = c(labels, "HO", "UVIR"))) %>%
+    readr::write_csv(glue::glue("/Users/briancarter/Desktop/{myObject}_astrobin_subs.csv"))
+  
+  dbDisconnect(astroDB)
+}
+tabulateSubs <- function(myObject) {
+  
+  astroDB <- connectDB()
+  df <- tbl(astroDB, "astroSubs")
+  
+  labels <- c("Luminance",
+              "Red",
+              "Green",
+              "Blue",
+              "H-alpha",
+              "Sulfur II",
+              "Oxygen III")
+  
+  df %>% 
+    dplyr::filter(Object == myObject) %>%
+    dplyr::filter(Status != "Excluded") %>%
+    group_by(FilterName) %>%
+    summarize(Number = n(),
+              Duration = sum(Duration) / 60) %>%
     ungroup() %>%
-    mutate(total_mins = cumsum(mins)) %>%
-    mutate(mins = format(round(mins, 1), nsmall = 1)) %>%
-    mutate(total_mins = format(round(total_mins, 1), nsmall = 1)) %>%
-    select(Filter = filter,
-           N,
-           `Duration\n(mins)` = mins,
-           `Cumulative\n(mins)` = total_mins)  %>%
+    collect() %>%
+    mutate(Filter = factor(FilterName,
+                           levels = c("L", "R", "G", "B", "S", "H", "O", "HO", "UVIR"),
+                           labels = c(labels, "HO", "UVIR"))) %>%
+    arrange(Filter) %>%
+    mutate(Duration2 = cumsum(Duration)) %>%
+    select(Filter, Number, `Duration\n(mins)` = Duration, `Duration\n(cum)` = Duration2) %>%
     gt(rowname_col = "row") %>%
     tab_header(
-      title = md(glue::glue("Sub tally for {object} grouped by filter")))
-  }
+      title = md(glue::glue("Sub tally for {myObject} grouped by filter and sub duration"))
+    ) 
   
-}  
-
+}
 
 
 # Run ------------------------------------------------------------------
 
-# Pick an object path
-src <- "/Volumes/Office-SSD/Astronomy/transfer/NGC206"
 
-tallySubs(src, astrobin = TRUE)
-tallySubs(src, astrobin = FALSE)
+
+myObject <- "M27"
+
+astroBinSubs(myObject) # saves a CSV file on desktop for upload
+
+tabulateSubs(myObject) # more useful function
+
 
 
