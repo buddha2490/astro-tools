@@ -56,7 +56,7 @@ tabulateSubs <- function(myObject) {
     ungroup() %>%
     collect() %>%
     mutate(Filter = factor(FilterName,
-                           levels = c("L", "R", "G", "B", "S", "H", "O", "HO", "UVIR"),
+                           levels = c("L", "R", "G", "B",  "H", "O", "S","HO", "UVIR"),
                            labels = c(labels, "HO", "UVIR"))) %>%
     arrange(Filter) %>%
     mutate(Duration2 = cumsum(Duration)) %>%
@@ -80,4 +80,8 @@ astroBinSubs(myObject) # saves a CSV file on desktop for upload
 tabulateSubs(myObject) # more useful function
 
 
-
+foo <- connectDB()
+df <- tbl(foo, "astroSubs") 
+df %>%
+  dplyr::filter(is.na(Object)) %>%
+  pull(Filename)
