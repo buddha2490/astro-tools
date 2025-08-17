@@ -58,12 +58,17 @@ connectDB <- function () {
 changeMetaPath <- function(file, subsDf = subsDf) {
   
   # change only if necessary
-  df <- readr::read_csv(file) 
+  df <- readr::read_csv(file) %>%
+    arrange(desc(ExposureNumber))
 
   name_order <- colnames(df)
   
-  loc <- df$FilePath[1]
-  
+  loc <- df %>%
+    dplyr::filter(!is.na(FilePath)) %>% # drops excluded 
+    arrange(desc(ExposureNumber)) %>%
+    slice(1) %>%
+    pull(FilePath)
+
   if ((stringr::str_detect(loc, "c:/users") == TRUE) |
       (stringr::str_detect(loc, "C:/Users") == TRUE)) {
   
@@ -118,9 +123,18 @@ metadataFiles <- list.files(subdirs, pattern = "ImageMetaData.csv",
 
 # Update the metadata file with the correct file path information
 # they are listed as "c:/users/Brian Carter" and I want them on the NAS
-sapply(metadataFiles, changeMetaPath, subsDf = subsDf)
+invisible(capture.output(
+  suppressMessages(
+    suppressWarnings({
+      sapply(metadataFiles, changeMetaPath, subsDf = subsDf)
+    })
+  )
+))
+
 
 # nrow = 4740 at development - August 15th 2025
+invisible(capture.output(
+  suppressMessages(
 metadata <- lapply(metadataFiles, readr::read_csv) %>%
   Reduce(function(x,y) bind_rows(x, y), .) %>%
   mutate(Object = basename(dirname(dirname(FilePath)))) %>%
@@ -139,11 +153,55 @@ metadata <- lapply(metadataFiles, readr::read_csv) %>%
   select(Object, Date, Filename, ExposureStart, FilterName, Duration, CameraTemp,
          Gain, ADUMean, DetectedStars, HFR, FWHM, Eccentricity, GuidingRMSArcSec,
          FocuserPosition, FocuserTemp, RotatorPosition, Status)
-  
+  )
+)) 
+
+
+# Deal with missing metadata
+# Still missing for some "Excluded" - that's ok
+metadata$order <- seq_len(nrow(metadata))
+missing <- metadata %>% dplyr::filter(is.na(Object))
+notmissing <- metadata %>% anti_join(missing)
+
+missing$Object <- stringr::str_split(missing$Filename, "_") %>%
+  sapply(function(x) x[1]) # get the object name from the filename
+
+missing$Date <- stringr::str_split(missing$Filename, "_") %>%
+  sapply(function(x) x[2]) # get the date from the filename
+
+metadata <- missing %>% bind_rows(notmissing) %>%
+  arrange(order) %>%
+  select(-order)
+
 
 astroDB <- connectDB()
-dbWriteTable(astroDB, "astroSubs", metadata, overwrite = TRUE)
+old <- tbl(astroDB, "astroSubs") %>%
+  collect()
+
+
+# compare the database table to the new version
+# If the same: stop
+# If there is new stuff: write it to the database
+add_to_database <- metadata %>%
+  anti_join(old)
+if (nrow(add_to_database) > 0) {
+  message("Adding new metadata to the database")
+  dbAppendTable(astroDB, "astroSubs", add_to_database)
+} else {
+  message("No new metadata to add to the database")
+}
+
+
+# Add a log
+log <- data.frame(
+  Timestamp = Sys.time(),
+  Action = "Inventory metadata",
+  Status = ifelse(nrow(add_to_database) > 0, "Added new metadata", "No new metadata")
+)
+
+dbAppendTable(astroDB, "astroDBLog", log)
 dbDisconnect(astroDB)
+
 
 rm(list = ls())
 
