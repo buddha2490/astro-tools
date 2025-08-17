@@ -18,8 +18,8 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
          used (Mb) gc trigger (Mb) limit (Mb) max used (Mb)
-Ncells 132341  7.1     350000 18.7         NA   206004 11.1
-Vcells 260302  2.0    8388608 64.0      24576  1080457  8.3
+Ncells 132341  7.1     350000 18.7         NA   205874 11.0
+Vcells 260302  2.0    8388608 64.0      24576  1078099  8.3
 [[1]]
 [1] TRUE
 
@@ -97,84 +97,13 @@ The following object is masked from ‘package:magrittr’:
 > 
 > 
 > # Functions ---------------------------------------------------------------
-> connectDB <- function () {
-+   username <- Sys.getenv("username")
-+   password <- Sys.getenv("password")
-+   tryCatch({
-+     if (length(username) != 0 & length(password) != 0) {
-+       dbConnect(RPostgres::Postgres(), dbname = "astroDB", 
-+                 host = "100.85.227.75", port = 5432, user = username, 
-+                 password = password, sslmode = "prefer")
-+     }
-+     else {
-+       dbConnect(RPostgres::Postgres(), dbname = "astroDB", 
-+                 host = "100.85.227.75", port = 5432, user = getPass::getPass("Username"), 
-+                 password = getPass::getPass("Password"), sslmode = "prefer")
-+     }
-+   }, error = function(cond) {
-+     message("Can't connect to Raspberry PI")
-+     message(cond)
-+     return(NA)
-+   })
-+ }
-> 
-> 
-> # This will change the file paths in the metadata files
-> # to match the /Volumes/Office-SSD location
-> changeMetaPath <- function(file, subsDf = subsDf) {
-+   
-+   # change only if necessary
-+   df <- readr::read_csv(file) 
-+ 
-+   name_order <- colnames(df)
-+   
-+   loc <- df$FilePath[1]
-+   
-+   if ((stringr::str_detect(loc, "c:/users") == TRUE) |
-+       (stringr::str_detect(loc, "C:/Users") == TRUE)) {
-+   
-+     df <- df %>%
-+       mutate(Filename = basename(FilePath)) %>%
-+       mutate(Object = basename(dirname(dirname(FilePath)))) 
-+     
-+       
-+     subsList <- subsDf %>%
-+       dplyr::filter(Object == df$Object[1]) %>%
-+       dplyr::filter(Filename %in% df$Filename) %>%
-+       select(FilePathCorrect = FilePath, Filename)
-+     
-+     df %>%
-+       left_join(subsList, "Filename") %>%
-+       select(-FilePath, -Filename, -Object) %>%
-+       rename(FilePath = FilePathCorrect) %>%
-+       select(all_of(name_order)) %>% # re-order columns to match original
-+       readr::write_csv(file) # write out the new file paths to metadata file
-+   }
-+ }
-> 
-> 
+> "astroDB/functions/functions.R" %>% source()
 > # Inventory subs ----------------------------------------------------------
-> subsDf <- data.frame(FilePath = list.files(subdirs, all.files = TRUE,
-+                                              recursive = TRUE, full.names = TRUE,
-+                                              pattern = ".fit")) %>%
-+   mutate(Filename = basename(FilePath)) %>%
-+   mutate(Object = basename(dirname(dirname(FilePath)))) %>%
-+   mutate(Date = stringr::str_extract(FilePath, "\\d{4}-\\d{2}-\\d{2}")) %>%
-+   mutate(DurationSubs = ifelse(stringr::str_detect(Filename, "_30.00") == TRUE, 30, ifelse(
-+     stringr::str_detect(Filename, "_60.0") == TRUE, 60, ifelse(
-+       stringr::str_detect(Filename, "_120.0") == TRUE, 120, ifelse(
-+         stringr::str_detect(Filename, "_180.0") == TRUE, 180, ifelse(
-+           stringr::str_detect(Filename, "_300.0") == TRUE, 300, ifelse(
-+             stringr::str_detect(Filename, "_600.0") == TRUE, 600, NA_real_))))))) %>%
-+   mutate(FilterSubs = ifelse(stringr::str_detect(Filename, "_L_") == TRUE, "L", ifelse(
-+     stringr::str_detect(Filename, "_R_") == TRUE, "R", ifelse(
-+       stringr::str_detect(Filename, "_G_") == TRUE, "G", ifelse(
-+         stringr::str_detect(Filename, "_B_") == TRUE, "B", ifelse(
-+           stringr::str_detect(Filename, "_H_") == TRUE, "H", ifelse(
-+             stringr::str_detect(Filename, "_S_") == TRUE, "S", ifelse(
-+               stringr::str_detect(Filename, "_O_") == TRUE, "O", ifelse(
-+                 stringr::str_detect(Filename, "UVIR") == TRUE, "UVIR", ifelse(
-+                   stringr::str_detect(Filename, "_HO_") == TRUE, "HO", ""))))))))))
+> 
+> 
+> 
+> 
+> subsDf <- subsInventory()
 >                 
 > 
 > # Inventory metadata ------------------------------------------------------
@@ -184,662 +113,60 @@ The following object is masked from ‘package:magrittr’:
 > 
 > # Update the metadata file with the correct file path information
 > # they are listed as "c:/users/Brian Carter" and I want them on the NAS
-> sapply(metadataFiles, changeMetaPath, subsDf = subsDf)
-Rows: 221 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 341 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 364 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 76 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 108 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 95 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 109 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 110 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 67 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 65 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 154 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 312 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 179 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 175 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 133 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 202 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 218 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 36 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 37 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 36 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 278 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 183 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 97 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 57 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 307 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 342 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 320 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 118 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 21 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 87 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Galaxies/NGC7331/NGC7331_2025-07-19/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Galaxies/NGC7331/NGC7331_2025-07-21/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Galaxies/NGC7331/NGC7331_2025-07-23/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Globs/M13/M13_2025-07-05/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Globs/M13/M13_2025-07-06/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Objects/M16/M16_2025-07-12/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Objects/M16/M16_2025-07-13/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Objects/M16/M16_2025-07-14/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Objects/M16/M16_2025-07-17/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Objects/M16/M16_2025-07-26/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Objects/M16/M16_2025-07-27/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Objects/M27/M27_2025-07-03/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Objects/M27/M27_2025-07-19/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Objects/M27/M27_2025-07-20/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Objects/M27/M27_2025-07-25/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Objects/M27/M27_2025-08-08/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Objects/M8andM20/M8andM20_2025-06-20/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Objects/M8andM20/M8andM20_2025-06-21/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Objects/M8andM20/M8andM20_2025-06-22/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Messier Objects/M8andM20/M8andM20_2025-06-23/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Nebulae/Cocoon-Reduced/IC5146_2025-07-04/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Nebulae/Cocoon-Reduced/IC5146_2025-07-05/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Nebulae/Cocoon-Reduced/IC5146_2025-07-07/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Nebulae/Helix/Helix_2025-08-06/metadata/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Nebulae/IC5146/IC5146_2025-07-24/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Nebulae/IC5146/IC5146_2025-07-25/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Nebulae/IC5146/IC5146_2025-07-26/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Nebulae/IC5146/IC5146_2025-07-27/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Nebulae/NGC6992/NGC6992_2025-08-06/ImageMetaData.csv`
-NULL
-
-$`/Volumes/Office-SSD/Astronomy/Astrophotography/Nebulae/NGC6992/NGC6992_2025-08-07/ImageMetaData.csv`
-NULL
-
+> invisible(capture.output(
++   suppressMessages(
++     suppressWarnings({
++       sapply(metadataFiles, changeMetaPath, subsDf = subsDf)
++     })
++   )
++ ))
+> 
+> 
+> 
 > 
 > # nrow = 4740 at development - August 15th 2025
-> metadata <- lapply(metadataFiles, readr::read_csv) %>%
+> invisible(capture.output(
++   suppressMessages(
++ metadata <- lapply(metadataFiles, readr::read_csv) %>%
 +   Reduce(function(x,y) bind_rows(x, y), .) %>%
-+   mutate(Object = basename(dirname(dirname(FilePath)))) %>%
-+   mutate(Filename = basename(FilePath)) %>%
-+   mutate(Date = stringr::str_remove(basename(dirname(FilePath)), paste0(Object, "_")) )%>%
-+   full_join(subsDf %>% 
-+               select(FilePathSubs = FilePath, Filename, FilterSubs, DurationSubs) %>% 
-+               mutate(inSubs = TRUE), 
-+             c("Filename")) %>%
-+   mutate(Status = ifelse(is.na(inSubs), "Excluded", ifelse(
-+     is.na(Date), "Missing Metadata", "Included"))) %>%
-+   mutate(Object = basename(dirname(dirname(FilePath))))  %>%
-+   mutate(FilePath = ifelse(is.na(FilePath), FilePathSubs, FilePath)) %>%
-+   mutate(FilterName = ifelse(is.na(FilterName), FilterSubs, FilterName)) %>%
-+   mutate(Duration = ifelse(is.na(Duration), DurationSubs, Duration)) %>%
-+   select(Object, Date, Filename, ExposureStart, FilterName, Duration, CameraTemp,
-+          Gain, ADUMean, DetectedStars, HFR, FWHM, Eccentricity, GuidingRMSArcSec,
-+          FocuserPosition, FocuserTemp, RotatorPosition, Status)
-Rows: 221 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 341 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 364 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 76 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 108 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 95 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 109 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 110 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 67 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 65 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 154 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 312 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 179 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 175 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 133 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 202 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 218 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 36 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 37 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 36 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 278 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 183 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 97 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 57 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 307 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 342 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 320 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 118 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 21 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 87 Columns: 34
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
->   
++   processMetadata() %>%
++   fixMissingMeta()
++   )
++ )) 
+> 
 > 
 > astroDB <- connectDB()
-> dbWriteTable(astroDB, "astroSubs", metadata, overwrite = TRUE)
+> old <- tbl(astroDB, "astroSubs") %>%
++   collect()
+> 
+> 
+> # compare the database table to the new version
+> # If the same: stop
+> # If there is new stuff: write it to the database
+> add_to_database <- metadata %>%
++   anti_join(old)
+Joining with `by = join_by(Object, Date, Filename, ExposureStart, FilterName,
+Duration, CameraTemp, Gain, ADUMean, DetectedStars, HFR, FWHM, Eccentricity,
+GuidingRMSArcSec, FocuserPosition, FocuserTemp, RotatorPosition, Status)`
+> if (nrow(add_to_database) > 0) {
++   message("Adding new metadata to the database")
++   dbAppendTable(astroDB, "astroSubs", add_to_database)
++ } else {
++   message("No new metadata to add to the database")
++ }
+No new metadata to add to the database
+> 
+> # Add a log
+> log <- data.frame(
++   Timestamp = Sys.time(),
++   Action = "Inventory metadata",
++   Status = ifelse(nrow(add_to_database) > 0, "Added new metadata", "No new metadata")
++ )
+> 
+> dbAppendTable(astroDB, "astroDBLog", log)
+[1] 1
 > dbDisconnect(astroDB)
+> 
 > 
 > rm(list = ls())
 > 
@@ -848,4 +175,4 @@ dttm  (2): ExposureStart, ExposureStartUTC
 > 
 > proc.time()
    user  system elapsed 
-  1.400   0.383   1.840 
+  5.314   1.249   6.688 
