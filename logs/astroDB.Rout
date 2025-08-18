@@ -175,4 +175,4 @@ No new metadata to add to the database
 > 
 > proc.time()
    user  system elapsed 
-  5.314   1.249   6.688 
+  5.154   1.497   6.360 

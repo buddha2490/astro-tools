@@ -207,6 +207,41 @@ objectTotalIntegration <- function(myObject) {
   
 }
 
+dbSummary <- function() {
+  astroDB <- connectDB()
+  df <- tbl(astroDB, "astroSubs")
+  
+  objects <- df %>%
+    dplyr::filter(!is.na(Object)) %>%
+    distinct(Object) %>%
+    pull(Object) %>%
+    as.character()
+  
+  result <- lapply(objects, function(myObject) {
+    foo <-  objectTotalIntegration(myObject) %>%
+      data.frame() %>%
+      mutate(Object = myObject) %>%
+      mutate(Filter = ifelse(Filter %in% c("Luminance", "Red", "Green", "Blue"), "LRGB", "Narrowband")) %>%
+      group_by(Object, Filter) %>%
+      summarize(integration = sum(as.numeric(Duration..mins.))) %>%
+      ungroup() %>%
+      tidyr::pivot_wider(id_cols= Object,  names_from = Filter, values_from = integration)
+  }) %>%
+    do.call("bind_rows", .) %>%
+    rowwise() %>%
+    mutate(`Total(mins)` = sum(LRGB, Narrowband, na.rm = TRUE)) %>%
+    
+    gt(rowname_col = "row") %>%
+    tab_header(
+      title = md(glue::glue("Total integration for all objects in astroDB"))) %>%
+    sub_missing(
+      columns = everything(),
+      missing_text = ""
+    )
+  dbDisconnect(astroDB)
+  return(result)
+}
+
 
 # glue friendly wrappers
 meanFMT <- function(var) {
@@ -224,7 +259,7 @@ objectMetaData <- function(myObject) {
   
   astroDB <- connectDB()
   
-  tbl(astroDB, "astroSubs") %>%
+  df <- tbl(astroDB, "astroSubs") %>%
     dplyr::filter(!is.na(Object)) %>%
     dplyr::filter(Object == myObject) %>%
     group_by(FilterName) %>%
@@ -239,11 +274,14 @@ objectMetaData <- function(myObject) {
     select(Filter = FilterName, `Duration\n(mins)` = Duration, GuidingRMS, DetectedStars,
            ADUMean, HFR, FWHM) %>%
     mutate(Filter = factor(Filter, levels = c("L", "R", "G", "B", "H", "S", "O","UVIR", "HO"))) %>%
-    arrange(Filter) %>%
+    arrange(Filter) 
+  
+  dbDisconnect(astroDB)
+  
+  df %>%
     gt(rowname_col = "row") %>%
     tab_header(
       title = md(glue::glue("Sub metadata for {myObject} grouped by filter")),
       subtitle = md("Mean, min, and max values for each filter")
     ) 
-  
 }

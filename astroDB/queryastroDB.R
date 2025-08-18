@@ -24,3 +24,7 @@ objectTotalIntegration(myObject)
 
 # Get the other metadata, guiding, HFR, FWHM, etc
 objectMetaData(myObject)
+
+
+# list all the objects and total integration time
+dbSummary()
