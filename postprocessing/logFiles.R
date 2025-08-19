@@ -69,7 +69,7 @@ source("functions/functions.R")
 
 # session paths -----------------------------------------------------------
  sessions <- data.frame(path = list.dirs(subsPath, recursive = TRUE, full.names = TRUE)) %>%
-  filter(stringr::str_detect(path, "checkFits"))  %>%
+  dplyr::filter(stringr::str_detect(path, "checkFits"))  %>%
   mutate(path = dirname(path)) %>%
   pull(path)
 
@@ -83,7 +83,7 @@ guideFiles <- data.frame(file = list.files(phd2Logs, pattern = ".txt", full.name
   mutate(mtime = file.mtime(file)) %>%
   arrange(desc(mtime)) %>%
   distinct(file, .keep_all = TRUE) %>%
-  filter(stringr::str_detect(file, "GuideLog") == TRUE)
+  dplyr::filter(stringr::str_detect(file, "GuideLog") == TRUE)
 
 
 # Copies guide log into each session folder
@@ -125,8 +125,8 @@ logReport <- read_delim(
   mutate(DATE = ymd_hms(DATE, tz = "UTC", quiet = TRUE)) %>%
   eventPairs() %>%
   cleanupLogs() %>%
-  filter(!is.na(EVENT_ID)) %>%
-  filter(!is.na(DATE)) %>%
+  dplyr::filter(!is.na(EVENT_ID)) %>%
+  dplyr::filter(!is.na(DATE)) %>%
   times()
 
 allRoles <- logReport %>%
@@ -141,7 +141,7 @@ logReshaped <- logReport %>%
     names_from  = TYPE,
     values_from = DATE
   ) %>%
-  filter(!is.na(start) & !is.na(end)) %>%
+  dplyr::filter(!is.na(start) & !is.na(end)) %>%
   bind_rows(addSubsToSequence())
 
 logAnalysis <- logReshaped %>% logChartDev()

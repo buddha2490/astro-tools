@@ -1,1 +1,3 @@
 
+"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/Brian Carter/astronomy/ASI2600MM/ES127/CygnusWall/CygnusWall_2025-08-18/flats,dir=c:/users/Brian Carter/astronomy/ASI2600MM/ES127/CygnusWall/CygnusWall_2025-08-18/flats" --force-exit
+"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/Brian Carter/astronomy/ASI2600MM/ES127/NGC206/NGC206_2025-08-18/flats,dir=c:/users/Brian Carter/astronomy/ASI2600MM/ES127/NGC206/NGC206_2025-08-18/flats" --force-exit

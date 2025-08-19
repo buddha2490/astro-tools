@@ -61,25 +61,25 @@ The following object is masked from 'package:magrittr':
 +   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
 +   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
 +   cameraSrc <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127" # subspath
-+   transfer <- "z:/Processing Space" # transfer path
++   transfer <- "z:/In Progress" # transfer path
 +   wbpp <- "C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat" # wbpp
 + } else if  (os == "Windows" & debug == TRUE) {
 +   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
 +   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
 +   cameraSrc <- "D:/NAS/testing/subs"
-+   transfer <- "z:/Processing Space" # transfer path
++   transfer <- "z:/In Progress" # transfer path
 +   wbpp <- file.path(src, "wbpp.sh")
 + } else if (machine == "OfficeMac") {
 +   setwd("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
 +   src <- file.path("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
 +   cameraSrc <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
-+   transfer <- "/Volumes/Office-SSD/Astronomy/Processing Space"
++   transfer <- "/Volumes/Office-SSD/Astronomy/In Progress"
 +   wbpp <- file.path(src, "wbpp.sh")
 + } else if (machine == "MBP14") {
 +   setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
 +   src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
 +   cameraSrc <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
-+   transfer <- "/Volumes/Office-SSD/Astronomy/Processing Space"
++   transfer <- "/Volumes/Office-SSD/Astronomy/In Progress"
 +   wbpp <- file.path(src, "wbpp.sh")
 + }
 > 
@@ -146,7 +146,7 @@ The following object is masked from 'package:lubridate':
 
     stamp
 
-Rows: 171 Columns: 34
+Rows: 166 Columns: 34
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (4): FilePath, FilterName, Binning, PierSide
@@ -155,7 +155,7 @@ dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 52 Columns: 34
+Rows: 53 Columns: 34
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (4): FilePath, FilterName, Binning, PierSide
@@ -166,7 +166,7 @@ dttm  (2): ExposureStart, ExposureStartUTC
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 Loading required package: httr
 Loading required package: jsonlite
-Rows: 171 Columns: 34
+Rows: 166 Columns: 34
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (4): FilePath, FilterName, Binning, PierSide
@@ -175,7 +175,7 @@ dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 52 Columns: 34
+Rows: 53 Columns: 34
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (4): FilePath, FilterName, Binning, PierSide
@@ -206,25 +206,13 @@ e.g.:
 > sapply(files_to_transfer, function(x) {
 +   file.copy(x, transfer, recursive = TRUE)
 + })
-c:/users/Brian Carter/astronomy/ASI2600MM/ES127/Imaging summary - 2025-08-15.png 
+c:/users/Brian Carter/astronomy/ASI2600MM/ES127/Imaging summary - 2025-08-18.png 
                                                                             TRUE 
-Warning message:
-In file.copy(x, transfer, recursive = TRUE) :
-  'recursive' will be ignored as 'to' is not a single existing directory
 > 
 > 
 > returnStatus <- sapply(dirs_to_transfer, function(x) {
 +   file.copy(x, transfer, recursive = TRUE)
 + })
-Warning messages:
-1: In file.copy(x, transfer, recursive = TRUE) :
-  'recursive' will be ignored as 'to' is not a single existing directory
-2: In file.copy(x, transfer, recursive = TRUE) :
-  cannot overwrite a non-directory with a directory
-3: In file.copy(x, transfer, recursive = TRUE) :
-  'recursive' will be ignored as 'to' is not a single existing directory
-4: In file.copy(x, transfer, recursive = TRUE) :
-  cannot overwrite a non-directory with a directory
 > 
 > for (i in 1:length(returnStatus)) {
 +   if (returnStatus[i] == TRUE) {unlink(dirs_to_transfer[i], recursive = TRUE, force = TRUE)}
@@ -232,9 +220,9 @@ Warning messages:
 > 
 > png <- list.files(file.path(cameraSrc), pattern = ".png", recursive = TRUE, full.names = TRUE)
 > sapply(png, file.remove)
-c:/users/Brian Carter/astronomy/ASI2600MM/ES127/Imaging summary - 2025-08-15.png 
+c:/users/Brian Carter/astronomy/ASI2600MM/ES127/Imaging summary - 2025-08-18.png 
                                                                             TRUE 
 > 
 > proc.time()
    user  system elapsed 
-  10.73   10.56   40.18 
+  11.10   76.40  427.67 
