@@ -126,9 +126,12 @@ checkLogs <- function() {
   suppressWarnings({
     tbl(astroDB, "astroDBLog") %>%
       arrange(desc(Timestamp)) %>%
+      dplyr::filter(!Status %in% c("Added new metadata", "No new metadata")) %>%
       group_by(Status) %>%
       dplyr::filter(row_number() == 1) %>%
-      print()
+      collect() %>%
+      mutate(Timestamp = as.POSIXct(Timestamp, tz = "EST")) %>%
+      print() 
     cat("Printing most recent update time by Status\n")
     dbDisconnect(astroDB)
   })

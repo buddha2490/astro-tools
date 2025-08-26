@@ -55,9 +55,6 @@ invisible(capture.output(
   )
 ))
 
-
-
-
 # nrow = 4740 at development - August 15th 2025
 invisible(capture.output(
   suppressMessages(
@@ -69,31 +66,50 @@ metadata <- lapply(metadataFiles, readr::read_csv) %>%
 )) 
 
 
+metadata <- metadata %>%
+  dplyr::filter(!is.na(Filename))
+
 astroDB <- connectDB()
 old <- tbl(astroDB, "astroSubs") %>%
   collect()
 
+new_rows <- nrow(metadata) - nrow(old)
 
-# compare the database table to the new version
-# If the same: stop
-# If there is new stuff: write it to the database
-add_to_database <- metadata %>%
-  anti_join(old)
-if (nrow(add_to_database) > 0) {
-  message("Adding new metadata to the database")
-  dbAppendTable(astroDB, "astroSubs", add_to_database)
-} else {
-  message("No new metadata to add to the database")
+
+if (new_rows > 0) {
+  message <- glue::glue("There were {new_rows} new images added") 
+  log <- data.frame(
+    Timestamp = Sys.time(),
+    Action = "Inventory added",
+    Status = message)
+
+  dbWriteTable(astroDB, "astroSubs", metadata, overwrite = TRUE)
+  dbAppendTable(astroDB, "astroDBLog", log)
+  message(message)
+  
+}
+if (new_rows < 0) {
+  message <- glue::glue("There were {abs(new_rows)} images removed from the database") 
+  log <- data.frame(
+    Timestamp = Sys.time(),
+    Action = "Inventory removed",
+    Status = message)
+  dbWriteTable(astroDB, "astroSubs", metadata, overwrite = TRUE)
+  dbAppendTable(astroDB, "astroDBLog", log)
+  message(message)
+  
 }
 
-# Add a log
-log <- data.frame(
-  Timestamp = Sys.time(),
-  Action = "Inventory metadata",
-  Status = ifelse(nrow(add_to_database) > 0, "Added new metadata", "No new metadata")
-)
+if (new_rows == 0) {
+  message("No new images to add to the database")
+  log <- data.frame(
+    Timestamp = Sys.time(),
+    Action = "Inventory checked",
+    Status = "No new images to add")
+  dbAppendTable(astroDB, "astroDBLog", log)
+  
+}
 
-dbAppendTable(astroDB, "astroDBLog", log)
 dbDisconnect(astroDB)
 
 

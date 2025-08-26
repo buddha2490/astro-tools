@@ -28,3 +28,4 @@ objectMetaData(myObject)
 
 # list all the objects and total integration time
 dbSummary()
+
