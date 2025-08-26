@@ -249,12 +249,12 @@ cleanup <- function(myObject, os = os, machine = machine) {
   if (!is.null(renameStatus)) {
   copyFiles <- c(
     renameStatus %>%
-      filter(returnStatus == "TRUE") %>%
+      dplyr::filter(returnStatus == "TRUE") %>%
       mutate(foo = glue::glue("{path}/{newFlats}")) %>%
       pull(foo) %>%
       file.path(),
     renameStatus %>%
-      filter(returnStatus == "FALSE") %>%
+      dplyr::filter(returnStatus == "FALSE") %>%
       mutate(foo = glue::glue("{path}/{file}")) %>%
       pull(foo) %>%
       file.path()
@@ -306,7 +306,7 @@ renameFlats <- function(flatsList) {
 eventPairs <- function(dat) {
   
   starts <- dat %>%
-    filter(str_detect(MESSAGE, "^Starting Category:") |
+    dplyr::filter(str_detect(MESSAGE, "^Starting Category:") |
            MESSAGE == "Meridian Flip - Initializing Meridian Flip.") %>%
     mutate(
       ROLE = str_match(MESSAGE, "Item: ([^,]+)")[,2],
@@ -316,7 +316,7 @@ eventPairs <- function(dat) {
     mutate(ROLE = ifelse(is.na(ROLE) & MESSAGE == "Meridian Flip - Initializing Meridian Flip.", "MeridianFlip", ROLE))
   
   finishes <- dat %>%
-    filter(str_detect(MESSAGE, "^Finishing Category:") |
+    dplyr::filter(str_detect(MESSAGE, "^Finishing Category:") |
             MESSAGE == "Meridian Flip - Exiting meridian flip") %>%
     mutate(
       ROLE = str_match(MESSAGE, "Item: ([^,]+)")[,2],
@@ -327,7 +327,7 @@ eventPairs <- function(dat) {
   
   bind_rows(starts, finishes) %>%
     arrange(DATE) %>%
-    filter(!is.na(ROLE)) %>%
+    dplyr::filter(!is.na(ROLE)) %>%
     mutate(EVENT_ID = ifelse(is.na(EVENT_ID), lag(EVENT_ID), EVENT_ID)) %>%
     select(-LEVEL, -SOURCE, - MEMBER, -LINE)
   
@@ -346,7 +346,7 @@ pullLogs <- function(path, guest = FALSE) {
   # Maybe create an archive for the the log files after I run this script?
   allFiles <- data.frame(files = list.files(logPath, pattern = ".log", full.names = TRUE)) %>%
     mutate(mtime = file.mtime(files)) %>%
-    filter(stringr::str_detect(files, "robocopy") == FALSE)
+    dplyr::filter(stringr::str_detect(files, "robocopy") == FALSE)
   
   # This is the most recent log file, assuming it is the correct one
   # output to global environment for later copy
@@ -357,8 +357,8 @@ pullLogs <- function(path, guest = FALSE) {
     as.character()
   
   allFiles <- allFiles %>%
-    filter(!files == logFilePath) %>%
-    filter(stringr::str_detect(files, "log.log") == FALSE)
+    dplyr::filter(!files == logFilePath) %>%
+    dplyr::filter(stringr::str_detect(files, "log.log") == FALSE)
   
   archive <- glue::glue("{logPath}/archive") 
   archive %>% dir.create(showWarnings = FALSE)
@@ -388,14 +388,14 @@ times <- function(dat, os = os, machine = machine) {
   # There's a lot of trash in these logs.  I have an annotation for start/end the sequence.
   # I can use these to subset to only the active sequence section
   starttime <<- dat %>% 
-    filter(ROLE == "Annotation" & 
+    dplyr::filter(ROLE == "Annotation" & 
              str_detect(MESSAGE, "START SEQUENCE NOW") == TRUE &
              TYPE == "start") %>% 
     pull(DATE) 
   attr(starttime, "tzone") <- "America/New_York"
   
   endtime <<- dat %>%
-    filter(ROLE == "Annotation" & 
+    dplyr::filter(ROLE == "Annotation" & 
              str_detect(MESSAGE, "STOP SEQUENCE NOW") == TRUE &
              TYPE == "end") %>% 
     pull(DATE)
@@ -406,8 +406,8 @@ times <- function(dat, os = os, machine = machine) {
   if (length(endtime) == 0) endtime <- getDarkTimesAPI()$getLight %>% as.POSIXct() 
   
   dat %>%
-    filter(DATE >= starttime & DATE <= endtime) %>%
-    filter(ROLE != "Annotation") %>%
+    dplyr::filter(DATE >= starttime & DATE <= endtime) %>%
+    dplyr::filter(ROLE != "Annotation") %>%
     group_by(EVENT_ID) %>%
     mutate(TIME = ifelse(TYPE == "end", difftime(DATE, lag(DATE), units = "secs"), 0)) %>%
     ungroup()
@@ -419,7 +419,7 @@ addSubsToSequence <- function(paths = dirname(sessions)) {
   dirs <- list.dirs(paths, recursive = TRUE) %>%
     setdiff(list.dirs(paths, recursive = FALSE)) %>% 
     data.frame(file = . )  %>%
-    filter(!stringr::str_detect(file, "flats") & 
+    dplyr::filter(!stringr::str_detect(file, "flats") & 
              !stringr::str_detect(file, "checkFits") & 
              !stringr::str_detect(file, "master") & 
              !stringr::str_detect(file, "logs") & 
@@ -556,7 +556,7 @@ processMetaData <- function(path) {
 cleanupLogs <- function(dat, os = os, machine = machine) {
   
   dat %>%
-    filter(stringr::str_detect(MESSAGE, "Trigger") == FALSE) %>%
+    dplyr::filter(stringr::str_detect(MESSAGE, "Trigger") == FALSE) %>%
     mutate(ROLE =  ifelse(ROLE %in% c("CenterAndRotate", "FineHome", "Center"), "Slew, rotate, platesolve", ifelse(
       ((ROLE %in% c("CloseClover", "OpenCover", "SetBrightness", "ToggleLight")) |
          (stringr::str_detect(MESSAGE, "Flat") == TRUE)), "Flats", ROLE)
@@ -616,7 +616,7 @@ getDarkTimesAPI <- function(lat = 33, lng = -84, date = thisNight) {
 logChartDev <- function(df = logReshaped) {
   
   df <- df %>%
-    filter(!is.na(start) & !is.na(end))
+    dplyr::filter(!is.na(start) & !is.na(end))
   
   date <- as.Date(df$start[1]) %>% as.character()
   
@@ -704,7 +704,7 @@ logChartDev <- function(df = logReshaped) {
     )
   # Summarize durations
   summary_table <- df %>%
-    filter(!ROLE %in% objects) %>%
+    dplyr::filter(!ROLE %in% objects) %>%
     mutate(duration = as.numeric(difftime(end, start, units = "secs"))) %>%
     group_by(ROLE) %>%
     summarise(
@@ -712,8 +712,8 @@ logChartDev <- function(df = logReshaped) {
       total_time_mins = round(sum(duration) / 60, 1),
       .groups = "drop"
     ) %>%
-    filter(total_time_mins != 0) %>%
-    filter(ROLE != "Astronomical\nDusk-Dawn") %>%
+    dplyr::filter(total_time_mins != 0) %>%
+    dplyr::filter(ROLE != "Astronomical\nDusk-Dawn") %>%
     arrange(desc(total_time_mins))
   
   # Add total event and sequence time rows

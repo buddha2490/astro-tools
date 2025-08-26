@@ -119,7 +119,7 @@ NULL
 > system.time({
 + objects %>% lapply(processObjects)
 + })
-Rows: 171 Columns: 34
+Rows: 200 Columns: 34
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (4): FilePath, FilterName, Binning, PierSide
@@ -128,7 +128,7 @@ dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 171 Columns: 34
+Rows: 200 Columns: 34
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (4): FilePath, FilterName, Binning, PierSide
@@ -137,7 +137,7 @@ dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 52 Columns: 34
+Rows: 190 Columns: 34
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (4): FilePath, FilterName, Binning, PierSide
@@ -146,7 +146,7 @@ dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 52 Columns: 34
+Rows: 190 Columns: 34
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (4): FilePath, FilterName, Binning, PierSide
@@ -156,7 +156,7 @@ dttm  (2): ExposureStart, ExposureStartUTC
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
    user  system elapsed 
-   1.82   19.56   33.91 
+   2.47   32.75   53.63 
 > 
 > # go ahead and run it if on the dev rig
 > # MBP14 - /volumes/office-ssd/astronomy/testing: 271.737 elapsed
@@ -187,4 +187,4 @@ dttm  (2): ExposureStart, ExposureStartUTC
 > 
 > proc.time()
    user  system elapsed 
-   2.93   20.04   37.62 
+   3.93   33.03   58.07 
