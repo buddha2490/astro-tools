@@ -18,8 +18,8 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
          used (Mb) gc trigger (Mb) limit (Mb) max used (Mb)
-Ncells 132341  7.1     350000 18.7         NA   205874 11.0
-Vcells 260302  2.0    8388608 64.0      24576  1078099  8.3
+Ncells 132341  7.1     350000 18.7         NA   205898 11.0
+Vcells 260302  2.0    8388608 64.0      24576  1078563  8.3
 [[1]]
 [1] TRUE
 
@@ -51,6 +51,12 @@ Vcells 260302  2.0    8388608 64.0      24576  1078099  8.3
 [1] TRUE
 
 [[11]]
+[1] TRUE
+
+[[12]]
+[1] TRUE
+
+[[13]]
 [1] TRUE
 
 > 
@@ -136,56 +142,12 @@ The following object is masked from ‘package:magrittr’:
 +   dplyr::filter(!is.na(Filename))
 > 
 > astroDB <- connectDB()
+Can't connect to Raspberry PI
+connection to server at "100.85.227.75", port 5432 failed: Operation timed out
+	Is the server running on that host and accepting TCP/IP connections?
 > old <- tbl(astroDB, "astroSubs") %>%
 +   collect()
-> 
-> new_rows <- nrow(metadata) - nrow(old)
-> 
-> 
-> if (new_rows > 0) {
-+   message <- glue::glue("There were {new_rows} new images added") 
-+   log <- data.frame(
-+     Timestamp = Sys.time(),
-+     Action = "Inventory added",
-+     Status = message)
-+ 
-+   dbWriteTable(astroDB, "astroSubs", metadata, overwrite = TRUE)
-+   dbAppendTable(astroDB, "astroDBLog", log)
-+   message(message)
-+   
-+ }
-> if (new_rows < 0) {
-+   message <- glue::glue("There were {abs(new_rows)} images removed from the database") 
-+   log <- data.frame(
-+     Timestamp = Sys.time(),
-+     Action = "Inventory removed",
-+     Status = message)
-+   dbWriteTable(astroDB, "astroSubs", metadata, overwrite = TRUE)
-+   dbAppendTable(astroDB, "astroDBLog", log)
-+   message(message)
-+   
-+ }
-> 
-> if (new_rows == 0) {
-+   message("No new images to add to the database")
-+   log <- data.frame(
-+     Timestamp = Sys.time(),
-+     Action = "Inventory checked",
-+     Status = "No new images to add")
-+   dbAppendTable(astroDB, "astroDBLog", log)
-+   
-+ }
-No new images to add to the database
-[1] 1
-> 
-> dbDisconnect(astroDB)
-> 
-> 
-> rm(list = ls())
-> 
-> 
-> 
-> 
-> proc.time()
-   user  system elapsed 
-  5.702   1.844   7.023 
+Error in UseMethod("tbl") : 
+  no applicable method for 'tbl' applied to an object of class "logical"
+Calls: %>% -> collect -> tbl
+Execution halted

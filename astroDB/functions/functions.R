@@ -1,22 +1,5 @@
 connectDB <- function () {
-  username <- Sys.getenv("username")
-  password <- Sys.getenv("password")
-  tryCatch({
-    if (length(username) != 0 & length(password) != 0) {
-      dbConnect(RPostgres::Postgres(), dbname = "astroDB", 
-                host = "100.85.227.75", port = 5432, user = username, 
-                password = password, sslmode = "prefer")
-    }
-    else {
-      dbConnect(RPostgres::Postgres(), dbname = "astroDB", 
-                host = "100.85.227.75", port = 5432, user = getPass::getPass("Username"), 
-                password = getPass::getPass("Password"), sslmode = "prefer")
-    }
-  }, error = function(cond) {
-    message("Can't connect to Raspberry PI")
-    message(cond)
-    return(NA)
-  })
+  DBI::dbConnect(RSQLite::SQLite(), "/Volumes/Office-SSD/Astronomy/astroDB.sqlite")
 }
 
 

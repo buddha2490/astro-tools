@@ -10,11 +10,11 @@ options(dplyr.summarise.inform = FALSE)
 
 # Run ------------------------------------------------------------------
 
-myObject <- "CygnusWall"
+myObject <- "LBN-357"
 
 # Check the most recent logs
 # Provides a summary of the most recent update time by Status
-checkLogs()
+checkLogs() 
 
 # Creates a .txt file on desktop for astrobin upload
 astrobinCSV(myObject)
@@ -28,4 +28,3 @@ objectMetaData(myObject)
 
 # list all the objects and total integration time
 dbSummary()
-
