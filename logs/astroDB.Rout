@@ -142,12 +142,56 @@ The following object is masked from ‘package:magrittr’:
 +   dplyr::filter(!is.na(Filename))
 > 
 > astroDB <- connectDB()
-Can't connect to Raspberry PI
-connection to server at "100.85.227.75", port 5432 failed: Operation timed out
-	Is the server running on that host and accepting TCP/IP connections?
 > old <- tbl(astroDB, "astroSubs") %>%
 +   collect()
-Error in UseMethod("tbl") : 
-  no applicable method for 'tbl' applied to an object of class "logical"
-Calls: %>% -> collect -> tbl
-Execution halted
+> 
+> new_rows <- nrow(metadata) - nrow(old)
+> 
+> 
+> if (new_rows > 0) {
++   message <- glue::glue("There were {new_rows} new images added") 
++   log <- data.frame(
++     Timestamp = Sys.time(),
++     Action = "Inventory added",
++     Status = message)
++ 
++   dbWriteTable(astroDB, "astroSubs", metadata, overwrite = TRUE)
++   dbAppendTable(astroDB, "astroDBLog", log)
++   message(message)
++   
++ }
+> if (new_rows < 0) {
++   message <- glue::glue("There were {abs(new_rows)} images removed from the database") 
++   log <- data.frame(
++     Timestamp = Sys.time(),
++     Action = "Inventory removed",
++     Status = message)
++   dbWriteTable(astroDB, "astroSubs", metadata, overwrite = TRUE)
++   dbAppendTable(astroDB, "astroDBLog", log)
++   message(message)
++   
++ }
+> 
+> if (new_rows == 0) {
++   message("No new images to add to the database")
++   log <- data.frame(
++     Timestamp = Sys.time(),
++     Action = "Inventory checked",
++     Status = "No new images to add")
++   dbAppendTable(astroDB, "astroDBLog", log)
++   
++ }
+No new images to add to the database
+[1] 1
+> 
+> dbDisconnect(astroDB)
+> 
+> 
+> rm(list = ls())
+> 
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  8.643   1.660   9.670 
