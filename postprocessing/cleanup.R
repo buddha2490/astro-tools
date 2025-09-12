@@ -47,6 +47,12 @@ if (os == "Windows" & debug == FALSE) {
 }
 
 
+# When I'm at DAV, I am not going to transfer to office
+# This sends it to a detachable volume
+if (file.exists("d:/Post")) {
+  transfer <- file.path("D:/Post")
+}
+
 
 
 
@@ -70,6 +76,7 @@ close(con)
 # Logs --------------------------------------------------------------------
 
 glue::glue("{src}/logFiles.R") %>% source()
+
 
 
 # transfer over to astro-ssd

@@ -119,44 +119,44 @@ NULL
 > system.time({
 + objects %>% lapply(processObjects)
 + })
-Rows: 200 Columns: 34
+Rows: 132 Columns: 35
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
 dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
 dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 200 Columns: 34
+Rows: 132 Columns: 35
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
 dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
 dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 190 Columns: 34
+Rows: 98 Columns: 35
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
 dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
 dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 190 Columns: 34
+Rows: 98 Columns: 35
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
-chr   (4): FilePath, FilterName, Binning, PierSide
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
 dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
 dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
    user  system elapsed 
-   2.47   32.75   53.63 
+   1.02   11.92   19.13 
 > 
 > # go ahead and run it if on the dev rig
 > # MBP14 - /volumes/office-ssd/astronomy/testing: 271.737 elapsed
@@ -187,4 +187,4 @@ dttm  (2): ExposureStart, ExposureStartUTC
 > 
 > proc.time()
    user  system elapsed 
-   3.93   33.03   58.07 
+   2.00   12.39   22.98 
