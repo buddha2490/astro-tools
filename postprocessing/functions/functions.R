@@ -82,7 +82,7 @@ processObjects <- function(myObject, os = os, machine = machine) {
   
   # Flag the fit files that need individual review
   for (i in 1:nrow(imageCombo)) {
-    df <- filter(metadata, FilterName == imageCombo$FilterName[i])
+    df <- dplyr::filter(metadata, FilterName == imageCombo$FilterName[i])
     
     
     measures <- c("DetectedStars", "HFR", "FWHM", "Eccentricity", "GuidingRMSArcSec")
@@ -109,7 +109,7 @@ processObjects <- function(myObject, os = os, machine = machine) {
     
     # Move flagged subs to a directory for individual review
     flaggedSubs <- df %>%  
-      filter(flag == 1) %>%
+      dplyr::filter(flag == 1) %>%
       select(FilePath, FilterName, DetectedStars, HFR, HFRStDev, FWHM, Eccentricity, GuidingRMSArcSec, Exclusion)
     
     lapply(flaggedSubs$FilePath, function(x) {
@@ -328,7 +328,9 @@ eventPairs <- function(dat) {
   bind_rows(starts, finishes) %>%
     arrange(DATE) %>%
     dplyr::filter(!is.na(ROLE)) %>%
-    mutate(EVENT_ID = ifelse(is.na(EVENT_ID), lag(EVENT_ID), EVENT_ID)) %>%
+    tidyr::fill(EVENT_ID, .direction = "down") %>%
+    # mutate(EVENT_ID = ifelse(is.na(EVENT_ID), tidyr::fill("down"), EVENT_ID))
+    # mutate(EVENT_ID = ifelse(is.na(EVENT_ID), lag(EVENT_ID), EVENT_ID)) %>%
     select(-LEVEL, -SOURCE, - MEMBER, -LINE)
   
 }
@@ -575,7 +577,7 @@ cleanTime <- function(time) {
   
 }
 
-getDarkTimesAPI <- function(lat = 33, lng = -84, date = thisNight) {
+getDarkTimesAPI <- function(lat = 33, lng = -84, date = Sys.Date() - 1) {
   require(httr)
   require(jsonlite)
 
@@ -584,13 +586,13 @@ getDarkTimesAPI <- function(lat = 33, lng = -84, date = thisNight) {
   params1 <- list(
     lat = lat,
     lng = lng,
-    date = thisNight,
+    date = date,
     formatted = 0  # Use 0 for ISO 8601 format (UTC)
   )
   params2 <- list(
     lat = lat,
     lng = lng,
-    date = thisNight + 1,
+    date = date + 1,
     formatted = 0  # Use 0 for ISO 8601 format (UTC)
   )
   
@@ -618,7 +620,9 @@ logChartDev <- function(df = logReshaped) {
   df <- df %>%
     dplyr::filter(!is.na(start) & !is.na(end))
   
-  date <- as.Date(df$start[1]) %>% as.character()
+  
+  date <- (Sys.Date() - 1) %>% as.character()
+
   
   # Add the dark and light times
   

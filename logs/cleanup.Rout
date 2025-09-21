@@ -86,7 +86,6 @@ The following object is masked from 'package:magrittr':
 > 
 > 
 > 
-> 
 > source("functions/functions.R")
 > 
 > 
@@ -96,10 +95,10 @@ The following object is masked from 'package:magrittr':
 > list.dirs(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
 +   lapply(cleanup, os = os, machine = machine)
 [[1]]
-[1] 0
+NULL
 
 [[2]]
-[1] 0
+NULL
 
 > 
 > # reinitialize the wbpp script for next time!
@@ -146,27 +145,9 @@ The following object is masked from 'package:lubridate':
 
     stamp
 
-Rows: 132 Columns: 35
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 98 Columns: 35
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 Loading required package: httr
 Loading required package: jsonlite
-Rows: 132 Columns: 35
+Rows: 73 Columns: 35
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
@@ -175,7 +156,25 @@ dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 98 Columns: 35
+Rows: 76 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 73 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 76 Columns: 35
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
@@ -195,6 +194,7 @@ e.g.:
 ℹ Please use `linewidth` instead. 
 > 
 > 
+> 
 > # transfer over to astro-ssd
 > # 10 minutes for 355 files
 > dirs_to_transfer <- list.dirs(cameraSrc, recursive = FALSE) %>%
@@ -206,7 +206,7 @@ e.g.:
 > sapply(files_to_transfer, function(x) {
 +   file.copy(x, transfer, recursive = TRUE)
 + })
-c:/users/Brian Carter/astronomy/ASI2600MM/ES127/Imaging summary - 2025-09-12.png 
+c:/users/Brian Carter/astronomy/ASI2600MM/ES127/Imaging summary - 2025-09-19.png 
                                                                             TRUE 
 > 
 > 
@@ -220,9 +220,9 @@ c:/users/Brian Carter/astronomy/ASI2600MM/ES127/Imaging summary - 2025-09-12.png
 > 
 > png <- list.files(file.path(cameraSrc), pattern = ".png", recursive = TRUE, full.names = TRUE)
 > sapply(png, file.remove)
-c:/users/Brian Carter/astronomy/ASI2600MM/ES127/Imaging summary - 2025-09-12.png 
+c:/users/Brian Carter/astronomy/ASI2600MM/ES127/Imaging summary - 2025-09-19.png 
                                                                             TRUE 
 > 
 > proc.time()
    user  system elapsed 
-    5.9    59.6   315.2 
+   6.23   95.82  547.54 

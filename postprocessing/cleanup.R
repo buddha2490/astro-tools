@@ -47,13 +47,6 @@ if (os == "Windows" & debug == FALSE) {
 }
 
 
-# When I'm at DAV, I am not going to transfer to office
-# This sends it to a detachable volume
-if (file.exists("d:/Post")) {
-  transfer <- file.path("D:/Post")
-}
-
-
 
 
 source("functions/functions.R")

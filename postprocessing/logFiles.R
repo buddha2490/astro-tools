@@ -27,7 +27,7 @@ machine <- ifelse(
       ifelse(machine == "ES127", "ES127", machine)))) %>%
   as.character()
 
-
+debug <- FALSE
 
 
 # Environmental parameters ------------------------------------------------
@@ -142,7 +142,7 @@ logReshaped <- logReport %>%
     values_from = DATE
   ) %>%
   dplyr::filter(!is.na(start) & !is.na(end)) %>%
-  bind_rows(addSubsToSequence())
+  bind_rows(addSubsToSequence()) 
 
 logAnalysis <- logReshaped %>% logChartDev()
 chart <- logAnalysis$plot

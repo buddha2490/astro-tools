@@ -65,14 +65,14 @@ if (machine == "ES127" & debug != TRUE) {
 # Note: 26July - R is picking up the xisf file as directories
 folders <- list.dirs(camera, recursive = FALSE, full.names = TRUE)
 objects <- data.frame(dir = list.dirs(camera, recursive = TRUE, full.names = TRUE)) %>%
-  filter(!stringr::str_detect(dir, "checkFits")) %>%
-  filter(!stringr::str_detect(dir, "flats")) %>%
-  filter(!stringr::str_detect(dir, "metadata")) %>%
-  filter(!stringr::str_detect(dir, "calibrated")) %>%
-  filter(!stringr::str_detect(dir, "logs")) %>%
-  filter(!stringr::str_detect(dir, "Flat_BIN")) %>%
-  filter(dir %in% setdiff(dir, folders)) %>%
-  filter(dir %in% setdiff(dir, camera)) %>%
+  dplyr::filter(!stringr::str_detect(dir, "checkFits") == TRUE) %>%
+  dplyr::filter(!stringr::str_detect(dir, "flats") == TRUE) %>%
+  dplyr::filter(!stringr::str_detect(dir, "metadata") == TRUE) %>%
+  dplyr::filter(!stringr::str_detect(dir, "calibrated") == TRUE) %>%
+  dplyr::filter(!stringr::str_detect(dir, "logs") == TRUE) %>%
+  dplyr::filter(!stringr::str_detect(dir, "Flat_BIN") == TRUE) %>%
+  dplyr::filter(dir %in% setdiff(dir, folders)) %>%
+  dplyr::filter(dir %in% setdiff(dir, camera)) %>%
   pull(dir)
 
 
