@@ -13,7 +13,9 @@ machine <- ifelse(
   stringr::str_detect(machine, "BRIANC-MacUS") == TRUE, "MBP13", ifelse(
     stringr::str_detect(machine, "Brians-MacBook-Pro") == TRUE, "MBP14", ifelse(
       stringr::str_detect(machine, "Office-Mac") == TRUE, "OfficeMac",
-      ifelse(machine == "ES127", "ES127", machine)))) %>%
+      ifelse(machine == "BDC-AM5", "ES127", ifelse(
+        machine == "mele-astro", "ES127", machine)
+      )))) %>%
   as.character()
 
 
