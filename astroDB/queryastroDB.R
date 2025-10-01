@@ -17,7 +17,7 @@ myObject <- "NGC281"
 checkLogs() 
 
 # Creates a .txt file on desktop for astrobin upload
-astrobinCSV(myObject, csv = TRUE)
+astrobinCSV(myObject, csv = FALSE)
 
 # Query the total integration for an object
 objectTotalIntegration(myObject)

@@ -120,7 +120,7 @@ checkLogs <- function() {
   })
 }
 
-astrobinCSV <- function(myObject, CSV = FALSE) {
+astrobinCSV <- function(myObject, csv = FALSE) {
   
   
   astroDB <- connectDB()
