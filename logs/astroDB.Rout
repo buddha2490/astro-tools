@@ -18,8 +18,8 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
          used (Mb) gc trigger (Mb) limit (Mb) max used (Mb)
-Ncells 132341  7.1     350000 18.7         NA   205898 11.0
-Vcells 260302  2.0    8388608 64.0      24576  1078563  8.3
+Ncells 132341  7.1     350000 18.7         NA   205901 11.0
+Vcells 260302  2.0    8388608 64.0      24576  1078622  8.3
 [[1]]
 [1] TRUE
 
@@ -194,4 +194,4 @@ No new images to add to the database
 > 
 > proc.time()
    user  system elapsed 
-  8.643   1.660   9.670 
+  8.697   3.866  10.808 

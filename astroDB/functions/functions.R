@@ -120,7 +120,7 @@ checkLogs <- function() {
   })
 }
 
-astrobinCSV <- function(myObject) {
+astrobinCSV <- function(myObject, CSV = FALSE) {
   
   
   astroDB <- connectDB()
@@ -146,7 +146,9 @@ astrobinCSV <- function(myObject) {
   dbDisconnect(astroDB)
   
   # save as a txt so it will open in textedit
+  if (csv == TRUE) {
   result %>% readr::write_csv(glue::glue("/Users/briancarter/Desktop/{myObject}_astrobin_subs.txt"))
+  }
   
   # Print in the viewer
   result %>%

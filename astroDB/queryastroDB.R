@@ -10,14 +10,14 @@ options(dplyr.summarise.inform = FALSE)
 
 # Run ------------------------------------------------------------------
 
-myObject <- "LBN-357"
+myObject <- "NGC281"
 
 # Check the most recent logs
 # Provides a summary of the most recent update time by Status
 checkLogs() 
 
 # Creates a .txt file on desktop for astrobin upload
-astrobinCSV(myObject)
+astrobinCSV(myObject, csv = TRUE)
 
 # Query the total integration for an object
 objectTotalIntegration(myObject)
