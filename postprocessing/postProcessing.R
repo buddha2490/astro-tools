@@ -96,7 +96,7 @@ if (os == "Mac") {
 
 
 # There are some weird errors, but everything runs with below.
-if (os == "Windows" & debug == TRUE) {
+if (os == "Windows" ) {
   glue::glue("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat") %>% sys::exec_wait()
 }
 

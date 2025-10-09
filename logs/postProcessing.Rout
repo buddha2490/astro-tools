@@ -44,7 +44,9 @@ The following objects are masked from 'package:base':
 +   stringr::str_detect(machine, "BRIANC-MacUS") == TRUE, "MBP13", ifelse(
 +     stringr::str_detect(machine, "Brians-MacBook-Pro") == TRUE, "MBP14", ifelse(
 +       stringr::str_detect(machine, "Office-Mac") == TRUE, "OfficeMac",
-+       ifelse(machine == "ES127", "ES127", machine)))) %>%
++       ifelse(machine == "BDC-AM5", "ES127", ifelse(
++         machine == "mele-astro", "ES127", machine)
++       )))) %>%
 +   as.character()
 > 
 > 
@@ -94,5 +96,76 @@ The following objects are masked from 'package:base':
 > # This is fixed now - 25July2025
 > # Note: 26July - R is picking up the xisf file as directories
 > folders <- list.dirs(camera, recursive = FALSE, full.names = TRUE)
-Error: object 'camera' not found
-Execution halted
+> objects <- data.frame(dir = list.dirs(camera, recursive = TRUE, full.names = TRUE)) %>%
++   dplyr::filter(!stringr::str_detect(dir, "checkFits") == TRUE) %>%
++   dplyr::filter(!stringr::str_detect(dir, "flats") == TRUE) %>%
++   dplyr::filter(!stringr::str_detect(dir, "metadata") == TRUE) %>%
++   dplyr::filter(!stringr::str_detect(dir, "calibrated") == TRUE) %>%
++   dplyr::filter(!stringr::str_detect(dir, "logs") == TRUE) %>%
++   dplyr::filter(!stringr::str_detect(dir, "Flat_BIN") == TRUE) %>%
++   dplyr::filter(dir %in% setdiff(dir, folders)) %>%
++   dplyr::filter(dir %in% setdiff(dir, camera)) %>%
++   pull(dir)
+> 
+> 
+> 
+> objects %>%  lapply(bulkRename)
+[[1]]
+NULL
+
+> 
+> # MBP14 - /volumes/office-ssd/astronomy/testing: 271.737 elapsed
+> system.time({
++ objects %>% lapply(processObjects)
++ })
+Rows: 54 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 54 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+   user  system elapsed 
+   0.50    2.28    6.03 
+> 
+> # go ahead and run it if on the dev rig
+> # MBP14 - /volumes/office-ssd/astronomy/testing: 271.737 elapsed
+> system.time({
++ if (os == "Mac") {
++   glue::glue("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing/wbpp.sh") %>% system()
++ }
++ })
+   user  system elapsed 
+      0       0       0 
+> 
+> 
+> # There are some weird errors, but everything runs with below.
+> if (os == "Windows" & debug == TRUE) {
++   glue::glue("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat") %>% sys::exec_wait()
++ }
+> 
+>   
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+   1.28    2.54    9.64 

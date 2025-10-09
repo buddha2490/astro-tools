@@ -79,7 +79,8 @@ glue::glue("{src}/logFiles.R") %>% source()
 dirs_to_transfer <- list.dirs(cameraSrc, recursive = FALSE) %>%
   stringr::str_remove("Dark Library")
 
-files_to_transfer <- list.files(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
+files_to_transfer <- list.files(cameraSrc, recursive = FALSE, full.names = TRUE)  %>%
+  c(list.files(file.path(cameraSrc), pattern = ".json", recursive = TRUE, full.names = TRUE)) %>%
   setdiff(dirs_to_transfer)
 
 sapply(files_to_transfer, function(x) {
@@ -95,5 +96,6 @@ for (i in 1:length(returnStatus)) {
   if (returnStatus[i] == TRUE) {unlink(dirs_to_transfer[i], recursive = TRUE, force = TRUE)}
 }
 
-png <- list.files(file.path(cameraSrc), pattern = ".png", recursive = TRUE, full.names = TRUE)
+png <- list.files(file.path(cameraSrc), pattern = ".png", recursive = TRUE, full.names = TRUE) %>%
+  c(list.files(file.path(cameraSrc), pattern = ".json", recursive = TRUE, full.names = TRUE))
 sapply(png, file.remove)
