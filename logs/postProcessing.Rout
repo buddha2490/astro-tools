@@ -113,12 +113,15 @@ The following objects are masked from 'package:base':
 [[1]]
 NULL
 
+[[2]]
+NULL
+
 > 
 > # MBP14 - /volumes/office-ssd/astronomy/testing: 271.737 elapsed
 > system.time({
 + objects %>% lapply(processObjects)
 + })
-Rows: 54 Columns: 35
+Rows: 481 Columns: 35
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
@@ -127,7 +130,25 @@ dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 54 Columns: 35
+Rows: 481 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 79 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 79 Columns: 35
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
@@ -137,7 +158,7 @@ dttm  (2): ExposureStart, ExposureStartUTC
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
    user  system elapsed 
-   0.50    2.28    6.03 
+   2.45   38.25   65.25 
 > 
 > # go ahead and run it if on the dev rig
 > # MBP14 - /volumes/office-ssd/astronomy/testing: 271.737 elapsed
@@ -151,9 +172,26 @@ dttm  (2): ExposureStart, ExposureStartUTC
 > 
 > 
 > # There are some weird errors, but everything runs with below.
-> if (os == "Windows" & debug == TRUE) {
+> if (os == "Windows" ) {
 +   glue::glue("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat") %>% sys::exec_wait()
 + }
+
+C:\Users\Brian Carter\Astronomy\astro-tools\postprocessing>"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/Brian Carter/astronomy/ASI2600MM/ES127/M33/M33_2025-11-15/flats,dir=c:/users/Brian Carter/astronomy/ASI2600MM/ES127/M33/M33_2025-11-15/flats" --force-exit 
+[12952:8440:1116/054915.492:ERROR:gpu_channel_manager.cc(959)] Failed to create GLES3 context, fallback to GLES2.
+[12952:8440:1116/054915.492:ERROR:gpu_channel_manager.cc(970)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+
+:LOGFILE:c:/users/Brian Carter/astronomy/ASI2600MM/ES127/M33/M33_2025-11-15/flats/logs/20251116105024.log:LOGFILE:
+
+TEST MANUALLY INTERRUPTED
+
+C:\Users\Brian Carter\Astronomy\astro-tools\postprocessing>"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/Brian Carter/astronomy/ASI2600MM/ES127/NGC2244/NGC2244_2025-11-15/flats,dir=c:/users/Brian Carter/astronomy/ASI2600MM/ES127/NGC2244/NGC2244_2025-11-15/flats" --force-exit 
+[9600:4464:1116/060817.410:ERROR:gpu_channel_manager.cc(959)] Failed to create GLES3 context, fallback to GLES2.
+[9600:4464:1116/060817.410:ERROR:gpu_channel_manager.cc(970)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+
+:LOGFILE:c:/users/Brian Carter/astronomy/ASI2600MM/ES127/NGC2244/NGC2244_2025-11-15/flats/logs/20251116110854.log:LOGFILE:
+
+TEST MANUALLY INTERRUPTED
+[1] 0
 > 
 >   
 > 
@@ -168,4 +206,4 @@ dttm  (2): ExposureStart, ExposureStartUTC
 > 
 > proc.time()
    user  system elapsed 
-   1.28    2.54    9.64 
+   4.40   41.51 2818.54 

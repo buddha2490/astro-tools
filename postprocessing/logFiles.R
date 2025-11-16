@@ -139,7 +139,8 @@ logReshaped <- logReport %>%
   pivot_wider(
     id_cols     = c(EVENT_ID, ROLE),
     names_from  = TYPE,
-    values_from = DATE
+    values_from = DATE,
+    values_fn = mean
   ) %>%
   dplyr::filter(!is.na(start) & !is.na(end)) %>%
   bind_rows(addSubsToSequence()) 
