@@ -36,14 +36,14 @@ debug <- FALSE
 # change for particular pc
 
 if (os == "Windows" & debug == FALSE) {
-  setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
-  logPath <- "C:/Users/Brian Carter/AppData/Local/NINA/Logs"
-  subsPath <- "C:/Users/Brian Carter/Astronomy/ASI2600MM/ES127"
-  phd2Logs <- "C:/Users/Brian Carter/Documents/PHD2"
+  setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing")
+  logPath <- "C:/Users/bcart/AppData/Local/NINA/Logs"
+  subsPath <- "C:/Users/bcart/Astronomy/ASI2600MM/ES127"
+  phd2Logs <- "C:/Users/bcart/Documents/PHD2"
 } 
 
 if (os == "Windows" & debug == TRUE) {
-  setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
+  setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing")
   logPath <- "D:/NAS/testing/logs"
   subsPath <- "D:/NAS/testing/subs"
   phd2Logs <- logPath

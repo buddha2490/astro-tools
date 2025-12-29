@@ -15,7 +15,7 @@ machine <- ifelse(
     stringr::str_detect(machine, "Brians-MacBook-Pro") == TRUE, "MBP14", ifelse(
       stringr::str_detect(machine, "Office-Mac") == TRUE, "OfficeMac",
       ifelse(machine == "BDC-AM5", "ES127", ifelse(
-        machine == "mele-astro", "ES127", machine)
+        machine == "MELE-ASTRO", "ES127", machine)
       )))) %>%
   as.character()
 
@@ -24,18 +24,18 @@ machine <- ifelse(
 # Environmental parameters ------------------------------------------------
 
 if (machine == "ES127" & debug != TRUE) {
-  setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
-  src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
-  camera <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127"
+  setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing")
+  src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
+  camera <- "c:/users/bcart/astronomy/ASI2600MM/ES127"
   darks <- file.path(camera, "../Dark Library/") 
   source("functions/functions.R")
   
   
 } else if (machine == "ES127" & debug == TRUE) {
-  setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
-  src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing")
+  setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing")
+  src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
   camera <- "D:/NAS/testing/subs"
-  darks <-  "c:/users/Brian Carter/astronomy/ASI2600MM/Dark Library/"
+  darks <-  "c:/users/bcart/astronomy/ASI2600MM/Dark Library/"
   source("functions/functions.R")
   
 } else if (machine == "OfficeMac") {
@@ -97,7 +97,7 @@ if (os == "Mac") {
 
 # There are some weird errors, but everything runs with below.
 if (os == "Windows" ) {
-  glue::glue("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat") %>% sys::exec_wait()
+  glue::glue("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat") %>% sys::exec_wait()
 }
 
   

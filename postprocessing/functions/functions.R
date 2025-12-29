@@ -146,7 +146,7 @@ wbppFlats <- function(objectFlats) {
     
     js1 <- '"C:\\Program Files\\PixInsight\\src\\scripts\\BatchPreprocessing\\WBPP.js,automationMode=true,outputDirectory='
     
-    wbpp <- file("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat", "a")
+    wbpp <- file("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat", "a")
   }
   
   if (os == "Mac") {

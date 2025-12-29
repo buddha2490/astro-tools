@@ -1,5 +1,5 @@
 
-R version 4.5.1 (2025-06-13 ucrt) -- "Great Square Root"
+R version 4.4.3 (2025-02-28 ucrt) -- "Trophy Case"
 Copyright (C) 2025 The R Foundation for Statistical Computing
 Platform: x86_64-w64-mingw32/x64
 
@@ -51,7 +51,7 @@ The following object is masked from 'package:magrittr':
 +     stringr::str_detect(machine, "Brians-MacBook-Pro") == TRUE, "MBP14", ifelse(
 +       stringr::str_detect(machine, "Office-Mac") == TRUE, "OfficeMac",
 +       ifelse(machine == "BDC-AM5", "ES127", ifelse(
-+         machine == "mele-astro", "ES127", machine)
++         machine == "MELE-ASTRO", "ES127", machine)
 +       )))) %>%
 +   as.character()
 > 
@@ -60,14 +60,14 @@ The following object is masked from 'package:magrittr':
 > # Environmental parameters ------------------------------------------------
 > 
 > if (os == "Windows" & debug == FALSE) {
-+   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
-+   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
-+   cameraSrc <- "c:/users/Brian Carter/astronomy/ASI2600MM/ES127" # subspath
++   setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing") # execpath
++   src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing") # execpath
++   cameraSrc <- "c:/users/bcart/astronomy/ASI2600MM/ES127" # subspath
 +   transfer <- "z:/In Progress" # transfer path
-+   wbpp <- "C:/users/Brian Carter/Astronomy/astro-tools/postprocessing/wbpp.bat" # wbpp
++   wbpp <- "C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat" # wbpp
 + } else if  (os == "Windows" & debug == TRUE) {
-+   setwd("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
-+   src <- file.path("C:/users/Brian Carter/Astronomy/astro-tools/postprocessing") # execpath
++   setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing") # execpath
++   src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing") # execpath
 +   cameraSrc <- "D:/NAS/testing/subs"
 +   transfer <- "z:/In Progress" # transfer path
 +   wbpp <- file.path(src, "wbpp.sh")
@@ -96,9 +96,7 @@ The following object is masked from 'package:magrittr':
 > 
 > list.dirs(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
 +   lapply(cleanup, os = os, machine = machine)
-[[1]]
-NULL
-
+list()
 > 
 > # reinitialize the wbpp script for next time!
 > file.remove(wbpp)
@@ -111,7 +109,7 @@ NULL
 > 
 > # Logs --------------------------------------------------------------------
 > 
-> glue::glue("{src}/logFiles.R") %>% source()
+>  glue::glue("{src}/logFiles.R") %>% source()
 
 Attaching package: 'lubridate'
 
@@ -144,82 +142,12 @@ The following object is masked from 'package:lubridate':
 
     stamp
 
-Loading required package: httr
-Loading required package: jsonlite
-Rows: 54 Columns: 35
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 54 Columns: 35
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-`summarise()` has grouped output by 'Object'. You can override using the
-`.groups` argument.
-Warning messages:
-1: One or more parsing issues, call `problems()` on your data frame for details,
+Error in UseMethod("mutate") : 
+  no applicable method for 'mutate' applied to an object of class "NULL"
+Calls: %>% ... summarize -> group_by -> mutate -> mutate -> arrange -> mutate
+In addition: Warning message:
+One or more parsing issues, call `problems()` on your data frame for details,
 e.g.:
   dat <- vroom(...)
   problems(dat) 
-2: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-ℹ Please use `linewidth` instead. 
-> 
-> 
-> 
-> # transfer over to astro-ssd
-> # 10 minutes for 355 files
-> dirs_to_transfer <- list.dirs(cameraSrc, recursive = FALSE) %>%
-+   stringr::str_remove("Dark Library")
-> 
-> files_to_transfer <- list.files(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
-+   setdiff(dirs_to_transfer)
-> 
-> sapply(files_to_transfer, function(x) {
-+   file.copy(x, transfer, recursive = TRUE)
-+ })
-         c:/users/Brian Carter/astronomy/ASI2600MM/ES127/BackupSequenceFile.json 
-                                                                           FALSE 
-c:/users/Brian Carter/astronomy/ASI2600MM/ES127/Imaging summary - 2025-10-09.png 
-                                                                           FALSE 
-Warning messages:
-1: In file.copy(x, transfer, recursive = TRUE) :
-  'recursive' will be ignored as 'to' is not a single existing directory
-2: In file.create(to[okay]) :
-  cannot create file 'z:/In Progress', reason 'No such file or directory'
-3: In file.copy(x, transfer, recursive = TRUE) :
-  'recursive' will be ignored as 'to' is not a single existing directory
-4: In file.create(to[okay]) :
-  cannot create file 'z:/In Progress', reason 'No such file or directory'
-> 
-> 
-> returnStatus <- sapply(dirs_to_transfer, function(x) {
-+   file.copy(x, transfer, recursive = TRUE)
-+ })
-Warning messages:
-1: In file.copy(x, transfer, recursive = TRUE) :
-  'recursive' will be ignored as 'to' is not a single existing directory
-2: In file.copy(x, transfer, recursive = TRUE) :
-  directories are omitted unless 'recursive = TRUE'
-> 
-> for (i in 1:length(returnStatus)) {
-+   if (returnStatus[i] == TRUE) {unlink(dirs_to_transfer[i], recursive = TRUE, force = TRUE)}
-+ }
-> 
-> png <- list.files(file.path(cameraSrc), pattern = ".png", recursive = TRUE, full.names = TRUE)
-> sapply(png, file.remove)
-c:/users/Brian Carter/astronomy/ASI2600MM/ES127/Imaging summary - 2025-10-09.png 
-                                                                            TRUE 
-> 
-> proc.time()
-   user  system elapsed 
-   3.70    0.62   74.42 
+Execution halted
