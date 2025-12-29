@@ -96,7 +96,16 @@ The following object is masked from 'package:magrittr':
 > 
 > list.dirs(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
 +   lapply(cleanup, os = os, machine = machine)
+<<<<<<< HEAD
 list()
+=======
+[[1]]
+NULL
+
+[[2]]
+NULL
+
+>>>>>>> 78f2de62be16c59919ca19927e1ff19767cde882
 > 
 > # reinitialize the wbpp script for next time!
 > file.remove(wbpp)
@@ -142,6 +151,7 @@ The following object is masked from 'package:lubridate':
 
     stamp
 
+<<<<<<< HEAD
 Error in UseMethod("mutate") : 
   no applicable method for 'mutate' applied to an object of class "NULL"
 Calls: %>% ... summarize -> group_by -> mutate -> mutate -> arrange -> mutate
@@ -150,4 +160,59 @@ One or more parsing issues, call `problems()` on your data frame for details,
 e.g.:
   dat <- vroom(...)
   problems(dat) 
+=======
+Loading required package: httr
+Loading required package: jsonlite
+Rows: 481 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 79 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Error in `bind_rows()`:
+! Can't combine `..1$end` <list> and `..2$end` <datetime<local>>.
+Backtrace:
+     ▆
+  1. ├─glue::glue("{src}/logFiles.R") %>% source()
+  2. ├─base::source(.)
+  3. │ ├─base::withVisible(eval(ei, envir))
+  4. │ └─base::eval(ei, envir)
+  5. │   └─base::eval(ei, envir)
+  6. ├─... %>% bind_rows(addSubsToSequence())
+  7. ├─dplyr::bind_rows(., addSubsToSequence())
+  8. │ └─vctrs::vec_rbind(!!!dots, .names_to = .id, .error_call = current_env())
+  9. └─vctrs (local) `<fn>`()
+ 10.   └─vctrs::vec_default_ptype2(...)
+ 11.     ├─base::withRestarts(...)
+ 12.     │ └─base (local) withOneRestart(expr, restarts[[1L]])
+ 13.     │   └─base (local) doWithOneRestart(return(expr), restart)
+ 14.     └─vctrs::stop_incompatible_type(...)
+ 15.       └─vctrs:::stop_incompatible(...)
+ 16.         └─vctrs:::stop_vctrs(...)
+ 17.           └─rlang::abort(message, class = c(class, "vctrs_error"), ..., call = call)
+Warning messages:
+1: One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat <- vroom(...)
+  problems(dat) 
+2: Values from `DATE` are not uniquely identified; output will contain list-cols.
+• Use `values_fn = list` to suppress this warning.
+• Use `values_fn = {summary_fun}` to summarise duplicates.
+• Use the following dplyr code to identify duplicates.
+  {data} |>
+  dplyr::summarise(n = dplyr::n(), .by = c(EVENT_ID, ROLE, TYPE)) |>
+  dplyr::filter(n > 1L) 
+>>>>>>> 78f2de62be16c59919ca19927e1ff19767cde882
 Execution halted
