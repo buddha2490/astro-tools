@@ -13,8 +13,8 @@ machine <- ifelse(
   stringr::str_detect(machine, "BRIANC-MacUS") == TRUE, "MBP13", ifelse(
     stringr::str_detect(machine, "Brians-MacBook-Pro") == TRUE, "MBP14", ifelse(
       stringr::str_detect(machine, "Office-Mac") == TRUE, "OfficeMac",
-      ifelse(machine == "BDC-AM5", "ES127", ifelse(
-        machine == "MELE-ASTRO", "ES127", machine)
+      ifelse(machine == "APERTURA-75", "TELESCOPE", ifelse(
+        machine == "ES127", "TELESCOPE", machine)
       )))) %>%
   as.character()
 
@@ -22,36 +22,16 @@ machine <- ifelse(
 
 # Environmental parameters ------------------------------------------------
 
-if (os == "Windows" & debug == FALSE) {
-  setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing") # execpath
-  src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing") # execpath
-  cameraSrc <- "c:/users/bcart/astronomy/ASI2600MM/ES127" # subspath
-  transfer <- "z:/In Progress" # transfer path
-  wbpp <- "C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat" # wbpp
-} else if  (os == "Windows" & debug == TRUE) {
-  setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing") # execpath
-  src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing") # execpath
-  cameraSrc <- "D:/NAS/testing/subs"
-  transfer <- "z:/In Progress" # transfer path
-  wbpp <- file.path(src, "wbpp.sh")
-} else if (machine == "OfficeMac") {
-  setwd("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
-  src <- file.path("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
-  cameraSrc <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
-  transfer <- "/Volumes/Office-SSD/Astronomy/In Progress"
-  wbpp <- file.path(src, "wbpp.sh")
-} else if (machine == "MBP14") {
-  setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-  src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-  cameraSrc <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
-  transfer <- "/Volumes/Office-SSD/Astronomy/In Progress"
-  wbpp <- file.path(src, "wbpp.sh")
+if (machine == "TELESCOPE") {
+  setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing")
+  src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
+  cameraSrc <- "c:/users/bcart/astronomy/ASI2600MM/Subs"
+  wbpp <- "C:/Users/bcart/astronomy/astro-tools/postprocessing/wbpp.bat"
+  transfer <- "//Office-Mac/Office-SSD/Astronomy/In Progress"
+  source("functions/functions.R")
 }
 
 
-
-
-source("functions/functions.R")
 
 
 
@@ -82,11 +62,6 @@ dirs_to_transfer <- list.dirs(cameraSrc, recursive = FALSE) %>%
 files_to_transfer <- list.files(cameraSrc, recursive = FALSE, full.names = TRUE)  %>%
   c(list.files(file.path(cameraSrc), pattern = ".json", recursive = TRUE, full.names = TRUE)) %>%
   setdiff(dirs_to_transfer)
-
-
-# When I am at the field
-# the transfer directory is on the SSD
-transfer <- "d:/In Progress"
 
 
 sapply(files_to_transfer, function(x) {

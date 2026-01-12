@@ -50,26 +50,15 @@ processObjects <- function(myObject, os = os, machine = machine) {
   # This metadata file does not include calibration subs
   metadata <- file.path(path, "ImageMetaData.csv") %>%
     readr::read_csv() %>%
-    mutate(FilePath = stringr::str_replace(FilePath, "/ES127/ES127/", "/ES127/")) %>%
     mutate(filename = basename(FilePath)) %>%
     mutate(FilePath = stringr::str_replace(FilePath, filename, stringr::str_replace(filename, " ", "")))
   
   
   # create some directories
-  objectFlats <- glue::glue(path, "/flats"); dir.create(objectFlats, showWarnings = FALSE)
+  objectFlats <- glue::glue(path, "/flats");
+    #dir.create(objectFlats, showWarnings = FALSE) # created in NINA now - Jan2026
   objectFits <- glue::glue(path, "/checkFits"); dir.create(objectFits, showWarnings = FALSE)
   
-  # Move flats into the flats folder
-  #TODO: with mono, there are about 200 flats per object and this copy is a significant bottleneck
-  # see if I can leverage some system command
-  flatfiles <- list.files(path, pattern = "FLAT", full.names = TRUE)
-  if (length(flatfiles) > 0) {
-    returnStatus = sapply(flatfiles, function(x) file.copy(from = x, to = glue::glue(path, "/flats"), overwrite = T))
-    names(returnStatus) <- NULL
-    if (sum(returnStatus) == length(flatfiles)) {
-      sapply(flatfiles, file.remove)
-    }
-  }
   
   # grab some info from the file
   # Figure out how many image loops I need
@@ -123,6 +112,10 @@ processObjects <- function(myObject, os = os, machine = machine) {
   # Matches the dark to the temp/gain/duration
   # Also gets a matched master bias to stack with the flats
   # Runs in mac or windows
+
+imageCombo <- imageCombo %>%
+  mutate(CameraTargetTemp = ifelse(CameraTargetTemp <= -20, -20, CameraTargetTemp))
+
   for (i in 1:nrow(imageCombo)) {
     getDarks(
       temp = imageCombo$CameraTargetTemp[i],
@@ -140,25 +133,13 @@ processObjects <- function(myObject, os = os, machine = machine) {
 
 wbppFlats <- function(objectFlats) {
   
-  if (os == "Windows" & machine == "ES127") {
     
     exe <- '"C:\\Program Files\\PixInsight\\bin\\PixInsight.exe"  -n --automation-mode -r='
     
     js1 <- '"C:\\Program Files\\PixInsight\\src\\scripts\\BatchPreprocessing\\WBPP.js,automationMode=true,outputDirectory='
     
     wbpp <- file("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat", "a")
-  }
-  
-  if (os == "Mac") {
-    exe <- '"/Applications/PixInsight/PixInsight.app/Contents/MacOS/PixInsight"  -n --automation-mode -r='
     
-    js1 <- '"/Applications/Pixinsight/src/scripts/BatchPreprocessing/FBPP.js,automationMode=true,outputDirectory='
-    
-    wbpp <- file("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing/wbpp.sh", "a")
-    system('chmod 777 "/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing/wbpp.sh"')
-    
-  }
-  
   outputdir <- objectFlats
   
   dir <- glue::glue(objectFlats, '"')

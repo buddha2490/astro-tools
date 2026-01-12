@@ -24,10 +24,11 @@ machine <- ifelse(
   stringr::str_detect(machine, "BRIANC-MacUS") == TRUE, "MBP13", ifelse(
     stringr::str_detect(machine, "Brians-MacBook-Pro") == TRUE, "MBP14", ifelse(
       stringr::str_detect(machine, "Office-Mac") == TRUE, "OfficeMac",
-      ifelse(machine == "ES127", "ES127", machine)))) %>%
+      ifelse(machine == "APERTURA-75", "TELESCOPE", ifelse(
+        machine == "ES127", "TELESCOPE", machine)
+      )))) %>%
   as.character()
 
-debug <- FALSE
 
 
 # Environmental parameters ------------------------------------------------
@@ -35,33 +36,13 @@ debug <- FALSE
 # Path to the log file on the mele-astro mini computer
 # change for particular pc
 
-if (os == "Windows" & debug == FALSE) {
+
   setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing")
   logPath <- "C:/Users/bcart/AppData/Local/NINA/Logs"
-  subsPath <- "C:/Users/bcart/Astronomy/ASI2600MM/ES127"
+  subsPath <- "C:/Users/bcart/Astronomy/ASI2600MM/subs"
   phd2Logs <- "C:/Users/bcart/Documents/PHD2"
-} 
 
-if (os == "Windows" & debug == TRUE) {
-  setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing")
-  logPath <- "D:/NAS/testing/logs"
-  subsPath <- "D:/NAS/testing/subs"
-  phd2Logs <- logPath
-}
 
-if (machine == "OfficeMac") {
-  setwd("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
-  logPath <- "/Volumes/Office-SSD/Astronomy/testing/data/logs"
-  subsPath <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
-  phd2Logs <- logPath
-}
-  
-if (machine == "MBP14") {
-  setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-  logPath <- "/Volumes/Office-SSD/Astronomy/testing/data/logs"
-  subsPath <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
-  phd2Logs <- logPath
-}  
     
 source("functions/functions.R")
 
@@ -94,12 +75,12 @@ sapply(sessions, function(x) {
     file.copy(file.path(x, "PHD2_GuideLog.txt"))
 })
 
-if (os == "Windows" &  debug == FALSE) {
+
 guideFiles %>%
   slice(-1) %>%
   pull(file) %>%
   sapply(file.remove)
-}
+
 
 
 

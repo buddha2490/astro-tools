@@ -14,8 +14,8 @@ machine <- ifelse(
   stringr::str_detect(machine, "BRIANC-MacUS") == TRUE, "MBP13", ifelse(
     stringr::str_detect(machine, "Brians-MacBook-Pro") == TRUE, "MBP14", ifelse(
       stringr::str_detect(machine, "Office-Mac") == TRUE, "OfficeMac",
-      ifelse(machine == "BDC-AM5", "ES127", ifelse(
-        machine == "MELE-ASTRO", "ES127", machine)
+      ifelse(machine == "APERTURA-75", "TELESCOPE", ifelse(
+        machine == "ES127", "TELESCOPE", machine)
       )))) %>%
   as.character()
 
@@ -23,42 +23,13 @@ machine <- ifelse(
 
 # Environmental parameters ------------------------------------------------
 
-if (machine == "ES127" & debug != TRUE) {
+if (machine == "TELESCOPE") {
   setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing")
   src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
-  camera <- "c:/users/bcart/astronomy/ASI2600MM/ES127"
+  camera <- "c:/users/bcart/astronomy/ASI2600MM/Subs"
   darks <- file.path(camera, "../Dark Library/") 
   source("functions/functions.R")
-  
-  
-} else if (machine == "ES127" & debug == TRUE) {
-  setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing")
-  src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
-  camera <- "D:/NAS/testing/subs"
-  darks <-  "c:/users/bcart/astronomy/ASI2600MM/Dark Library/"
-  source("functions/functions.R")
-  
-} else if (machine == "OfficeMac") {
-  setwd("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
-  src <- file.path("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
-  camera <- file.path("/Volumes/Office-SSD/Astronomy/testing/data/subs")
-  username <- Sys.getenv("username")
-  password <- Sys.getenv("password")
-  darks <- file.path("/Volumes/Office-SSD/Astronomy/ASI2600MM/Dark Library")
-  source("functions/functions.R")
-  
-} else if (machine == "MBP14") {
-  setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-  src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-  camera <- file.path("/Volumes/Office-SSD/Astronomy/testing/data/subs")
-  username <- Sys.getenv("username")
-  password <- Sys.getenv("password")
-  darks <- file.path("/Volumes/Office-SSD/Astronomy/ASI2600MM/Dark Library")
-  source("functions/functions.R")
 }
-                  
-                  
-
 
 # Run the scripts ---------------------------------------------------------
 
@@ -86,13 +57,6 @@ system.time({
 objects %>% lapply(processObjects)
 })
 
-# go ahead and run it if on the dev rig
-# MBP14 - /volumes/office-ssd/astronomy/testing: 271.737 elapsed
-system.time({
-if (os == "Mac") {
-  glue::glue("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing/wbpp.sh") %>% system()
-}
-})
 
 
 # There are some weird errors, but everything runs with below.
