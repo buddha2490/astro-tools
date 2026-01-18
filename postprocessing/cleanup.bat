@@ -1,1 +1,1 @@
-"C:/Program Files/R/R-4.5.2/bin/R.exe" CMD BATCH --no-save --no-restore "C:/Users/bcart/Astronomy/astro-tools/postprocessing/cleanup.R" "C:/Users/bcart/Astronomy/astro-tools/logs/cleanup.Rout"
+"C:/Program Files/R/R-4.5.2/bin/R.exe" CMD BATCH --no-save --no-restore --args "d:/subs" "C:/Users/bcart/Astronomy/astro-tools/postprocessing/cleanup.R" "C:/Users/bcart/Astronomy/astro-tools/logs/cleanup.Rout"

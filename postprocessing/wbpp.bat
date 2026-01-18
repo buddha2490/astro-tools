@@ -1,1 +1,3 @@
 
+"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/bcart/astronomy/ASI2600MM/Subs/IC2177/IC2177_2026-01-15/flats,dir=c:/users/bcart/astronomy/ASI2600MM/Subs/IC2177/IC2177_2026-01-15/flats" --force-exit
+"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/bcart/astronomy/ASI2600MM/Subs/IC2177/IC2177_2026-01-15/flats,dir=c:/users/bcart/astronomy/ASI2600MM/Subs/IC2177/IC2177_2026-01-15/flats" --force-exit

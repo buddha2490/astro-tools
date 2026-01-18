@@ -1,5 +1,5 @@
 
-R version 4.4.3 (2025-02-28 ucrt) -- "Trophy Case"
+R version 4.5.2 (2025-10-31 ucrt) -- "[Not] Part in a Rumble"
 Copyright (C) 2025 The R Foundation for Statistical Computing
 Platform: x86_64-w64-mingw32/x64
 
@@ -50,8 +50,8 @@ The following object is masked from 'package:magrittr':
 +   stringr::str_detect(machine, "BRIANC-MacUS") == TRUE, "MBP13", ifelse(
 +     stringr::str_detect(machine, "Brians-MacBook-Pro") == TRUE, "MBP14", ifelse(
 +       stringr::str_detect(machine, "Office-Mac") == TRUE, "OfficeMac",
-+       ifelse(machine == "BDC-AM5", "ES127", ifelse(
-+         machine == "MELE-ASTRO", "ES127", machine)
++       ifelse(machine == "APERTURA-75", "TELESCOPE", ifelse(
++         machine == "ES127", "TELESCOPE", machine)
 +       )))) %>%
 +   as.character()
 > 
@@ -59,36 +59,16 @@ The following object is masked from 'package:magrittr':
 > 
 > # Environmental parameters ------------------------------------------------
 > 
-> if (os == "Windows" & debug == FALSE) {
-+   setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing") # execpath
-+   src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing") # execpath
-+   cameraSrc <- "c:/users/bcart/astronomy/ASI2600MM/ES127" # subspath
-+   transfer <- "z:/In Progress" # transfer path
-+   wbpp <- "C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat" # wbpp
-+ } else if  (os == "Windows" & debug == TRUE) {
-+   setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing") # execpath
-+   src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing") # execpath
-+   cameraSrc <- "D:/NAS/testing/subs"
-+   transfer <- "z:/In Progress" # transfer path
-+   wbpp <- file.path(src, "wbpp.sh")
-+ } else if (machine == "OfficeMac") {
-+   setwd("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
-+   src <- file.path("/Volumes/Office-SSD/Astronomy/astro-tools/postprocessing")
-+   cameraSrc <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
-+   transfer <- "/Volumes/Office-SSD/Astronomy/In Progress"
-+   wbpp <- file.path(src, "wbpp.sh")
-+ } else if (machine == "MBP14") {
-+   setwd("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-+   src <- file.path("/Users/briancarter/Astronomy/astro-tools/postprocessing")
-+   cameraSrc <- "/Volumes/Office-SSD/Astronomy/testing/data/subs"
-+   transfer <- "/Volumes/Office-SSD/Astronomy/In Progress"
-+   wbpp <- file.path(src, "wbpp.sh")
+> if (machine == "TELESCOPE") {
++   setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing")
++   src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
++   cameraSrc <- "c:/users/bcart/astronomy/ASI2600MM/Subs"
++   wbpp <- "C:/Users/bcart/astronomy/astro-tools/postprocessing/wbpp.bat"
++   transfer <- "//Office-Mac/Office-SSD/Astronomy/In Progress"
++   source("functions/functions.R")
 + }
 > 
 > 
-> 
-> 
-> source("functions/functions.R")
 > 
 > 
 > 
@@ -96,16 +76,15 @@ The following object is masked from 'package:magrittr':
 > 
 > list.dirs(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
 +   lapply(cleanup, os = os, machine = machine)
-<<<<<<< HEAD
-list()
-=======
 [[1]]
 NULL
 
 [[2]]
-NULL
+[1] 0
 
->>>>>>> 78f2de62be16c59919ca19927e1ff19767cde882
+[[3]]
+[1] 0
+
 > 
 > # reinitialize the wbpp script for next time!
 > file.remove(wbpp)
@@ -151,19 +130,9 @@ The following object is masked from 'package:lubridate':
 
     stamp
 
-<<<<<<< HEAD
-Error in UseMethod("mutate") : 
-  no applicable method for 'mutate' applied to an object of class "NULL"
-Calls: %>% ... summarize -> group_by -> mutate -> mutate -> arrange -> mutate
-In addition: Warning message:
-One or more parsing issues, call `problems()` on your data frame for details,
-e.g.:
-  dat <- vroom(...)
-  problems(dat) 
-=======
 Loading required package: httr
 Loading required package: jsonlite
-Rows: 481 Columns: 35
+Rows: 22 Columns: 35
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
@@ -172,7 +141,7 @@ dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 79 Columns: 35
+Rows: 997 Columns: 35
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
@@ -181,38 +150,72 @@ dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Error in `bind_rows()`:
-! Can't combine `..1$end` <list> and `..2$end` <datetime<local>>.
-Backtrace:
-     ▆
-  1. ├─glue::glue("{src}/logFiles.R") %>% source()
-  2. ├─base::source(.)
-  3. │ ├─base::withVisible(eval(ei, envir))
-  4. │ └─base::eval(ei, envir)
-  5. │   └─base::eval(ei, envir)
-  6. ├─... %>% bind_rows(addSubsToSequence())
-  7. ├─dplyr::bind_rows(., addSubsToSequence())
-  8. │ └─vctrs::vec_rbind(!!!dots, .names_to = .id, .error_call = current_env())
-  9. └─vctrs (local) `<fn>`()
- 10.   └─vctrs::vec_default_ptype2(...)
- 11.     ├─base::withRestarts(...)
- 12.     │ └─base (local) withOneRestart(expr, restarts[[1L]])
- 13.     │   └─base (local) doWithOneRestart(return(expr), restart)
- 14.     └─vctrs::stop_incompatible_type(...)
- 15.       └─vctrs:::stop_incompatible(...)
- 16.         └─vctrs:::stop_vctrs(...)
- 17.           └─rlang::abort(message, class = c(class, "vctrs_error"), ..., call = call)
-Warning messages:
-1: One or more parsing issues, call `problems()` on your data frame for details,
-e.g.:
-  dat <- vroom(...)
-  problems(dat) 
-2: Values from `DATE` are not uniquely identified; output will contain list-cols.
-• Use `values_fn = list` to suppress this warning.
-• Use `values_fn = {summary_fun}` to summarise duplicates.
-• Use the following dplyr code to identify duplicates.
-  {data} |>
-  dplyr::summarise(n = dplyr::n(), .by = c(EVENT_ID, ROLE, TYPE)) |>
-  dplyr::filter(n > 1L) 
->>>>>>> 78f2de62be16c59919ca19927e1ff19767cde882
-Execution halted
+Rows: 1 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 22 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 997 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+`summarise()` has grouped output by 'Object'. You can override using the
+`.groups` argument.
+Warning message:
+Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead. 
+> 
+> 
+> 
+> # transfer over to astro-ssd
+> # 10 minutes for 355 files
+> dirs_to_transfer <- list.dirs(cameraSrc, recursive = FALSE) %>%
++   stringr::str_remove("Dark Library")
+> 
+> files_to_transfer <- list.files(cameraSrc, recursive = FALSE, full.names = TRUE)  %>%
++   c(list.files(file.path(cameraSrc), pattern = ".json", recursive = TRUE, full.names = TRUE)) %>%
++   setdiff(dirs_to_transfer)
+> 
+> 
+> sapply(files_to_transfer, function(x) {
++   file.copy(x, transfer, recursive = TRUE)
++ })
+c:/users/bcart/astronomy/ASI2600MM/Subs/Imaging summary - 2026-01-16.png 
+                                                                    TRUE 
+> 
+> 
+> returnStatus <- sapply(dirs_to_transfer, function(x) {
++   file.copy(x, transfer, recursive = TRUE)
++ })
+> 
+> for (i in 1:length(returnStatus)) {
++   if (returnStatus[i] == TRUE) {unlink(dirs_to_transfer[i], recursive = TRUE, force = TRUE)}
++ }
+> 
+> png <- list.files(file.path(cameraSrc), pattern = ".png", recursive = TRUE, full.names = TRUE) %>%
++   c(list.files(file.path(cameraSrc), pattern = ".json", recursive = TRUE, full.names = TRUE))
+> sapply(png, file.remove)
+c:/users/bcart/astronomy/ASI2600MM/Subs/Imaging summary - 2026-01-16.png 
+                                                                    TRUE 
+> 
+> proc.time()
+   user  system elapsed 
+   7.17  176.12 1072.11 
