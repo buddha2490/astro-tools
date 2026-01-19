@@ -22,20 +22,19 @@ machine <- ifelse(
 
 # Environmental parameters ------------------------------------------------
 
-
   setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing")
   src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
   cameraSrc <- "c:/users/bcart/astronomy/ASI2600MM/Subs"
   wbpp <- "C:/Users/bcart/astronomy/astro-tools/postprocessing/wbpp.bat"
   source("functions/functions.R")
 
+  
 if (file.exists("d:/")) {
-  transfer <- "d:/subs"
+transfer <- commandArgs(trailingOnly = TRUE)[1]
 } else {
-    transfer <- "//Office-Mac/Office-SSD/Astronomy/In Progress"
+  transfer <- "//Office-Mac/Office-SSD/Astronomy/In Progress"
+
 }
-
-
 
 
 # Run the scripts ---------------------------------------------------------

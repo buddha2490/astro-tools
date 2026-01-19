@@ -84,12 +84,18 @@ The following objects are masked from 'package:base':
 [[1]]
 NULL
 
+[[2]]
+NULL
+
+[[3]]
+NULL
+
 > 
 > # MBP14 - /volumes/office-ssd/astronomy/testing: 271.737 elapsed
 > system.time({
 + objects %>% lapply(processObjects)
 + })
-Rows: 22 Columns: 35
+Rows: 203 Columns: 35
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
@@ -98,7 +104,43 @@ dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 22 Columns: 35
+Rows: 203 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 577 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 577 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 252 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 252 Columns: 35
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
@@ -108,7 +150,7 @@ dttm  (2): ExposureStart, ExposureStartUTC
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
    user  system elapsed 
-   0.53    0.11    0.66 
+   1.77   10.06   25.42 
 > 
 > 
 > 
@@ -118,18 +160,34 @@ dttm  (2): ExposureStart, ExposureStartUTC
 + }
 
 C:\Users\bcart\astronomy\astro-tools\postprocessing>"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/bcart/astronomy/ASI2600MM/Subs/IC2177/IC2177_2026-01-15/flats,dir=c:/users/bcart/astronomy/ASI2600MM/Subs/IC2177/IC2177_2026-01-15/flats" --force-exit 
-[13904:11776:0118/102502.209:ERROR:gpu_channel_manager.cc(959)] Failed to create GLES3 context, fallback to GLES2.
-[13904:11776:0118/102502.211:ERROR:gpu_channel_manager.cc(970)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+[12880:9660:0119/095316.920:ERROR:gpu_channel_manager.cc(959)] Failed to create GLES3 context, fallback to GLES2.
+[12880:9660:0119/095316.920:ERROR:gpu_channel_manager.cc(970)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
 
-:LOGFILE:c:/users/bcart/astronomy/ASI2600MM/Subs/IC2177/IC2177_2026-01-15/flats/logs/20260118152540.log:LOGFILE:
+C:\Users\bcart\astronomy\astro-tools\postprocessing>"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/bcart/astronomy/ASI2600MM/Subs/IC2177/IC2177_2026-01-15/flats,dir=c:/users/bcart/astronomy/ASI2600MM/Subs/IC2177/IC2177_2026-01-15/flats" --force-exit 
+[2808:4024:0119/095348.728:ERROR:gpu_channel_manager.cc(959)] Failed to create GLES3 context, fallback to GLES2.
+[2808:4024:0119/095348.728:ERROR:gpu_channel_manager.cc(970)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+
+C:\Users\bcart\astronomy\astro-tools\postprocessing>"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/bcart/astronomy/ASI2600MM/Subs/IC2118/IC2118_2026-01-18/flats,dir=c:/users/bcart/astronomy/ASI2600MM/Subs/IC2118/IC2118_2026-01-18/flats" --force-exit 
+[6652:10224:0119/095410.549:ERROR:gpu_channel_manager.cc(959)] Failed to create GLES3 context, fallback to GLES2.
+[6652:10224:0119/095410.549:ERROR:gpu_channel_manager.cc(970)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+
+:LOGFILE:c:/users/bcart/astronomy/ASI2600MM/Subs/IC2118/IC2118_2026-01-18/flats/logs/20260119145434.log:LOGFILE:
 
 TEST MANUALLY INTERRUPTED
 
-C:\Users\bcart\astronomy\astro-tools\postprocessing>"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/bcart/astronomy/ASI2600MM/Subs/IC2177/IC2177_2026-01-15/flats,dir=c:/users/bcart/astronomy/ASI2600MM/Subs/IC2177/IC2177_2026-01-15/flats" --force-exit 
-[15200:12728:0118/103043.197:ERROR:gpu_channel_manager.cc(959)] Failed to create GLES3 context, fallback to GLES2.
-[15200:12728:0118/103043.197:ERROR:gpu_channel_manager.cc(970)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+C:\Users\bcart\astronomy\astro-tools\postprocessing>"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/bcart/astronomy/ASI2600MM/Subs/M42/M42_2026-01-18/flats,dir=c:/users/bcart/astronomy/ASI2600MM/Subs/M42/M42_2026-01-18/flats" --force-exit 
+[9760:7048:0119/101106.559:ERROR:gpu_channel_manager.cc(959)] Failed to create GLES3 context, fallback to GLES2.
+[9760:7048:0119/101106.565:ERROR:gpu_channel_manager.cc(970)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
 
-:LOGFILE:c:/users/bcart/astronomy/ASI2600MM/Subs/IC2177/IC2177_2026-01-15/flats/logs/20260118153111.log:LOGFILE:
+:LOGFILE:c:/users/bcart/astronomy/ASI2600MM/Subs/M42/M42_2026-01-18/flats/logs/20260119151129.log:LOGFILE:
+
+TEST MANUALLY INTERRUPTED
+
+C:\Users\bcart\astronomy\astro-tools\postprocessing>"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/bcart/astronomy/ASI2600MM/Subs/MarkarianChain/MarkarianChain_2026-01-18/flats,dir=c:/users/bcart/astronomy/ASI2600MM/Subs/MarkarianChain/MarkarianChain_2026-01-18/flats" --force-exit 
+[2560:12836:0119/102741.735:ERROR:gpu_channel_manager.cc(959)] Failed to create GLES3 context, fallback to GLES2.
+[2560:12836:0119/102741.735:ERROR:gpu_channel_manager.cc(970)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+
+:LOGFILE:c:/users/bcart/astronomy/ASI2600MM/Subs/MarkarianChain/MarkarianChain_2026-01-18/flats/logs/20260119152805.log:LOGFILE:
 
 TEST MANUALLY INTERRUPTED
 [1] 0
@@ -147,4 +205,4 @@ TEST MANUALLY INTERRUPTED
 > 
 > proc.time()
    user  system elapsed 
-   1.95    1.51  381.45 
+   3.42   13.64 3121.40 
