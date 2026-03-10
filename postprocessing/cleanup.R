@@ -30,10 +30,9 @@ machine <- ifelse(
 
   
 if (file.exists("d:/")) {
-transfer <- commandArgs(trailingOnly = TRUE)[1]
+transfer <- "d:/Subs"
 } else {
   transfer <- "//Office-Mac/Office-SSD/Astronomy/In Progress"
-
 }
 
 
