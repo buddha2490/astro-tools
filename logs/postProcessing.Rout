@@ -84,12 +84,15 @@ The following objects are masked from 'package:base':
 [[1]]
 NULL
 
+[[2]]
+NULL
+
 > 
 > # MBP14 - /volumes/office-ssd/astronomy/testing: 271.737 elapsed
 > system.time({
 + objects %>% lapply(processObjects)
 + })
-Rows: 74 Columns: 35
+Rows: 392 Columns: 35
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
@@ -98,7 +101,25 @@ dttm  (2): ExposureStart, ExposureStartUTC
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 74 Columns: 35
+Rows: 392 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 2203 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 2203 Columns: 35
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
@@ -108,7 +129,8 @@ dttm  (2): ExposureStart, ExposureStartUTC
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
    user  system elapsed 
-   0.45    0.89    3.61 
+   1.53    3.93    9.30 
+There were 18 warnings (use warnings() to see them)
 > 
 > 
 > 
@@ -117,11 +139,19 @@ dttm  (2): ExposureStart, ExposureStartUTC
 +   glue::glue("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat") %>% sys::exec_wait()
 + }
 
-C:\Users\bcart\astronomy\astro-tools\postprocessing>"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/bcart/astronomy/ASI2600MM/Subs/IC2177/IC2177_2026-03-05/flats,dir=c:/users/bcart/astronomy/ASI2600MM/Subs/IC2177/IC2177_2026-03-05/flats" --force-exit 
-[6996:4840:0305/233309.752:ERROR:gpu_channel_manager.cc(959)] Failed to create GLES3 context, fallback to GLES2.
-[6996:4840:0305/233309.752:ERROR:gpu_channel_manager.cc(970)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+C:\Users\bcart\astronomy\astro-tools\postprocessing>"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/bcart/astronomy/ASI2600MM/Subs/M51/M51_2026-03-21/flats,dir=c:/users/bcart/astronomy/ASI2600MM/Subs/M51/M51_2026-03-21/flats" --force-exit 
+[8572:1316:0322/064932.982:ERROR:gpu_channel_manager.cc(959)] Failed to create GLES3 context, fallback to GLES2.
+[8572:1316:0322/064932.983:ERROR:gpu_channel_manager.cc(970)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
 
-:LOGFILE:c:/users/bcart/astronomy/ASI2600MM/Subs/IC2177/IC2177_2026-03-05/flats/logs/20260306043343.log:LOGFILE:
+:LOGFILE:c:/users/bcart/astronomy/ASI2600MM/Subs/M51/M51_2026-03-21/flats/logs/20260322105014.log:LOGFILE:
+
+TEST MANUALLY INTERRUPTED
+
+C:\Users\bcart\astronomy\astro-tools\postprocessing>"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/bcart/astronomy/ASI2600MM/Subs/NGC2392/NGC2392_2026-03-21/flats,dir=c:/users/bcart/astronomy/ASI2600MM/Subs/NGC2392/NGC2392_2026-03-21/flats" --force-exit 
+[13196:16408:0322/070755.786:ERROR:gpu_channel_manager.cc(959)] Failed to create GLES3 context, fallback to GLES2.
+[13196:16408:0322/070755.786:ERROR:gpu_channel_manager.cc(970)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+
+:LOGFILE:c:/users/bcart/astronomy/ASI2600MM/Subs/NGC2392/NGC2392_2026-03-21/flats/logs/20260322110823.log:LOGFILE:
 
 TEST MANUALLY INTERRUPTED
 [1] 0
@@ -139,4 +169,4 @@ TEST MANUALLY INTERRUPTED
 > 
 > proc.time()
    user  system elapsed 
-   1.76    2.79  595.50 
+   3.60    7.34 1282.45 
