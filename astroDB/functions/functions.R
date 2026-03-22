@@ -1,5 +1,12 @@
 connectDB <- function () {
-  DBI::dbConnect(RSQLite::SQLite(), "/Volumes/Office-SSD/Astronomy/astroDB.sqlite")
+  DBI::dbConnect(
+  RPostgres::Postgres(),
+  host     = Sys.getenv("pi-host"),
+  port     = 5432,
+  dbname   = "briancarter",
+  user     = Sys.getenv("username"),
+  password = Sys.getenv("pi-db-password")
+)
 }
 
 
@@ -44,10 +51,12 @@ changeMetaPath <- function(file, subsDf = subsDf) {
 subsInventory <- function() {
   data.frame(FilePath = list.files(subdirs, all.files = TRUE,
                                    recursive = TRUE, full.names = TRUE,
-                                   pattern = ".fit")) %>%
+                                   pattern = "\\.fits?$")) %>%
+    dplyr::filter(!stringr::str_detect(FilePath, "master")) %>%   # exclude master calibration files
     mutate(Filename = basename(FilePath)) %>%
-    mutate(Object = basename(dirname(dirname(FilePath)))) %>%
-    mutate(Date = stringr::str_extract(FilePath, "\\d{4}-\\d{2}-\\d{2}")) %>%
+    # Extract Object and Date from filename (reliable regardless of subfolder depth)
+    mutate(Object = stringr::str_extract(Filename, "^[^_]+")) %>%
+    mutate(Date = stringr::str_extract(Filename, "\\d{4}-\\d{2}-\\d{2}")) %>%
     mutate(DurationSubs = ifelse(stringr::str_detect(Filename, "_30.00") == TRUE, 30, ifelse(
       stringr::str_detect(Filename, "_60.0") == TRUE, 60, ifelse(
         stringr::str_detect(Filename, "_120.0") == TRUE, 120, ifelse(
@@ -66,23 +75,37 @@ subsInventory <- function() {
 }
 
 processMetadata <- function(dat) {
-  dat %>%
+  # Start from the file system inventory (subsDf) as the source of truth.
+  # Only files that actually exist on disk will be in the final result.
+
+  # Prepare metadata from CSVs - extract Object and Filename for joining
+  csvMeta <- dat %>%
     mutate(Object = basename(dirname(dirname(FilePath)))) %>%
     mutate(Filename = basename(FilePath)) %>%
-    mutate(Date = stringr::str_remove(basename(dirname(FilePath)), paste0(Object, "_")) )%>%
-    full_join(subsDf %>% 
-                select(FilePathSubs = FilePath, Filename, FilterSubs, DurationSubs) %>% 
-                mutate(inSubs = TRUE), 
-              c("Filename")) %>%
-    mutate(Status = ifelse(is.na(inSubs), "Excluded", ifelse(
-      is.na(Date), "Missing Metadata", "Included"))) %>%
-    mutate(Object = basename(dirname(dirname(FilePath))))  %>%
-    mutate(FilePath = ifelse(is.na(FilePath), FilePathSubs, FilePath)) %>%
+    mutate(MetaDate = stringr::str_remove(basename(dirname(FilePath)), paste0(Object, "_"))) %>%
+    # Deduplicate: CSVs can have duplicate entries for the same file
+    # (e.g., session interrupted and restarted). Keep the last entry.
+    group_by(Filename, Object) %>%
+    slice_tail(n = 1) %>%
+    ungroup()
+
+  # Join: start with actual files on disk, left join to CSV metadata
+  # This ensures only files that exist on disk are included
+  matched <- subsDf %>%
+    left_join(
+      csvMeta %>% select(-FilePath),
+      by = c("Filename", "Object")
+    ) %>%
+    mutate(Status = ifelse(!is.na(MetaDate), "Included", "Missing Metadata")) %>%
+    # Use CSV metadata where available, fall back to filename-derived values
     mutate(FilterName = ifelse(is.na(FilterName), FilterSubs, FilterName)) %>%
     mutate(Duration = ifelse(is.na(Duration), DurationSubs, Duration)) %>%
+    mutate(Date = ifelse(!is.na(MetaDate), MetaDate, Date)) %>%
     select(Object, Date, Filename, ExposureStart, FilterName, Duration, CameraTemp,
            Gain, ADUMean, DetectedStars, HFR, FWHM, Eccentricity, GuidingRMSArcSec,
            FocuserPosition, FocuserTemp, RotatorPosition, Status)
+
+  return(matched)
 }
 
 fixMissingMeta <- function(metadata = metadata) {

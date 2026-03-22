@@ -38,77 +38,55 @@ subdirs <- subs %>%
 
 
 subsDf <- subsInventory()
-                
+message(glue::glue("Found {nrow(subsDf)} files on disk"))
 
 # Inventory metadata ------------------------------------------------------
 metadataFiles <- list.files(subdirs, pattern = "ImageMetaData.csv",
                             full.names = TRUE, recursive = TRUE, all.files = TRUE)
 
 
-# Update the metadata file with the correct file path information
-# they are listed as "c:/users/Brian Carter" and I want them on the NAS
+# Read all CSV metadata and cross-reference with actual files on disk.
+# Only files that physically exist in astrophotography/ will be included.
 invisible(capture.output(
   suppressMessages(
     suppressWarnings({
-      sapply(metadataFiles, changeMetaPath, subsDf = subsDf)
+      metadata <- lapply(metadataFiles, readr::read_csv) %>%
+        Reduce(function(x,y) bind_rows(x, y), .) %>%
+        processMetadata()
     })
   )
 ))
-
-# nrow = 4740 at development - August 15th 2025
-invisible(capture.output(
-  suppressMessages(
-metadata <- lapply(metadataFiles, readr::read_csv) %>%
-  Reduce(function(x,y) bind_rows(x, y), .) %>%
-  processMetadata() %>%
-  fixMissingMeta()
-  )
-)) 
-
 
 metadata <- metadata %>%
   dplyr::filter(!is.na(Filename))
 
 astroDB <- connectDB()
-old <- tbl(astroDB, "astroSubs") %>%
-  collect()
+old <- tryCatch(
+  tbl(astroDB, "astroSubs") %>% collect(),
+  error = function(e) data.frame()
+)
 
-new_rows <- nrow(metadata) - nrow(old)
+old_count <- nrow(old)
+new_count <- nrow(metadata)
+diff <- new_count - old_count
 
+# Always refresh the table with current file-system truth
+dbExecute(astroDB, 'DELETE FROM "astroSubs"')
+dbAppendTable(astroDB, "astroSubs", metadata)
 
-if (new_rows > 0) {
-  message <- glue::glue("There were {new_rows} new images added") 
-  log <- data.frame(
-    Timestamp = Sys.time(),
-    Action = "Inventory added",
-    Status = message)
-
-  dbWriteTable(astroDB, "astroSubs", metadata, overwrite = TRUE)
-  dbAppendTable(astroDB, "astroDBLog", log)
-  message(message)
-  
-}
-if (new_rows < 0) {
-  message <- glue::glue("There were {abs(new_rows)} images removed from the database") 
-  log <- data.frame(
-    Timestamp = Sys.time(),
-    Action = "Inventory removed",
-    Status = message)
-  dbWriteTable(astroDB, "astroSubs", metadata, overwrite = TRUE)
-  dbAppendTable(astroDB, "astroDBLog", log)
-  message(message)
-  
+if (diff > 0) {
+  msg <- glue::glue("There were {diff} new images added (total: {new_count})")
+  log <- data.frame(Timestamp = Sys.time(), Action = "Inventory added", Status = msg)
+} else if (diff < 0) {
+  msg <- glue::glue("There were {abs(diff)} images removed (total: {new_count})")
+  log <- data.frame(Timestamp = Sys.time(), Action = "Inventory removed", Status = msg)
+} else {
+  msg <- glue::glue("No change in inventory (total: {new_count})")
+  log <- data.frame(Timestamp = Sys.time(), Action = "Inventory checked", Status = msg)
 }
 
-if (new_rows == 0) {
-  message("No new images to add to the database")
-  log <- data.frame(
-    Timestamp = Sys.time(),
-    Action = "Inventory checked",
-    Status = "No new images to add")
-  dbAppendTable(astroDB, "astroDBLog", log)
-  
-}
+dbAppendTable(astroDB, "astroDBLog", log)
+message(msg)
 
 dbDisconnect(astroDB)
 

@@ -13,7 +13,7 @@ options(scipen=10)
 # Packages ----------------------------------------------------------------
 myPackages <- c("dplyr", "magrittr", "parallel",
                 "openxlsx", "DBI", "glue", "readr", "testthat", "utils",
-                "getPass", "RPostgreSQL")
+                "getPass", "RPostgres")
 
 suppressMessages({
      lapply(myPackages, require, character.only = TRUE, quietly = TRUE)
