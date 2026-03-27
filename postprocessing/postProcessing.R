@@ -15,7 +15,7 @@ machine <- ifelse(
     stringr::str_detect(machine, "Brians-MacBook-Pro") == TRUE, "MBP14", ifelse(
       stringr::str_detect(machine, "Office-Mac") == TRUE, "OfficeMac",
       ifelse(machine == "APERTURA-75", "TELESCOPE", ifelse(
-        machine == "ES127", "TELESCOPE", machine)
+        machine == "MELE-ASTRO", "TELESCOPE", machine)
       )))) %>%
   as.character()
 
