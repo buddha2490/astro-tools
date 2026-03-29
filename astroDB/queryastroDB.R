@@ -19,7 +19,7 @@ lapply(meta, function(x) {
 
 # Run ------------------------------------------------------------------
 
-myObject <- "M51"
+myObject <- "NGC4559"
 
 
 
@@ -31,25 +31,12 @@ checkLogs()
 astrobinCSV(myObject, csv = F)
 
 # Query the total integration for an object
-objectTotalIntegration(myObject="M51")
+objectTotalIntegration(myObject)
 
 # Get the other metadata, guiding, HFR, FWHM, etc
-objectMetaData(myObject = "M33")
+objectMetaData(myObject)
 
 
 # list all the objects and total integration time
 dbSummary()
 
-con <- connectDB()
-
-
-df <- tbl(con, "astroSubs") %>%
-  filter(Object == "M51") %>%
-  collect() 
-
-table(df$Object)
-
-
-
-
-dbWriteTable(con, "astroSubs", df, overwrite = TRUE)

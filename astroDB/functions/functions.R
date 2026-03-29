@@ -51,7 +51,7 @@ changeMetaPath <- function(file, subsDf = subsDf) {
 subsInventory <- function() {
   data.frame(FilePath = list.files(subdirs, all.files = TRUE,
                                    recursive = TRUE, full.names = TRUE,
-                                   pattern = "\\.fits?$")) %>%
+                                   pattern = "\\.(fits?|xisf)$")) %>%
     dplyr::filter(!stringr::str_detect(FilePath, "master")) %>%   # exclude master calibration files
     mutate(Filename = basename(FilePath)) %>%
     # Extract Object and Date from filename (reliable regardless of subfolder depth)
@@ -210,11 +210,17 @@ objectTotalIntegration <- function(myObject) {
                            labels = c(labels, "HO", "UVIR"))) %>%
     arrange(Filter) %>%
     mutate(Duration2 = cumsum(Duration)) %>%
-    select(Filter, Number, `Duration\n(mins)` = Duration, `Duration\n(cum)` = Duration2) %>%
+    mutate(DurationHrs = round(Duration / 60, 1)) %>%
+    mutate(DurationHrsCum = round(cumsum(DurationHrs), 1)) %>%
+    select(Filter, Number, `Duration\n(mins)` = Duration, `Duration\n(cum)` = Duration2,
+           `Duration\n(hours)` = DurationHrs, `Hours\n(cum)` = DurationHrsCum) %>%
     gt(rowname_col = "row") %>%
     tab_header(
       title = md(glue::glue("Sub tally for {myObject} grouped by filter and sub duration"))
-    ) 
+    ) %>%
+    cols_align(align = "left", columns = Filter) %>%
+    cols_align(align = "center", columns = c(Number, `Duration\n(mins)`, `Duration\n(cum)`,
+                                             `Duration\n(hours)`, `Hours\n(cum)`))
   
 }
 
