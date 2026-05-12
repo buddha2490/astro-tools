@@ -101,10 +101,11 @@ processObjects <- function(myObject, os = os, machine = machine) {
       dplyr::filter(flag == 1) %>%
       select(FilePath, FilterName, DetectedStars, HFR, HFRStDev, FWHM, Eccentricity, GuidingRMSArcSec, Exclusion)
     
-    lapply(flaggedSubs$FilePath, function(x) {
-      if (file.exists(x)) file.copy(x, glue::glue("{path}/checkFits"))
-      if (file.exists(x)) file.remove(x)
-    })
+    # Removing this since I'm using subframe selector more often
+    # lapply(flaggedSubs$FilePath, function(x) {
+    #   if (file.exists(x)) file.copy(x, glue::glue("{path}/checkFits"))
+    #   if (file.exists(x)) file.remove(x)
+    # })
     
   }
   

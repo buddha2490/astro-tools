@@ -29,11 +29,8 @@ machine <- ifelse(
   source("functions/functions.R")
 
   
-if (file.exists("d:/")) {
-transfer <- "d:/Subs"
-} else {
-  transfer <- "//Office-Mac/Office-SSD/Astronomy/In Progress"
-}
+
+  transfer <- "//100.67.219.30/ariabot/Astronomy/subs"
 
 
 # Run the scripts ---------------------------------------------------------
