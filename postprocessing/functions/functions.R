@@ -4,7 +4,7 @@
 
 # Functions ---------------------------------------------------------------
 # postprocessing.R
-getDarks <- function(temp = temp, gain = gain, duration = duration, copyto = sessions) {
+getDarks <- function(temp, gain, duration, copyto) {
   
   biasfile <- glue::glue("{darks}/{temp}/Gain{gain}/masterBias_gain{gain}.xisf") %>% normalizePath()
   
@@ -116,7 +116,7 @@ imageCombo <- imageCombo %>%
 
   flatsToCopy <- list.files(flatsAngle, pattern = ".xisf", full.names = TRUE)
 
-  for (i in 1:length(flatsToCopy)) {
+  for (i in seq_along(flatsToCopy)) {
     file.copy(flatsToCopy[i], objectFlats, overwrite = TRUE)
   }
 
@@ -157,7 +157,7 @@ testit <- function(x) {
   proc.time() - p1
 }
 
-countFlats <- function(objectFlats, os = os, machine = machine) {
+countFlats <- function(objectFlats) {
   
   nFlats <-list.files(objectFlats, pattern = "fits")
   L <- nFlats[grep("L", nFlats)]
@@ -183,30 +183,30 @@ countFlats <- function(objectFlats, os = os, machine = machine) {
   
 }
 
-bulkRename <- function(myObject, os = os, machine = machine) {
-  
+bulkRename <- function(myObject) {
+
   # Remove spaces from the file names
   # Sometimes I forget to do this in NINA
   subs <- list.files(myObject, pattern = "fit")
   newname <- stringr::str_replace(subs, " ", "")
-  for (i in 1:length(subs)) {
+  for (i in seq_along(subs)) {
     file.rename(from = glue::glue("{myObject}/{subs[i]}"),
                 to = glue::glue("{myObject}/{newname[i]}"))
   }
 
 }
   
-moveFlats <- function(rotatorAngle, flatsDir = flatsDir) {
+moveFlats <- function(rotatorAngle) {
 
   master <- glue::glue("{flatsDir}/{rotatorAngle}/master")
-  masterFlatsList <- list.files(master, full.name = TRUE)
+  masterFlatsList <- list.files(master, full.names = TRUE)
 
   # drop the original fit files
   glue::glue("{flatsDir}/{rotatorAngle}") %>%
     list.files(pattern = ".fits", full.names = TRUE) %>%
     lapply(file.remove)
 
-  lapply(masterFlats, function(x) {
+  lapply(masterFlatsList, function(x) {
     file.copy(x, glue::glue("{flatsDir}/{rotatorAngle}"))
   })
 
@@ -214,7 +214,7 @@ moveFlats <- function(rotatorAngle, flatsDir = flatsDir) {
 
 
 # Cleanup
-cleanup <- function(myObject, os = os, machine = machine) {
+cleanup <- function(myObject) {
   
   groups <- data.frame(groups = list.dirs(myObject, recursive = FALSE, full.names = TRUE)) %>%
     mutate(object = basename(myObject)) %>%
@@ -245,7 +245,7 @@ cleanup <- function(myObject, os = os, machine = machine) {
   
 }
   
-renameFlats <- function(rotatorAngle, flatsDir = flatsDir) {
+renameFlats <- function(rotatorAngle, flatsDir) {
 
   
   flats <- data.frame(
@@ -351,7 +351,7 @@ pullLogs <- function(path, guest = FALSE) {
   return(logfile)
 }
 
-times <- function(dat, os = os, machine = machine) {
+times <- function(dat) {
   
   dat$DATE <- as.POSIXlt(format(dat$DATE, "%Y-%m-%d %H:%M:%S"), tz = "America/New_York")
   dat$DATE <- as.POSIXct(dat$DATE)
@@ -420,7 +420,7 @@ addSubsToSequence <- function(paths = dirname(sessions)) {
 
  }
 
-reportGen <- function(dat, endtime = endtime, starttime = starttime, os = os, machine = machine) {
+reportGen <- function(dat) {
   
   starttime <- dat$DATE[1]
   endtime <- dat$DATE[nrow(dat)]
@@ -455,7 +455,7 @@ reportGen <- function(dat, endtime = endtime, starttime = starttime, os = os, ma
   return(report)
 }
 
-getMetaDataStartStop <- function(path, os = os, machine = machine) {
+getMetaDataStartStop <- function(path) {
   metadatFiles <- list.files(path = path, 
                              pattern = "ImageMetaData.csv", 
                              recursive = TRUE, 
@@ -526,7 +526,7 @@ processMetaData <- function(path) {
   
 }
 
-cleanupLogs <- function(dat, os = os, machine = machine) {
+cleanupLogs <- function(dat) {
   
   dat %>%
     dplyr::filter(stringr::str_detect(MESSAGE, "Trigger") == FALSE) %>%
