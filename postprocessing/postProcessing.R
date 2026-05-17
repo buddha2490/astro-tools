@@ -4,11 +4,11 @@ library(magrittr)
 
 
 
-debug <- FALSE
 
 os <- Sys.info()["sysname"]
 machine <- Sys.info()["nodename"]
 
+# We are always working on the "TELESCOPE", this is a relic of development
 os <- ifelse(os == "Darwin", "Mac", "Windows") %>% as.character()
 machine <- ifelse(
   stringr::str_detect(machine, "BRIANC-MacUS") == TRUE, "MBP13", ifelse(
@@ -23,27 +23,39 @@ machine <- ifelse(
 
 # Environmental parameters ------------------------------------------------
 
+
 if (machine == "TELESCOPE") {
   setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing")
   src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
   camera <- "c:/users/bcart/astronomy/ASI2600MM/Subs"
   darks <- file.path(camera, "../Dark Library/") 
+  flatsDir <- file.path(camera, "flats") # new - May 2026
   source("functions/functions.R")
 }
 
+
+
+#########   Process my flats for the night
+rotatorAngle <- flatsDir %>% list.dirs(recursive = FALSE) %>% basename()
+lapply(rotatorAngle, wbppFlats)
+glue::glue("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat") %>% sys::exec_wait()
+lapply(rotatorAngle, moveFlats)
+lapply(rotatorAngle, function(x) renameFlats(x, flatsDir = flatsDir))
+
+
 # Run the scripts ---------------------------------------------------------
 
-# Past versions could only handle 1 night of data at a time and would fail if the object fold had two nights
-# This is fixed now - 25July2025
-# Note: 26July - R is picking up the xisf file as directories
+
 folders <- list.dirs(camera, recursive = FALSE, full.names = TRUE)
+folders <- folders[-grep("flats", folders)]
 objects <- data.frame(dir = list.dirs(camera, recursive = TRUE, full.names = TRUE)) %>%
-  dplyr::filter(!stringr::str_detect(dir, "checkFits") == TRUE) %>%
+  dplyr::filter(!stringr::str_detect(dir, "darks") == TRUE) %>%
   dplyr::filter(!stringr::str_detect(dir, "flats") == TRUE) %>%
   dplyr::filter(!stringr::str_detect(dir, "metadata") == TRUE) %>%
   dplyr::filter(!stringr::str_detect(dir, "calibrated") == TRUE) %>%
   dplyr::filter(!stringr::str_detect(dir, "logs") == TRUE) %>%
-  dplyr::filter(!stringr::str_detect(dir, "Flat_BIN") == TRUE) %>%
+  dplyr::filter(!stringr::str_detect(dir, "SubFrameSelected") == TRUE) %>%
+  dplyr::filter(!stringr::str_detect(dir, "lights") == TRUE) %>%
   dplyr::filter(dir %in% setdiff(dir, folders)) %>%
   dplyr::filter(dir %in% setdiff(dir, camera)) %>%
   pull(dir)
@@ -59,10 +71,6 @@ objects %>% lapply(processObjects)
 
 
 
-# There are some weird errors, but everything runs with below.
-if (os == "Windows" ) {
-  glue::glue("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat") %>% sys::exec_wait()
-}
 
   
 

@@ -28,15 +28,28 @@ machine <- ifelse(
   wbpp <- "C:/Users/bcart/astronomy/astro-tools/postprocessing/wbpp.bat"
   source("functions/functions.R")
 
-  
-
   transfer <- "//100.67.219.30/ariabot/Astronomy/subs"
 
 
 # Run the scripts ---------------------------------------------------------
 
-list.dirs(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
+
+folders <- list.dirs(cameraSrc, recursive = FALSE, full.names = TRUE)
+folders <- folders[-grep("flats", folders)]
+data.frame(dir = list.dirs(cameraSrc, recursive = TRUE, full.names = TRUE)) %>%
+  dplyr::filter(!stringr::str_detect(dir, "darks") == TRUE) %>%
+  dplyr::filter(!stringr::str_detect(dir, "flats") == TRUE) %>%
+  dplyr::filter(!stringr::str_detect(dir, "metadata") == TRUE) %>%
+  dplyr::filter(!stringr::str_detect(dir, "calibrated") == TRUE) %>%
+  dplyr::filter(!stringr::str_detect(dir, "logs") == TRUE) %>%
+  dplyr::filter(!stringr::str_detect(dir, "SubFrameSelected") == TRUE) %>%
+  dplyr::filter(!stringr::str_detect(dir, "lights") == TRUE) %>%
+  dplyr::filter(dir %in% setdiff(dir, folders)) %>%
+  dplyr::filter(dir %in% setdiff(dir, cameraSrc)) %>%
+  pull(dir) %>%
   lapply(cleanup, os = os, machine = machine)
+
+
 
 # reinitialize the wbpp script for next time!
 file.remove(wbpp)
@@ -48,32 +61,21 @@ close(con)
 
 # Logs --------------------------------------------------------------------
 
- glue::glue("{src}/logFiles.R") %>% source()
+glue::glue("{src}/logFiles.R") %>% source()
 
 
 
-# transfer over to astro-ssd
-# 10 minutes for 355 files
+# transfer over to aria-bot
 dirs_to_transfer <- list.dirs(cameraSrc, recursive = FALSE) %>%
   stringr::str_remove("Dark Library")
 
-files_to_transfer <- list.files(cameraSrc, recursive = FALSE, full.names = TRUE)  %>%
-  c(list.files(file.path(cameraSrc), pattern = ".json", recursive = TRUE, full.names = TRUE)) %>%
-  setdiff(dirs_to_transfer)
-
-
-sapply(files_to_transfer, function(x) {
-  file.copy(x, transfer, recursive = TRUE)
-})
-
-
 returnStatus <- sapply(dirs_to_transfer, function(x) {
-  file.copy(x, transfer, recursive = TRUE)
+  file.copy(x, transfer, recursive = TRUE, overwrite = FALSE)
 })
 
-for (i in 1:length(returnStatus)) {
-  if (returnStatus[i] == TRUE) {unlink(dirs_to_transfer[i], recursive = TRUE, force = TRUE)}
-}
+# for (i in 1:length(returnStatus)) {
+#   if (returnStatus[i] == TRUE)  {unlink(dirs_to_transfer[i], recursive = TRUE, force = TRUE)}
+# }
 
 png <- list.files(file.path(cameraSrc), pattern = ".png", recursive = TRUE, full.names = TRUE) %>%
   c(list.files(file.path(cameraSrc), pattern = ".json", recursive = TRUE, full.names = TRUE))

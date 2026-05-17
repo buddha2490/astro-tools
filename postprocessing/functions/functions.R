@@ -10,7 +10,7 @@ getDarks <- function(temp = temp, gain = gain, duration = duration, copyto = ses
   
   darkfile <- glue::glue("{darks}/{temp}/Gain{gain}/masterDark_{duration}s.xisf") %>% normalizePath()
   
-  biasCopyto <- glue::glue("{copyto}/flats") %>% normalizePath()
+  biasCopyto <- glue::glue("{copyto}/../flats") %>% normalizePath()
   
   file.copy(biasfile, biasCopyto)
   
@@ -18,7 +18,7 @@ getDarks <- function(temp = temp, gain = gain, duration = duration, copyto = ses
   
 }
 
-processObjects <- function(myObject, os = os, machine = machine) {
+processObjects <- function(myObject) {
   
   
   sessions <- data.frame(object = basename(dirname(myObject)))  %>%
@@ -52,12 +52,27 @@ processObjects <- function(myObject, os = os, machine = machine) {
     readr::read_csv() %>%
     mutate(filename = basename(FilePath)) %>%
     mutate(FilePath = stringr::str_replace(FilePath, filename, stringr::str_replace(filename, " ", "")))
-  
-  
-  # create some directories
-  objectFlats <- glue::glue(path, "/flats");
-    #dir.create(objectFlats, showWarnings = FALSE) # created in NINA now - Jan2026
-  objectFits <- glue::glue(path, "/checkFits"); dir.create(objectFits, showWarnings = FALSE)
+
+
+# We need to get the mechanical rotation angle to match the flats later
+# I am not taking flats and saving them at the end of the session by mechanical rotation angle
+  mechRotate <- metadata %>%
+    group_by(FilterName) %>%
+    summarize(angle = floor(mean(RotatorPosition))) %>%
+    ungroup()
+
+  # create some directories to file everything away in the repo
+  glue::glue(path, "/flats") %>% dir.create(showWarnings = F)
+  glue::glue(path, "/darks") %>% dir.create(showWarnings = F)
+  glue::glue(path, "/lights") %>% dir.create(showWarnings = F)
+  glue::glue(path, "/SubFrameSelected") %>% dir.create(showWarnings = F)
+
+  objectFlats <- glue::glue(path, "/flats") 
+  objectDarks <- glue::glue(path, "/darks")
+  objectLights <- glue::glue(path, "/lights") 
+  objectFinal <- glue::glue(path, "/SubFrameSelected") 
+
+
   
   
   # grab some info from the file
@@ -66,54 +81,14 @@ processObjects <- function(myObject, os = os, machine = machine) {
   # I need this metric for later
   imageCombo <- metadata %>%
     group_by(CameraTargetTemp, Gain, Duration, FilterName) %>%
-    distinct(CameraTargetTemp, Gain, Duration, FilterName)
+    distinct(CameraTargetTemp, Gain, Duration, FilterName) %>%
+    left_join(mechRotate, "FilterName")
   
-  
-  # Flag the fit files that need individual review
-  for (i in 1:nrow(imageCombo)) {
-    df <- dplyr::filter(metadata, FilterName == imageCombo$FilterName[i])
     
-    
-    measures <- c("DetectedStars", "HFR", "FWHM", "Eccentricity", "GuidingRMSArcSec")
-    metrics <- lapply(measures, function(x) {
-      sd(df[[x]], na.rm = TRUE)
-    })
-    names(metrics) <- c("stars", "HFR", "FWHM", "roundness", "guiding")
-    
-    # Flag files 
-    df <- df %>%
-      mutate(LowStars = ifelse(DetectedStars < mean(DetectedStars, na.rm = TRUE) - 2 * metrics$stars, 1, 0)) %>%
-      mutate(HighHFR = ifelse(HFR > mean(HFR, na.rm = TRUE) + 2 * metrics$HFR, 1, 0)) %>%
-      mutate(HighFWHM = ifelse(FWHM > mean(FWHM, na.rm = TRUE) + 2 * metrics$FWHM, 1, 0)) %>%
-      mutate(notRound = ifelse(Eccentricity > 0.6, 1, 0)) %>%
-      mutate(badGuiding = ifelse(GuidingRMSArcSec > 1, 1, 0)) %>%
-      mutate(Exclusion = ifelse(LowStars == 1, 1, ifelse(
-        HighHFR == 1, 2, ifelse(HighFWHM == 1, 3, ifelse(
-          notRound == 1, 4, ifelse(
-            badGuiding == 1, 5, 99)))))) %>%
-      mutate(Exclusion = factor(Exclusion, c(1:5, 99), c("Low star count", ">HFR", ">FWHM", 
-                                                         "Eccentricity > 0.6", "Poor Guiding", ""))) %>%
-      mutate(flag = ifelse(Exclusion == "", 0 , 1))
-    
-    
-    # Move flagged subs to a directory for individual review
-    flaggedSubs <- df %>%  
-      dplyr::filter(flag == 1) %>%
-      select(FilePath, FilterName, DetectedStars, HFR, HFRStDev, FWHM, Eccentricity, GuidingRMSArcSec, Exclusion)
-    
-    # Removing this since I'm using subframe selector more often
-    # lapply(flaggedSubs$FilePath, function(x) {
-    #   if (file.exists(x)) file.copy(x, glue::glue("{path}/checkFits"))
-    #   if (file.exists(x)) file.remove(x)
-    # })
-    
-  }
-  
   # Copy over my darks
   # Matches the dark to the temp/gain/duration
   # Also gets a matched master bias to stack with the flats
   # Runs in mac or windows
-
 imageCombo <- imageCombo %>%
   mutate(CameraTargetTemp = ifelse(CameraTargetTemp <= -20, -20, CameraTargetTemp))
 
@@ -122,37 +97,57 @@ imageCombo <- imageCombo %>%
       temp = imageCombo$CameraTargetTemp[i],
       gain = imageCombo$Gain[i],
       duration = imageCombo$Duration[i],
-      copyto = path
+      copyto = glue::glue("{path}/darks")
     )
   }
 
-  # Process my flats
-  # This creates a bat file that calls PixInsight
-  wbppFlats(objectFlats)
-  
+  ## Copy over the flats
+  # these are angle specific
+  # first figure out the angles in the flats directory
+  flatsAngle <- data.frame(CopyDir = 
+    flatsDir %>% 
+    list.dirs(recursive = F)) %>%
+    mutate(angle = stringr::str_remove(basename(CopyDir), "Angle-") %>%
+      as.numeric() %>%
+      floor()) %>%
+    right_join(imageCombo, "angle") %>%
+    distinct(CopyDir) %>%
+    pull(CopyDir)
+
+  flatsToCopy <- list.files(flatsAngle, pattern = ".xisf", full.names = TRUE)
+
+  for (i in 1:length(flatsToCopy)) {
+    file.copy(flatsToCopy[i], objectFlats, overwrite = TRUE)
+  }
+
+
+  # Now move the lights in to the /lights folder
+  # this is a little slow
+  lightsToCopy <- list.files(myObject, pattern = "LIGHT", full.names = TRUE)
+  for (i in 1:length(lightsToCopy)) {
+    file.copy(lightsToCopy[i], objectLights, overwrite = TRUE)
+  }
+
 }
 
-wbppFlats <- function(objectFlats) {
+wbppFlats <- function(rotatorAngle) {
   
     
     exe <- '"C:\\Program Files\\PixInsight\\bin\\PixInsight.exe"  -n --automation-mode -r='
     
-    js1 <- '"C:\\Program Files\\PixInsight\\src\\scripts\\BatchPreprocessing\\WBPP.js,automationMode=true,outputDirectory='
+    js1 <- 'C:\\Program Files\\PixInsight\\src\\scripts\\BatchPreprocessing\\WBPP.js,automationMode=true,outputDirectory='
     
     wbpp <- file("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat", "a")
     
-  outputdir <- objectFlats
+  workingDir <- 'c:\\users\\bcart\\astronomy\\ASI2600MM/Subs\\flats\\{rotatorAngle}' %>% glue::glue()
   
-  dir <- glue::glue(objectFlats, '"')
   
   js2 <- '--force-exit'
   
-  foo <- glue::glue("{exe}{js1}{outputdir},dir={dir} {js2}")
-  
+  foo <- glue::glue('{exe}"{js1}{workingDir},dir={workingDir}" {js2}')
+    
   write(foo, wbpp, append = TRUE)
   close(wbpp)
-  
-
   
 }
 
@@ -201,65 +196,62 @@ bulkRename <- function(myObject, os = os, machine = machine) {
 
 }
   
+moveFlats <- function(rotatorAngle, flatsDir = flatsDir) {
+
+  master <- glue::glue("{flatsDir}/{rotatorAngle}/master")
+  masterFlatsList <- list.files(master, full.name = TRUE)
+
+  # drop the original fit files
+  glue::glue("{flatsDir}/{rotatorAngle}") %>%
+    list.files(pattern = ".fits", full.names = TRUE) %>%
+    lapply(file.remove)
+
+  lapply(masterFlats, function(x) {
+    file.copy(x, glue::glue("{flatsDir}/{rotatorAngle}"))
+  })
+
+}
 
 
 # Cleanup
 cleanup <- function(myObject, os = os, machine = machine) {
   
-  sessions <- data.frame(sessions = list.dirs(myObject, recursive = FALSE, full.names = TRUE)) %>%
+  groups <- data.frame(groups = list.dirs(myObject, recursive = FALSE, full.names = TRUE)) %>%
     mutate(object = basename(myObject)) %>%
-    mutate(folder = basename(sessions)) %>%
+    mutate(folder = basename(groups)) %>%
     mutate(dates = stringr::str_replace(folder, paste0(object, "_"), ""))  %>%
-    pull(sessions)
+    pull(groups)
   
-  flatDir <- file.path(sessions, "flats")
-  masterDir <- file.path(flatDir, "master")
-  fakeDir <- file.path(flatDir, "fake") # testing purposes
-  file.path(flatDir, "calibrated") %>% unlink(recursive = TRUE, force = TRUE)
-  file.path(flatDir, "logs") %>% unlink(recursive = TRUE, force = TRUE)
-  fakeDir %>% unlink(recursive = TRUE, force = TRUE) # testing purposes
+  # Verify contents
+  flats <- file.path(myObject, "flats") %>% list.files()
+  lights <- file.path(myObject, "lights") %>% list.files()
+  darks <- file.path(myObject, "darks") %>% list.files()
   
+  if (length(flats) ==0) stop("Flats were not copied")
+  if (length(lights) == 0) stop("Lights were not copied")
+  if (length(darks) == 0) stop("Darks were not copied")
   
-  
-   #  Process the stacked flats
-  nMaster <- list.files(masterDir, pattern = ".xisf", full.names = TRUE)
-  renameStatus <- renameFlats(nMaster)
-  
-  
-  # copy the files
-  # should fail safe if the flats didn't rename correctly
-  if (!is.null(renameStatus)) {
-  copyFiles <- c(
-    renameStatus %>%
-      dplyr::filter(returnStatus == "TRUE") %>%
-      mutate(foo = glue::glue("{path}/{newFlats}")) %>%
-      pull(foo) %>%
-      file.path(),
-    renameStatus %>%
-      dplyr::filter(returnStatus == "FALSE") %>%
-      mutate(foo = glue::glue("{path}/{file}")) %>%
-      pull(foo) %>%
-      file.path()
-   ) 
-  lapply(copyFiles, function(x) file.copy(from = x, to = sessions, overwrite = TRUE))
-  xisf <- list.files(sessions, pattern = "masterFlat")
-  
-  if (length(xisf) == length(copyFiles)) {
-    unlink(flatDir, recursive = TRUE, force = TRUE)
+  # Clean up the old lights
+  origLights <- list.files(myObject, pattern = ".fits")
+  notCopied <- setdiff(origLights, lights)
+  if (length(notCopied) > 0) {
+    file.copy(notCopied, file.path(myObject, file.path(myObject, "flats")))
   }
-  }
+  if (length(notCopied) == 0) {
+    lapply(origLights, function(x) {
+      file.remove(file.path(myObject, x))
+    })
   }
   
+}
+  
+renameFlats <- function(rotatorAngle, flatsDir = flatsDir) {
 
-
-
-renameFlats <- function(flatsList) {
-  if (length(flatsList) == 0) {
-    return(NULL)
-  }
   
-  flats <- data.frame(path = dirname(flatsList),
-                      file = basename(flatsList)) %>%
+  flats <- data.frame(
+    file = glue::glue("{flatsDir}/{rotatorAngle}") %>% list.files(pattern = ".xisf")
+  ) %>%
+    mutate(path = glue::glue("{flatsDir}/{rotatorAngle}")) %>%
     mutate(newFlats = ifelse(stringr::str_detect(file, "L_mono") == TRUE, "masterFlat_L.xisf", ifelse(
       stringr::str_detect(file, "R_mono") == TRUE, "masterFlat_R.xisf", ifelse(
         stringr::str_detect(file, "G_mono") == TRUE, "masterFlat_G.xisf", ifelse(
@@ -284,7 +276,6 @@ renameFlats <- function(flatsList) {
 }
 
 # Log files
-
 eventPairs <- function(dat) {
   
   starts <- dat %>%
@@ -481,7 +472,6 @@ getMetaDataStartStop <- function(path, os = os, machine = machine) {
   
 }
 
-
 getAllMetaData <- function(path) {
   
   metadatFiles <- list.files(path = path, 
@@ -494,7 +484,6 @@ getAllMetaData <- function(path) {
     select(Object, FilterName, Duration, HFR, FWHM, GuidingRMSArcSec,
            ExposureStart, FocuserTemp)
 }
-
 
 processMetaData <- function(path) {
   
@@ -559,7 +548,8 @@ cleanTime <- function(time) {
   
 }
 
-getDarkTimesAPI <- function(lat = 33, lng = -84, date = Sys.Date() - 1) {
+# Changed to the texas location lat/lng
+getDarkTimesAPI <- function(lat = 31, lng = -99, date = Sys.Date() - 1) {
   require(httr)
   require(jsonlite)
 

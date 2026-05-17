@@ -81,60 +81,14 @@ The following objects are masked from 'package:base':
 > 
 > 
 > objects %>%  lapply(bulkRename)
-[[1]]
-NULL
-
-[[2]]
-NULL
-
+list()
 > 
 > # MBP14 - /volumes/office-ssd/astronomy/testing: 271.737 elapsed
 > system.time({
 + objects %>% lapply(processObjects)
 + })
-Rows: 134 Columns: 35
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 134 Columns: 35
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 404 Columns: 35
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 404 Columns: 35
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
    user  system elapsed 
-   0.95    1.32    4.89 
-Warning messages:
-1: In normalizePath(path.expand(path), winslash, mustWork) :
-  path[1]="c:/users/bcart/astronomy/ASI2600MM/Subs/M16/M16_2026-05-11/flats": The system cannot find the file specified
-2: In normalizePath(path.expand(path), winslash, mustWork) :
-  path[1]="c:/users/bcart/astronomy/ASI2600MM/Subs/MarkarianChain/MarkarianChain_2026-05-11/flats": The system cannot find the file specified
+      0       0       0 
 > 
 > 
 > 
@@ -142,14 +96,6 @@ Warning messages:
 > if (os == "Windows" ) {
 +   glue::glue("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat") %>% sys::exec_wait()
 + }
-
-C:\Users\bcart\astronomy\astro-tools\postprocessing>"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/bcart/astronomy/ASI2600MM/Subs/M16/M16_2026-05-11/flats,dir=c:/users/bcart/astronomy/ASI2600MM/Subs/M16/M16_2026-05-11/flats" --force-exit 
-[17456:9044:0512/051636.573:ERROR:gpu_channel_manager.cc(959)] Failed to create GLES3 context, fallback to GLES2.
-[17456:9044:0512/051636.574:ERROR:gpu_channel_manager.cc(970)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
-
-C:\Users\bcart\astronomy\astro-tools\postprocessing>"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:/users/bcart/astronomy/ASI2600MM/Subs/MarkarianChain/MarkarianChain_2026-05-11/flats,dir=c:/users/bcart/astronomy/ASI2600MM/Subs/MarkarianChain/MarkarianChain_2026-05-11/flats" --force-exit 
-[16032:19168:0512/051710.595:ERROR:gpu_channel_manager.cc(959)] Failed to create GLES3 context, fallback to GLES2.
-[16032:19168:0512/051710.595:ERROR:gpu_channel_manager.cc(970)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
 [1] 0
 > 
 >   
@@ -165,4 +111,4 @@ C:\Users\bcart\astronomy\astro-tools\postprocessing>"C:\Program Files\PixInsight
 > 
 > proc.time()
    user  system elapsed 
-   2.12    2.01   76.29 
+   0.68    0.29    5.23 
