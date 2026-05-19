@@ -395,9 +395,10 @@ addSubsToSequence <- function(paths = dirname(sessions)) {
     setdiff(list.dirs(paths, recursive = FALSE)) %>% 
     data.frame(file = . )  %>%
     dplyr::filter(!stringr::str_detect(file, "flats") & 
-             !stringr::str_detect(file, "checkFits") & 
+             !stringr::str_detect(file, "SubFrameSelected") & 
              !stringr::str_detect(file, "master") & 
              !stringr::str_detect(file, "logs") & 
+             !stringr::str_detect(file, "darks") &
              !stringr::str_detect(file, "calibrated")) %>%
     unique() %>%
     pull()

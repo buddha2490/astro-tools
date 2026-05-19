@@ -50,13 +50,8 @@ source("functions/functions.R")
 
 # session paths -----------------------------------------------------------
  sessions <- data.frame(path = list.dirs(subsPath, recursive = TRUE, full.names = TRUE)) %>%
-  dplyr::filter(stringr::str_detect(path, "checkFits"))  %>%
-  mutate(path = dirname(path)) %>%
+  dplyr::filter(stringr::str_detect(path, "lights"))  %>%
   pull(path)
-
-# create a metadata folder
-sapply(sessions, function(x) dir.create(file.path(x, "metadata"), showWarnings = FALSE))
-sessions <- file.path(sessions, "metadata")
 
 # Guide logs --------------------------------------------------------------
 

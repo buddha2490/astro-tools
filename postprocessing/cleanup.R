@@ -28,7 +28,7 @@ machine <- ifelse(
   wbpp <- "C:/Users/bcart/astronomy/astro-tools/postprocessing/wbpp.bat"
   source("functions/functions.R")
 
-  transfer <- "//100.67.219.30/ariabot/Astronomy/subs"
+  transfer <- "Z:/Astronomy/subs"
 
 
 # Run the scripts ---------------------------------------------------------
@@ -47,7 +47,7 @@ data.frame(dir = list.dirs(cameraSrc, recursive = TRUE, full.names = TRUE)) %>%
   dplyr::filter(dir %in% setdiff(dir, folders)) %>%
   dplyr::filter(dir %in% setdiff(dir, cameraSrc)) %>%
   pull(dir) %>%
-  lapply(cleanup, os = os, machine = machine)
+  lapply(cleanup)
 
 
 
@@ -67,16 +67,21 @@ glue::glue("{src}/logFiles.R") %>% source()
 
 # transfer over to aria-bot
 dirs_to_transfer <- list.dirs(cameraSrc, recursive = FALSE) %>%
-  stringr::str_remove("Dark Library")
+  stringr::str_remove("c:/users/bcart/astronomy/ASI2600MM/Subs/flats")
+
+dirs_to_transfer <- dirs_to_transfer[dirs_to_transfer != ""]
+
 
 returnStatus <- sapply(dirs_to_transfer, function(x) {
   file.copy(x, transfer, recursive = TRUE, overwrite = FALSE)
 })
 
-# for (i in 1:length(returnStatus)) {
-#   if (returnStatus[i] == TRUE)  {unlink(dirs_to_transfer[i], recursive = TRUE, force = TRUE)}
-# }
+for (i in 1:length(returnStatus)) {
+  if (returnStatus[i] == TRUE)  {unlink(dirs_to_transfer[i], recursive = TRUE, force = TRUE)}
+}
 
 png <- list.files(file.path(cameraSrc), pattern = ".png", recursive = TRUE, full.names = TRUE) %>%
   c(list.files(file.path(cameraSrc), pattern = ".json", recursive = TRUE, full.names = TRUE))
 sapply(png, file.remove)
+
+unlink("c:/users/bcart/astronomy/ASI2600MM/Subs/flats", recursive = TRUE, force = TRUE)

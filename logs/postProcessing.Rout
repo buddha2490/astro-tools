@@ -34,11 +34,11 @@ The following objects are masked from 'package:base':
 > 
 > 
 > 
-> debug <- FALSE
 > 
 > os <- Sys.info()["sysname"]
 > machine <- Sys.info()["nodename"]
 > 
+> # We are always working on the "TELESCOPE", this is a relic of development
 > os <- ifelse(os == "Darwin", "Mac", "Windows") %>% as.character()
 > machine <- ifelse(
 +   stringr::str_detect(machine, "BRIANC-MacUS") == TRUE, "MBP13", ifelse(
@@ -53,27 +53,100 @@ The following objects are masked from 'package:base':
 > 
 > # Environmental parameters ------------------------------------------------
 > 
+> 
 > if (machine == "TELESCOPE") {
 +   setwd("C:/users/bcart/Astronomy/astro-tools/postprocessing")
 +   src <- file.path("C:/users/bcart/Astronomy/astro-tools/postprocessing")
 +   camera <- "c:/users/bcart/astronomy/ASI2600MM/Subs"
 +   darks <- file.path(camera, "../Dark Library/") 
++   flatsDir <- file.path(camera, "flats") # new - May 2026
 +   source("functions/functions.R")
 + }
 > 
+> 
+> 
+> #########   Process my flats for the night
+> rotatorAngle <- flatsDir %>% list.dirs(recursive = FALSE) %>% basename()
+> lapply(rotatorAngle, wbppFlats)
+[[1]]
+[1] 0
+
+> glue::glue("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat") %>% sys::exec_wait()
+
+C:\Users\bcart\astronomy\astro-tools\postprocessing>"C:\Program Files\PixInsight\bin\PixInsight.exe"  -n --automation-mode -r="C:\Program Files\PixInsight\src\scripts\BatchPreprocessing\WBPP.js,automationMode=true,outputDirectory=c:\users\bcart\astronomy\ASI2600MM/Subs\flats\Angle-0.00,dir=c:\users\bcart\astronomy\ASI2600MM/Subs\flats\Angle-0.00" --force-exit 
+[19008:3260:0519/070721.478:ERROR:gpu_channel_manager.cc(959)] Failed to create GLES3 context, fallback to GLES2.
+[19008:3260:0519/070721.478:ERROR:gpu_channel_manager.cc(970)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+
+:LOGFILE:c:\users\bcart\astronomy\ASI2600MM/Subs\flats\Angle-0.00/logs/20260519120800.log:LOGFILE:
+
+TEST MANUALLY INTERRUPTED
+[1] 0
+> lapply(rotatorAngle, moveFlats)
+[[1]]
+[[1]][[1]]
+[1] TRUE
+
+[[1]][[2]]
+[1] TRUE
+
+[[1]][[3]]
+[1] TRUE
+
+[[1]][[4]]
+[1] TRUE
+
+[[1]][[5]]
+[1] TRUE
+
+[[1]][[6]]
+[1] TRUE
+
+[[1]][[7]]
+[1] TRUE
+
+
+> lapply(rotatorAngle, function(x) renameFlats(x, flatsDir = flatsDir))
+[[1]]
+                                           file
+1 masterFlat_BIN-1_6248x4176_FILTER-B_mono.xisf
+2 masterFlat_BIN-1_6248x4176_FILTER-G_mono.xisf
+3 masterFlat_BIN-1_6248x4176_FILTER-H_mono.xisf
+4 masterFlat_BIN-1_6248x4176_FILTER-L_mono.xisf
+5 masterFlat_BIN-1_6248x4176_FILTER-O_mono.xisf
+6 masterFlat_BIN-1_6248x4176_FILTER-R_mono.xisf
+7 masterFlat_BIN-1_6248x4176_FILTER-S_mono.xisf
+                                                      path          newFlats
+1 c:/users/bcart/astronomy/ASI2600MM/Subs/flats/Angle-0.00 masterFlat_B.xisf
+2 c:/users/bcart/astronomy/ASI2600MM/Subs/flats/Angle-0.00 masterFlat_G.xisf
+3 c:/users/bcart/astronomy/ASI2600MM/Subs/flats/Angle-0.00 masterFlat_H.xisf
+4 c:/users/bcart/astronomy/ASI2600MM/Subs/flats/Angle-0.00 masterFlat_L.xisf
+5 c:/users/bcart/astronomy/ASI2600MM/Subs/flats/Angle-0.00 masterFlat_O.xisf
+6 c:/users/bcart/astronomy/ASI2600MM/Subs/flats/Angle-0.00 masterFlat_R.xisf
+7 c:/users/bcart/astronomy/ASI2600MM/Subs/flats/Angle-0.00 masterFlat_S.xisf
+  returnStatus
+1         TRUE
+2         TRUE
+3         TRUE
+4         TRUE
+5         TRUE
+6         TRUE
+7         TRUE
+
+> 
+> 
 > # Run the scripts ---------------------------------------------------------
 > 
-> # Past versions could only handle 1 night of data at a time and would fail if the object fold had two nights
-> # This is fixed now - 25July2025
-> # Note: 26July - R is picking up the xisf file as directories
+> 
 > folders <- list.dirs(camera, recursive = FALSE, full.names = TRUE)
+> folders <- folders[-grep("flats", folders)]
 > objects <- data.frame(dir = list.dirs(camera, recursive = TRUE, full.names = TRUE)) %>%
-+   dplyr::filter(!stringr::str_detect(dir, "checkFits") == TRUE) %>%
++   dplyr::filter(!stringr::str_detect(dir, "darks") == TRUE) %>%
 +   dplyr::filter(!stringr::str_detect(dir, "flats") == TRUE) %>%
 +   dplyr::filter(!stringr::str_detect(dir, "metadata") == TRUE) %>%
 +   dplyr::filter(!stringr::str_detect(dir, "calibrated") == TRUE) %>%
 +   dplyr::filter(!stringr::str_detect(dir, "logs") == TRUE) %>%
-+   dplyr::filter(!stringr::str_detect(dir, "Flat_BIN") == TRUE) %>%
++   dplyr::filter(!stringr::str_detect(dir, "SubFrameSelected") == TRUE) %>%
++   dplyr::filter(!stringr::str_detect(dir, "lights") == TRUE) %>%
 +   dplyr::filter(dir %in% setdiff(dir, folders)) %>%
 +   dplyr::filter(dir %in% setdiff(dir, camera)) %>%
 +   pull(dir)
@@ -81,22 +154,37 @@ The following objects are masked from 'package:base':
 > 
 > 
 > objects %>%  lapply(bulkRename)
-list()
+[[1]]
+NULL
+
 > 
 > # MBP14 - /volumes/office-ssd/astronomy/testing: 271.737 elapsed
 > system.time({
 + objects %>% lapply(processObjects)
 + })
+Rows: 285 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 285 Columns: 35
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
+dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
+dttm  (2): ExposureStart, ExposureStartUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
    user  system elapsed 
-      0       0       0 
+   1.45   30.14   45.24 
 > 
 > 
 > 
-> # There are some weird errors, but everything runs with below.
-> if (os == "Windows" ) {
-+   glue::glue("C:/users/bcart/Astronomy/astro-tools/postprocessing/wbpp.bat") %>% sys::exec_wait()
-+ }
-[1] 0
 > 
 >   
 > 
@@ -111,4 +199,4 @@ list()
 > 
 > proc.time()
    user  system elapsed 
-   0.68    0.29    5.23 
+   3.45   36.21 1682.54 

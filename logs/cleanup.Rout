@@ -65,21 +65,885 @@ The following object is masked from 'package:magrittr':
 >   wbpp <- "C:/Users/bcart/astronomy/astro-tools/postprocessing/wbpp.bat"
 >   source("functions/functions.R")
 > 
->   
-> if (file.exists("d:/")) {
-+ transfer <- "d:/Subs"
-+ } else {
-+   transfer <- "//Office-Mac/Office-SSD/Astronomy/In Progress"
-+ }
+>   transfer <- "//100.67.219.30/ariabot/Astronomy/subs"
 > 
 > 
 > # Run the scripts ---------------------------------------------------------
 > 
-> list.dirs(cameraSrc, recursive = FALSE, full.names = TRUE) %>%
-+   lapply(cleanup, os = os, machine = machine)
+> 
+> folders <- list.dirs(cameraSrc, recursive = FALSE, full.names = TRUE)
+> folders <- folders[-grep("flats", folders)]
+> data.frame(dir = list.dirs(cameraSrc, recursive = TRUE, full.names = TRUE)) %>%
++   dplyr::filter(!stringr::str_detect(dir, "darks") == TRUE) %>%
++   dplyr::filter(!stringr::str_detect(dir, "flats") == TRUE) %>%
++   dplyr::filter(!stringr::str_detect(dir, "metadata") == TRUE) %>%
++   dplyr::filter(!stringr::str_detect(dir, "calibrated") == TRUE) %>%
++   dplyr::filter(!stringr::str_detect(dir, "logs") == TRUE) %>%
++   dplyr::filter(!stringr::str_detect(dir, "SubFrameSelected") == TRUE) %>%
++   dplyr::filter(!stringr::str_detect(dir, "lights") == TRUE) %>%
++   dplyr::filter(dir %in% setdiff(dir, folders)) %>%
++   dplyr::filter(dir %in% setdiff(dir, cameraSrc)) %>%
++   pull(dir) %>%
++   lapply(cleanup)
 [[1]]
-[1] 0
+[[1]][[1]]
+[1] TRUE
 
+[[1]][[2]]
+[1] TRUE
+
+[[1]][[3]]
+[1] TRUE
+
+[[1]][[4]]
+[1] TRUE
+
+[[1]][[5]]
+[1] TRUE
+
+[[1]][[6]]
+[1] TRUE
+
+[[1]][[7]]
+[1] TRUE
+
+[[1]][[8]]
+[1] TRUE
+
+[[1]][[9]]
+[1] TRUE
+
+[[1]][[10]]
+[1] TRUE
+
+[[1]][[11]]
+[1] TRUE
+
+[[1]][[12]]
+[1] TRUE
+
+[[1]][[13]]
+[1] TRUE
+
+[[1]][[14]]
+[1] TRUE
+
+[[1]][[15]]
+[1] TRUE
+
+[[1]][[16]]
+[1] TRUE
+
+[[1]][[17]]
+[1] TRUE
+
+[[1]][[18]]
+[1] TRUE
+
+[[1]][[19]]
+[1] TRUE
+
+[[1]][[20]]
+[1] TRUE
+
+[[1]][[21]]
+[1] TRUE
+
+[[1]][[22]]
+[1] TRUE
+
+[[1]][[23]]
+[1] TRUE
+
+[[1]][[24]]
+[1] TRUE
+
+[[1]][[25]]
+[1] TRUE
+
+[[1]][[26]]
+[1] TRUE
+
+[[1]][[27]]
+[1] TRUE
+
+[[1]][[28]]
+[1] TRUE
+
+[[1]][[29]]
+[1] TRUE
+
+[[1]][[30]]
+[1] TRUE
+
+[[1]][[31]]
+[1] TRUE
+
+[[1]][[32]]
+[1] TRUE
+
+[[1]][[33]]
+[1] TRUE
+
+[[1]][[34]]
+[1] TRUE
+
+[[1]][[35]]
+[1] TRUE
+
+[[1]][[36]]
+[1] TRUE
+
+[[1]][[37]]
+[1] TRUE
+
+[[1]][[38]]
+[1] TRUE
+
+[[1]][[39]]
+[1] TRUE
+
+[[1]][[40]]
+[1] TRUE
+
+[[1]][[41]]
+[1] TRUE
+
+[[1]][[42]]
+[1] TRUE
+
+[[1]][[43]]
+[1] TRUE
+
+[[1]][[44]]
+[1] TRUE
+
+[[1]][[45]]
+[1] TRUE
+
+[[1]][[46]]
+[1] TRUE
+
+[[1]][[47]]
+[1] TRUE
+
+[[1]][[48]]
+[1] TRUE
+
+[[1]][[49]]
+[1] TRUE
+
+[[1]][[50]]
+[1] TRUE
+
+[[1]][[51]]
+[1] TRUE
+
+[[1]][[52]]
+[1] TRUE
+
+[[1]][[53]]
+[1] TRUE
+
+[[1]][[54]]
+[1] TRUE
+
+[[1]][[55]]
+[1] TRUE
+
+[[1]][[56]]
+[1] TRUE
+
+[[1]][[57]]
+[1] TRUE
+
+[[1]][[58]]
+[1] TRUE
+
+[[1]][[59]]
+[1] TRUE
+
+[[1]][[60]]
+[1] TRUE
+
+[[1]][[61]]
+[1] TRUE
+
+[[1]][[62]]
+[1] TRUE
+
+[[1]][[63]]
+[1] TRUE
+
+[[1]][[64]]
+[1] TRUE
+
+[[1]][[65]]
+[1] TRUE
+
+[[1]][[66]]
+[1] TRUE
+
+[[1]][[67]]
+[1] TRUE
+
+[[1]][[68]]
+[1] TRUE
+
+[[1]][[69]]
+[1] TRUE
+
+[[1]][[70]]
+[1] TRUE
+
+[[1]][[71]]
+[1] TRUE
+
+[[1]][[72]]
+[1] TRUE
+
+[[1]][[73]]
+[1] TRUE
+
+[[1]][[74]]
+[1] TRUE
+
+[[1]][[75]]
+[1] TRUE
+
+[[1]][[76]]
+[1] TRUE
+
+[[1]][[77]]
+[1] TRUE
+
+[[1]][[78]]
+[1] TRUE
+
+[[1]][[79]]
+[1] TRUE
+
+[[1]][[80]]
+[1] TRUE
+
+[[1]][[81]]
+[1] TRUE
+
+[[1]][[82]]
+[1] TRUE
+
+[[1]][[83]]
+[1] TRUE
+
+[[1]][[84]]
+[1] TRUE
+
+[[1]][[85]]
+[1] TRUE
+
+[[1]][[86]]
+[1] TRUE
+
+[[1]][[87]]
+[1] TRUE
+
+[[1]][[88]]
+[1] TRUE
+
+[[1]][[89]]
+[1] TRUE
+
+[[1]][[90]]
+[1] TRUE
+
+[[1]][[91]]
+[1] TRUE
+
+[[1]][[92]]
+[1] TRUE
+
+[[1]][[93]]
+[1] TRUE
+
+[[1]][[94]]
+[1] TRUE
+
+[[1]][[95]]
+[1] TRUE
+
+[[1]][[96]]
+[1] TRUE
+
+[[1]][[97]]
+[1] TRUE
+
+[[1]][[98]]
+[1] TRUE
+
+[[1]][[99]]
+[1] TRUE
+
+[[1]][[100]]
+[1] TRUE
+
+[[1]][[101]]
+[1] TRUE
+
+[[1]][[102]]
+[1] TRUE
+
+[[1]][[103]]
+[1] TRUE
+
+[[1]][[104]]
+[1] TRUE
+
+[[1]][[105]]
+[1] TRUE
+
+[[1]][[106]]
+[1] TRUE
+
+[[1]][[107]]
+[1] TRUE
+
+[[1]][[108]]
+[1] TRUE
+
+[[1]][[109]]
+[1] TRUE
+
+[[1]][[110]]
+[1] TRUE
+
+[[1]][[111]]
+[1] TRUE
+
+[[1]][[112]]
+[1] TRUE
+
+[[1]][[113]]
+[1] TRUE
+
+[[1]][[114]]
+[1] TRUE
+
+[[1]][[115]]
+[1] TRUE
+
+[[1]][[116]]
+[1] TRUE
+
+[[1]][[117]]
+[1] TRUE
+
+[[1]][[118]]
+[1] TRUE
+
+[[1]][[119]]
+[1] TRUE
+
+[[1]][[120]]
+[1] TRUE
+
+[[1]][[121]]
+[1] TRUE
+
+[[1]][[122]]
+[1] TRUE
+
+[[1]][[123]]
+[1] TRUE
+
+[[1]][[124]]
+[1] TRUE
+
+[[1]][[125]]
+[1] TRUE
+
+[[1]][[126]]
+[1] TRUE
+
+[[1]][[127]]
+[1] TRUE
+
+[[1]][[128]]
+[1] TRUE
+
+[[1]][[129]]
+[1] TRUE
+
+[[1]][[130]]
+[1] TRUE
+
+[[1]][[131]]
+[1] TRUE
+
+[[1]][[132]]
+[1] TRUE
+
+[[1]][[133]]
+[1] TRUE
+
+[[1]][[134]]
+[1] TRUE
+
+[[1]][[135]]
+[1] TRUE
+
+[[1]][[136]]
+[1] TRUE
+
+[[1]][[137]]
+[1] TRUE
+
+[[1]][[138]]
+[1] TRUE
+
+[[1]][[139]]
+[1] TRUE
+
+[[1]][[140]]
+[1] TRUE
+
+[[1]][[141]]
+[1] TRUE
+
+[[1]][[142]]
+[1] TRUE
+
+[[1]][[143]]
+[1] TRUE
+
+[[1]][[144]]
+[1] TRUE
+
+[[1]][[145]]
+[1] TRUE
+
+[[1]][[146]]
+[1] TRUE
+
+[[1]][[147]]
+[1] TRUE
+
+[[1]][[148]]
+[1] TRUE
+
+[[1]][[149]]
+[1] TRUE
+
+[[1]][[150]]
+[1] TRUE
+
+[[1]][[151]]
+[1] TRUE
+
+[[1]][[152]]
+[1] TRUE
+
+[[1]][[153]]
+[1] TRUE
+
+[[1]][[154]]
+[1] TRUE
+
+[[1]][[155]]
+[1] TRUE
+
+[[1]][[156]]
+[1] TRUE
+
+[[1]][[157]]
+[1] TRUE
+
+[[1]][[158]]
+[1] TRUE
+
+[[1]][[159]]
+[1] TRUE
+
+[[1]][[160]]
+[1] TRUE
+
+[[1]][[161]]
+[1] TRUE
+
+[[1]][[162]]
+[1] TRUE
+
+[[1]][[163]]
+[1] TRUE
+
+[[1]][[164]]
+[1] TRUE
+
+[[1]][[165]]
+[1] TRUE
+
+[[1]][[166]]
+[1] TRUE
+
+[[1]][[167]]
+[1] TRUE
+
+[[1]][[168]]
+[1] TRUE
+
+[[1]][[169]]
+[1] TRUE
+
+[[1]][[170]]
+[1] TRUE
+
+[[1]][[171]]
+[1] TRUE
+
+[[1]][[172]]
+[1] TRUE
+
+[[1]][[173]]
+[1] TRUE
+
+[[1]][[174]]
+[1] TRUE
+
+[[1]][[175]]
+[1] TRUE
+
+[[1]][[176]]
+[1] TRUE
+
+[[1]][[177]]
+[1] TRUE
+
+[[1]][[178]]
+[1] TRUE
+
+[[1]][[179]]
+[1] TRUE
+
+[[1]][[180]]
+[1] TRUE
+
+[[1]][[181]]
+[1] TRUE
+
+[[1]][[182]]
+[1] TRUE
+
+[[1]][[183]]
+[1] TRUE
+
+[[1]][[184]]
+[1] TRUE
+
+[[1]][[185]]
+[1] TRUE
+
+[[1]][[186]]
+[1] TRUE
+
+[[1]][[187]]
+[1] TRUE
+
+[[1]][[188]]
+[1] TRUE
+
+[[1]][[189]]
+[1] TRUE
+
+[[1]][[190]]
+[1] TRUE
+
+[[1]][[191]]
+[1] TRUE
+
+[[1]][[192]]
+[1] TRUE
+
+[[1]][[193]]
+[1] TRUE
+
+[[1]][[194]]
+[1] TRUE
+
+[[1]][[195]]
+[1] TRUE
+
+[[1]][[196]]
+[1] TRUE
+
+[[1]][[197]]
+[1] TRUE
+
+[[1]][[198]]
+[1] TRUE
+
+[[1]][[199]]
+[1] TRUE
+
+[[1]][[200]]
+[1] TRUE
+
+[[1]][[201]]
+[1] TRUE
+
+[[1]][[202]]
+[1] TRUE
+
+[[1]][[203]]
+[1] TRUE
+
+[[1]][[204]]
+[1] TRUE
+
+[[1]][[205]]
+[1] TRUE
+
+[[1]][[206]]
+[1] TRUE
+
+[[1]][[207]]
+[1] TRUE
+
+[[1]][[208]]
+[1] TRUE
+
+[[1]][[209]]
+[1] TRUE
+
+[[1]][[210]]
+[1] TRUE
+
+[[1]][[211]]
+[1] TRUE
+
+[[1]][[212]]
+[1] TRUE
+
+[[1]][[213]]
+[1] TRUE
+
+[[1]][[214]]
+[1] TRUE
+
+[[1]][[215]]
+[1] TRUE
+
+[[1]][[216]]
+[1] TRUE
+
+[[1]][[217]]
+[1] TRUE
+
+[[1]][[218]]
+[1] TRUE
+
+[[1]][[219]]
+[1] TRUE
+
+[[1]][[220]]
+[1] TRUE
+
+[[1]][[221]]
+[1] TRUE
+
+[[1]][[222]]
+[1] TRUE
+
+[[1]][[223]]
+[1] TRUE
+
+[[1]][[224]]
+[1] TRUE
+
+[[1]][[225]]
+[1] TRUE
+
+[[1]][[226]]
+[1] TRUE
+
+[[1]][[227]]
+[1] TRUE
+
+[[1]][[228]]
+[1] TRUE
+
+[[1]][[229]]
+[1] TRUE
+
+[[1]][[230]]
+[1] TRUE
+
+[[1]][[231]]
+[1] TRUE
+
+[[1]][[232]]
+[1] TRUE
+
+[[1]][[233]]
+[1] TRUE
+
+[[1]][[234]]
+[1] TRUE
+
+[[1]][[235]]
+[1] TRUE
+
+[[1]][[236]]
+[1] TRUE
+
+[[1]][[237]]
+[1] TRUE
+
+[[1]][[238]]
+[1] TRUE
+
+[[1]][[239]]
+[1] TRUE
+
+[[1]][[240]]
+[1] TRUE
+
+[[1]][[241]]
+[1] TRUE
+
+[[1]][[242]]
+[1] TRUE
+
+[[1]][[243]]
+[1] TRUE
+
+[[1]][[244]]
+[1] TRUE
+
+[[1]][[245]]
+[1] TRUE
+
+[[1]][[246]]
+[1] TRUE
+
+[[1]][[247]]
+[1] TRUE
+
+[[1]][[248]]
+[1] TRUE
+
+[[1]][[249]]
+[1] TRUE
+
+[[1]][[250]]
+[1] TRUE
+
+[[1]][[251]]
+[1] TRUE
+
+[[1]][[252]]
+[1] TRUE
+
+[[1]][[253]]
+[1] TRUE
+
+[[1]][[254]]
+[1] TRUE
+
+[[1]][[255]]
+[1] TRUE
+
+[[1]][[256]]
+[1] TRUE
+
+[[1]][[257]]
+[1] TRUE
+
+[[1]][[258]]
+[1] TRUE
+
+[[1]][[259]]
+[1] TRUE
+
+[[1]][[260]]
+[1] TRUE
+
+[[1]][[261]]
+[1] TRUE
+
+[[1]][[262]]
+[1] TRUE
+
+[[1]][[263]]
+[1] TRUE
+
+[[1]][[264]]
+[1] TRUE
+
+[[1]][[265]]
+[1] TRUE
+
+[[1]][[266]]
+[1] TRUE
+
+[[1]][[267]]
+[1] TRUE
+
+[[1]][[268]]
+[1] TRUE
+
+[[1]][[269]]
+[1] TRUE
+
+[[1]][[270]]
+[1] TRUE
+
+[[1]][[271]]
+[1] TRUE
+
+[[1]][[272]]
+[1] TRUE
+
+[[1]][[273]]
+[1] TRUE
+
+[[1]][[274]]
+[1] TRUE
+
+[[1]][[275]]
+[1] TRUE
+
+[[1]][[276]]
+[1] TRUE
+
+[[1]][[277]]
+[1] TRUE
+
+[[1]][[278]]
+[1] TRUE
+
+[[1]][[279]]
+[1] TRUE
+
+[[1]][[280]]
+[1] TRUE
+
+[[1]][[281]]
+[1] TRUE
+
+[[1]][[282]]
+[1] TRUE
+
+[[1]][[283]]
+[1] TRUE
+
+[[1]][[284]]
+[1] TRUE
+
+[[1]][[285]]
+[1] TRUE
+
+
+> 
+> 
 > 
 > # reinitialize the wbpp script for next time!
 > file.remove(wbpp)
@@ -92,7 +956,7 @@ The following object is masked from 'package:magrittr':
 > 
 > # Logs --------------------------------------------------------------------
 > 
->  glue::glue("{src}/logFiles.R") %>% source()
+> glue::glue("{src}/logFiles.R") %>% source()
 
 Attaching package: 'lubridate'
 
@@ -125,73 +989,7 @@ The following object is masked from 'package:lubridate':
 
     stamp
 
-Rows: 477 Columns: 35
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Loading required package: httr
-Loading required package: jsonlite
-Rows: 477 Columns: 35
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (5): FilePath, FilterName, Binning, PierSide, ImageType
-dbl  (28): ExposureNumber, Duration, CameraTemp, CameraTargetTemp, Gain, Off...
-dttm  (2): ExposureStart, ExposureStartUTC
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-`summarise()` has grouped output by 'Object'. You can override using the
-`.groups` argument.
-Warning messages:
-1: One or more parsing issues, call `problems()` on your data frame for details,
-e.g.:
-  dat <- vroom(...)
-  problems(dat) 
-2: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-ℹ Please use `linewidth` instead. 
-> 
-> 
-> 
-> # transfer over to astro-ssd
-> # 10 minutes for 355 files
-> dirs_to_transfer <- list.dirs(cameraSrc, recursive = FALSE) %>%
-+   stringr::str_remove("Dark Library")
-> 
-> files_to_transfer <- list.files(cameraSrc, recursive = FALSE, full.names = TRUE)  %>%
-+   c(list.files(file.path(cameraSrc), pattern = ".json", recursive = TRUE, full.names = TRUE)) %>%
-+   setdiff(dirs_to_transfer)
-> 
-> 
-> sapply(files_to_transfer, function(x) {
-+   file.copy(x, transfer, recursive = TRUE)
-+ })
-         c:/users/bcart/astronomy/ASI2600MM/Subs/BackupSequenceFile.json 
-                                                                    TRUE 
-c:/users/bcart/astronomy/ASI2600MM/Subs/Imaging summary - 2026-04-12.png 
-                                                                    TRUE 
-> 
-> 
-> returnStatus <- sapply(dirs_to_transfer, function(x) {
-+   file.copy(x, transfer, recursive = TRUE)
-+ })
-> 
-> for (i in 1:length(returnStatus)) {
-+   if (returnStatus[i] == TRUE) {unlink(dirs_to_transfer[i], recursive = TRUE, force = TRUE)}
-+ }
-> 
-> png <- list.files(file.path(cameraSrc), pattern = ".png", recursive = TRUE, full.names = TRUE) %>%
-+   c(list.files(file.path(cameraSrc), pattern = ".json", recursive = TRUE, full.names = TRUE))
-> sapply(png, file.remove)
-c:/users/bcart/astronomy/ASI2600MM/Subs/Imaging summary - 2026-04-12.png 
-                                                                    TRUE 
-         c:/users/bcart/astronomy/ASI2600MM/Subs/BackupSequenceFile.json 
-                                                                    TRUE 
-> 
-> proc.time()
-   user  system elapsed 
-   5.14   38.64 1197.29 
+Error in UseMethod("mutate") : 
+  no applicable method for 'mutate' applied to an object of class "NULL"
+Calls: %>% ... summarize -> group_by -> mutate -> mutate -> arrange -> mutate
+Execution halted
