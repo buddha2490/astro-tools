@@ -1,3 +1,33 @@
-{
-    "workbench.colorTheme": "Tomorrow Night Blue"
-}
+  
+  {                                                                                                                                             
+    "version": "3.0.0",                                                                                                                       
+    "tasks": [
+      {
+        "label": "Claude",
+        "type": "shell",
+        "command": "claude --dangerously-skip-permissions",
+        "isBackground": true,
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "runOptions": {
+          "runOn": "folderOpen"
+        }
+      },
+         {
+        "label": "Local Shell",
+        "type": "process",
+        "command": "/bin/zsh",
+        "args": ["-l"],
+        "isBackground": true,
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        },
+        "runOptions": {
+          "runOn": "folderOpen"
+        }
+      }
+    ]
+  }

@@ -1,107 +1,101 @@
 connectDB <- function () {
-  DBI::dbConnect(RSQLite::SQLite(), "/Volumes/Office-SSD/Astronomy/astroDB.sqlite")
+    DBI::dbConnect(
+    RPostgres::Postgres(),
+    dbname   = "briancarter",      # case-sensitive — must be exactly this
+    host     = "aria-bot.local",
+    port     = 5432,
+    user     = "briancarter",
+    password = Sys.getenv("psql-db-password")
+  )
 }
 
 
-# This will change the file paths in the metadata files
-# to match the /Volumes/Office-SSD location
-changeMetaPath <- function(file, subsDf = subsDf) {
-  
-  # change only if necessary
-  df <- readr::read_csv(file) %>%
-    arrange(desc(ExposureNumber))
-  
-  name_order <- colnames(df)
-  
-  loc <- df %>%
-    dplyr::filter(!is.na(FilePath)) %>% # drops excluded 
-    arrange(desc(ExposureNumber)) %>%
-    slice(1) %>%
-    pull(FilePath)
-  
-  if ((stringr::str_detect(loc, "c:/users") == TRUE) |
-      (stringr::str_detect(loc, "C:/Users") == TRUE)) {
-    
-    df <- df %>%
-      mutate(Filename = basename(FilePath)) %>%
-      mutate(Object = basename(dirname(dirname(FilePath)))) 
-    
-    
-    subsList <- subsDf %>%
-      dplyr::filter(Object == df$Object[1]) %>%
-      dplyr::filter(Filename %in% df$Filename) %>%
-      select(FilePathCorrect = FilePath, Filename)
-    
-    df %>%
-      left_join(subsList, "Filename") %>%
-      select(-FilePath, -Filename, -Object) %>%
-      rename(FilePath = FilePathCorrect) %>%
-      select(all_of(name_order)) %>% # re-order columns to match original
-      readr::write_csv(file) # write out the new file paths to metadata file
+
+# Inventory one night: read EVERY row from ImageMetaData.csv, reconstruct the
+# expected .xisf filename from the row columns (FilePath is often empty), then
+# flag which files actually survived in the SubFrameSelected folder.
+# nightDir example: ~/Astronomy/subs/M16/M16_2026-05-11
+inventoryNight <- function(nightDir) {
+  metaFile <- file.path(nightDir, "ImageMetaData.csv")
+  sfsDir   <- file.path(nightDir, "SubFrameSelected")
+
+  if (!file.exists(metaFile)) return(NULL)
+
+  meta <- suppressMessages(readr::read_csv(metaFile, show_col_types = FALSE))
+  if (nrow(meta) == 0) return(NULL)
+
+  # Older PixInsight metadata files (e.g. M8andM20) omit the ImageType column.
+  # Everything under subs/<object>/<night>/ is a light frame.
+  if (!"ImageType" %in% names(meta)) meta$ImageType <- "LIGHT"
+
+  selectedFiles <- if (dir.exists(sfsDir)) {
+    basename(list.files(sfsDir, pattern = "\\.xisf$"))
+  } else {
+    character(0)
   }
+
+  object <- basename(dirname(nightDir))
+  date   <- stringr::str_extract(basename(nightDir), "\\d{4}-\\d{2}-\\d{2}")
+
+  meta %>%
+    mutate(Filename = sprintf("%s_%s_%s_%s_%.2f_%04d.xisf",
+                              object, date, ImageType, FilterName,
+                              Duration, ExposureNumber),
+           Object = object,
+           Date = date,
+           SubFrameSelected = Filename %in% selectedFiles,
+           Status = ifelse(SubFrameSelected, "Included", "Excluded"))
 }
 
-subsInventory <- function() {
-  data.frame(FilePath = list.files(subdirs, all.files = TRUE,
-                                   recursive = TRUE, full.names = TRUE,
-                                   pattern = ".fit")) %>%
-    mutate(Filename = basename(FilePath)) %>%
-    mutate(Object = basename(dirname(dirname(FilePath)))) %>%
-    mutate(Date = stringr::str_extract(FilePath, "\\d{4}-\\d{2}-\\d{2}")) %>%
-    mutate(DurationSubs = ifelse(stringr::str_detect(Filename, "_30.00") == TRUE, 30, ifelse(
-      stringr::str_detect(Filename, "_60.0") == TRUE, 60, ifelse(
-        stringr::str_detect(Filename, "_120.0") == TRUE, 120, ifelse(
-          stringr::str_detect(Filename, "_180.0") == TRUE, 180, ifelse(
-            stringr::str_detect(Filename, "_300.0") == TRUE, 300, ifelse(
-              stringr::str_detect(Filename, "_600.0") == TRUE, 600, NA_real_))))))) %>%
-    mutate(FilterSubs = ifelse(stringr::str_detect(Filename, "_L_") == TRUE, "L", ifelse(
-      stringr::str_detect(Filename, "_R_") == TRUE, "R", ifelse(
-        stringr::str_detect(Filename, "_G_") == TRUE, "G", ifelse(
-          stringr::str_detect(Filename, "_B_") == TRUE, "B", ifelse(
-            stringr::str_detect(Filename, "_H_") == TRUE, "H", ifelse(
-              stringr::str_detect(Filename, "_S_") == TRUE, "S", ifelse(
-                stringr::str_detect(Filename, "_O_") == TRUE, "O", ifelse(
-                  stringr::str_detect(Filename, "UVIR") == TRUE, "UVIR", ifelse(
-                    stringr::str_detect(Filename, "_HO_") == TRUE, "HO", ""))))))))))
+# Strip the trailing "_a" from .xisf files inside every SubFrameSelected folder
+# under rootDir. e.g. M16_..._0024_a.xisf -> M16_..._0024.xisf.
+# Skips any rename where the target name already exists. Returns a data frame
+# of (from, to, renamed, skipped_conflict) for review.
+stripASuffix <- function(rootDir) {
+  objectDirs <- list.dirs(rootDir, recursive = FALSE)
+  nightDirs  <- unlist(lapply(objectDirs, list.dirs, recursive = FALSE))
+  sfsDirs    <- file.path(nightDirs, "SubFrameSelected")
+  sfsDirs    <- sfsDirs[dir.exists(sfsDirs)]
+
+  files <- list.files(sfsDirs, pattern = "_a\\.xisf$", full.names = TRUE)
+  if (length(files) == 0) {
+    message("No _a-suffixed .xisf files found under ", rootDir)
+    return(invisible(NULL))
+  }
+
+  new <- stringr::str_replace(files, "_a\\.xisf$", ".xisf")
+  conflict <- file.exists(new)
+
+  if (any(conflict)) {
+    warning(sum(conflict), " target file(s) already exist; those will be skipped")
+  }
+
+  ok <- rep(FALSE, length(files))
+  ok[!conflict] <- file.rename(files[!conflict], new[!conflict])
+
+  message(sum(ok), " of ", length(files), " files renamed")
+
+  data.frame(
+    from = files,
+    to = new,
+    renamed = ok,
+    skipped_conflict = conflict,
+    stringsAsFactors = FALSE
+  )
 }
 
-processMetadata <- function(dat) {
-  dat %>%
-    mutate(Object = basename(dirname(dirname(FilePath)))) %>%
-    mutate(Filename = basename(FilePath)) %>%
-    mutate(Date = stringr::str_remove(basename(dirname(FilePath)), paste0(Object, "_")) )%>%
-    full_join(subsDf %>% 
-                select(FilePathSubs = FilePath, Filename, FilterSubs, DurationSubs) %>% 
-                mutate(inSubs = TRUE), 
-              c("Filename")) %>%
-    mutate(Status = ifelse(is.na(inSubs), "Excluded", ifelse(
-      is.na(Date), "Missing Metadata", "Included"))) %>%
-    mutate(Object = basename(dirname(dirname(FilePath))))  %>%
-    mutate(FilePath = ifelse(is.na(FilePath), FilePathSubs, FilePath)) %>%
-    mutate(FilterName = ifelse(is.na(FilterName), FilterSubs, FilterName)) %>%
-    mutate(Duration = ifelse(is.na(Duration), DurationSubs, Duration)) %>%
-    select(Object, Date, Filename, ExposureStart, FilterName, Duration, CameraTemp,
-           Gain, ADUMean, DetectedStars, HFR, FWHM, Eccentricity, GuidingRMSArcSec,
-           FocuserPosition, FocuserTemp, RotatorPosition, Status)
-}
+# Walk every <object>/<night> under rootDir and assemble a combined data
+# frame matching the astroSubs table schema.
+buildInventory <- function(rootDir) {
+  objectDirs <- list.dirs(rootDir, recursive = FALSE)
+  nightDirs  <- unlist(lapply(objectDirs, list.dirs, recursive = FALSE))
 
-fixMissingMeta <- function(metadata = metadata) {
-  # Deal with missing metadata
-  # Still missing for some "Excluded" - that's ok
-  metadata$order <- seq_len(nrow(metadata))
-  missing <- metadata %>% dplyr::filter(is.na(Object))
-  notmissing <- metadata %>% anti_join(missing)
-  
-  missing$Object <- stringr::str_split(missing$Filename, "_") %>%
-    sapply(function(x) x[1]) # get the object name from the filename
-  
-  missing$Date <- stringr::str_split(missing$Filename, "_") %>%
-    sapply(function(x) x[2]) # get the date from the filename
-  
-  missing %>% bind_rows(notmissing) %>%
-    arrange(order) %>%
-    select(-order)
-  
+  lapply(nightDirs, inventoryNight) %>%
+    bind_rows() %>%
+    select(Object, Date, Filename, ExposureStart, FilterName, Duration,
+           CameraTemp, Gain, ADUMean, DetectedStars, HFR, FWHM, Eccentricity,
+           GuidingRMSArcSec, FocuserPosition, FocuserTemp, RotatorPosition,
+           Status, SubFrameSelected)
 }
 
 checkLogs <- function() {
@@ -124,7 +118,8 @@ astrobinCSV <- function(myObject, csv = FALSE) {
   
   
   astroDB <- connectDB()
-  df <- tbl(astroDB, "astroSubs")
+  df <- tbl(astroDB, "astroSubs") %>%
+    filter(SubFrameSelected == TRUE)
   
   # taken from the astrobin URL for each filter
   filterIDs <- c(4388, 4392, 4396, 5642, 5646, 5652, 5656, 6901, 13400)
@@ -164,7 +159,8 @@ astrobinCSV <- function(myObject, csv = FALSE) {
 objectTotalIntegration <- function(myObject) {
   
   astroDB <- connectDB()
-  df <- tbl(astroDB, "astroSubs")
+  df <- tbl(astroDB, "astroSubs") %>%
+    filter(SubFrameSelected == TRUE)
   
   labels <- c("Luminance",
               "Red",
@@ -197,7 +193,8 @@ objectTotalIntegration <- function(myObject) {
 
 dbSummary <- function() {
   astroDB <- connectDB()
-  df <- tbl(astroDB, "astroSubs")
+  df <- tbl(astroDB, "astroSubs") %>%
+    filter(SubFrameSelected == TRUE)
   
   objects <- df %>%
     dplyr::filter(!is.na(Object)) %>%
@@ -248,6 +245,7 @@ objectMetaData <- function(myObject) {
   astroDB <- connectDB()
   
   df <- tbl(astroDB, "astroSubs") %>%
+    filter(SubFrameSelected == TRUE) %>%
     dplyr::filter(!is.na(Object)) %>%
     dplyr::filter(Object == myObject) %>%
     group_by(FilterName) %>%

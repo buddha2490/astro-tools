@@ -5,12 +5,11 @@ options(dplyr.summarise.inform = FALSE)
 
 
 # Functions ---------------------------------------------------------------
-"/Volumes/Office-SSD/Astronomy/astro-tools/astroDB/functions/functions.R" %>% source()
-
+"astroDB/functions/functions.R" %>% source()
 
 # Run ------------------------------------------------------------------
 
-myObject <- "NGC281"
+myObject <- "M16"
 
 # Check the most recent logs
 # Provides a summary of the most recent update time by Status
