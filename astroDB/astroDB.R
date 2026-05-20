@@ -6,7 +6,12 @@ library(magrittr)
 library(tidyr)
 
 # Environmental parameters ------------------------------------------------
-subs <- path.expand("~/Astronomy/subs")
+# subs location differs per machine — use whichever path exists
+subs <- Filter(dir.exists, c(
+  path.expand("~/Astronomy/subs"),                        # Texas machine
+  "/Volumes/Office-SSD/Astronomy/In Progress"             # this Mac
+))[1]
+if (is.na(subs)) stop("No subs directory found on this machine.")
 
 
 # Functions ---------------------------------------------------------------
@@ -14,7 +19,7 @@ subs <- path.expand("~/Astronomy/subs")
 
 
 # Fix some filenames, strips _a from the file
-result <- stripASuffix("~/Astronomy/subs")
+result <- stripASuffix(subs)
 
 # Build inventory from SubFrameSelected folders ---------------------------
 metadata <- buildInventory(subs) %>%
@@ -23,7 +28,7 @@ metadata <- buildInventory(subs) %>%
 # Diff against existing astroSubs and update -------------------------------
 astroDB <- connectDB()
 old <- tbl(astroDB, "astroSubs") %>% collect() %>%
-  filter(stringr::str_detect(Filename, ".fit") == FALSE)
+  dplyr::filter(stringr::str_detect(Filename, ".fit") == FALSE)
 
 
 # Remove anything in metadata that was already written to the database
