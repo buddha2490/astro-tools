@@ -18,8 +18,8 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
          used (Mb) gc trigger (Mb) limit (Mb) max used (Mb)
-Ncells 132341  7.1     350000 18.7         NA   205901 11.0
-Vcells 260302  2.0    8388608 64.0      24576  1078622  8.3
+Ncells 132342  7.1     350000 18.7         NA   205879 11.0
+Vcells 260311  2.0    8388608 64.0      36864  1078142  8.3
 [[1]]
 [1] TRUE
 
@@ -59,8 +59,6 @@ Vcells 260302  2.0    8388608 64.0      24576  1078622  8.3
 [[13]]
 [1] TRUE
 
-> 
-> 
 > # AstroDB
 > library(dplyr)
 > library(DBI)
@@ -79,119 +77,12 @@ The following object is masked from ‘package:magrittr’:
     extract
 
 > 
-> 
-> debug <- FALSE
-> 
-> os <- Sys.info()["sysname"]
-> machine <- Sys.info()["nodename"]
-> 
-> os <- ifelse(os == "Darwin", "Mac", "Windows") %>% as.character()
-> machine <- ifelse(
-+   stringr::str_detect(machine, "BRIANC-MacUS") == TRUE, "MBP13", ifelse(
-+     stringr::str_detect(machine, "Brians-MacBook-Pro") == TRUE, "MBP14", ifelse(
-+       stringr::str_detect(machine, "Office-Mac") == TRUE, "OfficeMac",
-+       ifelse(machine == "ES127", "ES127", machine)))) %>%
-+   as.character()
-> 
 > # Environmental parameters ------------------------------------------------
-> setwd("/Volumes/Office-SSD/Astronomy/astro-tools")
-> subs <- "/Volumes/Office-SSD/Astronomy/Astrophotography"
-> subdirs <- subs %>%
-+   list.dirs(recursive = FALSE) %>%
-+   stringr::str_subset("Dark Library", negate = TRUE) # drops darks
-> 
-> 
-> 
-> # Functions ---------------------------------------------------------------
-> "astroDB/functions/functions.R" %>% source()
-> # Inventory subs ----------------------------------------------------------
-> 
-> 
-> 
-> 
-> subsDf <- subsInventory()
->                 
-> 
-> # Inventory metadata ------------------------------------------------------
-> metadataFiles <- list.files(subdirs, pattern = "ImageMetaData.csv",
-+                             full.names = TRUE, recursive = TRUE, all.files = TRUE)
-> 
-> 
-> # Update the metadata file with the correct file path information
-> # they are listed as "c:/users/Brian Carter" and I want them on the NAS
-> invisible(capture.output(
-+   suppressMessages(
-+     suppressWarnings({
-+       sapply(metadataFiles, changeMetaPath, subsDf = subsDf)
-+     })
-+   )
-+ ))
-> 
-> # nrow = 4740 at development - August 15th 2025
-> invisible(capture.output(
-+   suppressMessages(
-+ metadata <- lapply(metadataFiles, readr::read_csv) %>%
-+   Reduce(function(x,y) bind_rows(x, y), .) %>%
-+   processMetadata() %>%
-+   fixMissingMeta()
-+   )
-+ )) 
-> 
-> 
-> metadata <- metadata %>%
-+   dplyr::filter(!is.na(Filename))
-> 
-> astroDB <- connectDB()
-> old <- tbl(astroDB, "astroSubs") %>%
-+   collect()
-> 
-> new_rows <- nrow(metadata) - nrow(old)
-> 
-> 
-> if (new_rows > 0) {
-+   message <- glue::glue("There were {new_rows} new images added") 
-+   log <- data.frame(
-+     Timestamp = Sys.time(),
-+     Action = "Inventory added",
-+     Status = message)
-+ 
-+   dbWriteTable(astroDB, "astroSubs", metadata, overwrite = TRUE)
-+   dbAppendTable(astroDB, "astroDBLog", log)
-+   message(message)
-+   
-+ }
-> if (new_rows < 0) {
-+   message <- glue::glue("There were {abs(new_rows)} images removed from the database") 
-+   log <- data.frame(
-+     Timestamp = Sys.time(),
-+     Action = "Inventory removed",
-+     Status = message)
-+   dbWriteTable(astroDB, "astroSubs", metadata, overwrite = TRUE)
-+   dbAppendTable(astroDB, "astroDBLog", log)
-+   message(message)
-+   
-+ }
-> 
-> if (new_rows == 0) {
-+   message("No new images to add to the database")
-+   log <- data.frame(
-+     Timestamp = Sys.time(),
-+     Action = "Inventory checked",
-+     Status = "No new images to add")
-+   dbAppendTable(astroDB, "astroDBLog", log)
-+   
-+ }
-No new images to add to the database
-[1] 1
-> 
-> dbDisconnect(astroDB)
-> 
-> 
-> rm(list = ls())
-> 
-> 
-> 
-> 
-> proc.time()
-   user  system elapsed 
-  8.697   3.866  10.808 
+> # subs location differs per machine — use whichever path exists
+> subs <- Filter(dir.exists, c(
++   path.expand("~/Astronomy/subs"),                        # Texas machine
++   "/Volumes/Office-SSD/Astronomy/In Progress"             # this Mac
++ ))[1]
+> if (is.na(subs)) stop("No subs directory found on this machine.")
+Error: No subs directory found on this machine.
+Execution halted

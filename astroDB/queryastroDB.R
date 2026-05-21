@@ -9,7 +9,7 @@ options(dplyr.summarise.inform = FALSE)
 
 # Run ------------------------------------------------------------------
 
-myObject <- "M16"
+myObject <- "MarkarianChain"
 
 # Check the most recent logs
 # Provides a summary of the most recent update time by Status
