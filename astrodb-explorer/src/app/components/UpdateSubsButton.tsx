@@ -120,7 +120,7 @@ export default function UpdateSubsButton({ object }: { object: string }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="rounded-lg bg-red-500/15 px-3 py-1.5 text-sm font-medium text-red-300 ring-1 ring-red-500/30 transition-colors hover:bg-red-500/25"
+        className="rounded-lg bg-emerald-500/15 px-3 py-1.5 text-sm font-medium text-emerald-300 ring-1 ring-emerald-500/30 transition-colors hover:bg-emerald-500/25"
       >
         Update subs
       </button>

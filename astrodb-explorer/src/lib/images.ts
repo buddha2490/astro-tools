@@ -52,6 +52,17 @@ export async function getObjectImagePaths(): Promise<Map<string, string>> {
   }
 }
 
+// Remove an object's uploaded image: delete the file on disk (best-effort) and
+// its object_images row. Called when an object is deleted so a stale image
+// can't resurface if the object is later re-added under the same name.
+export async function deleteObjectImage(object: string): Promise<void> {
+  const prev = await getObjectImagePath(object);
+  if (prev) {
+    await unlink(join(process.cwd(), "public", prev)).catch(() => {});
+  }
+  await query(`DELETE FROM object_images WHERE object = $1`, [object]);
+}
+
 // Persist an uploaded image, replacing any previous one for this object.
 // Returns the public path (/uploads/<file>).
 export async function storeObjectImage(

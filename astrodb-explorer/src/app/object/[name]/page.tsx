@@ -11,6 +11,7 @@ import QualityTrendChart from "@/app/components/charts/QualityTrendChart";
 import AltitudeSection from "@/app/components/AltitudeSection";
 import ObjectImageSection from "@/app/components/ObjectImageSection";
 import UpdateSubsButton from "@/app/components/UpdateSubsButton";
+import DeleteObjectButton from "@/app/components/DeleteObjectButton";
 
 export default function ObjectPage({
   params,
@@ -81,6 +82,7 @@ export default function ObjectPage({
                 >
                   Astrobin CSV ↓
                 </a>
+                <DeleteObjectButton object={detail.object} />
               </div>
             </div>
             <p className="mt-2 text-sm text-muted">

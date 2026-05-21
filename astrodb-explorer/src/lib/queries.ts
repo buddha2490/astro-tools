@@ -1,4 +1,5 @@
 import { query } from "./db";
+import type { Queryable } from "./curation";
 import {
   FILTER_ORDER,
   FILTER_LABELS,
@@ -789,6 +790,22 @@ export async function removePlannedTarget(designation: string): Promise<void> {
     `DELETE FROM planned_targets WHERE designation = $1`,
     [designation],
   );
+}
+
+// Permanently remove every astroSubs frame for an object, regardless of its
+// curation state (Kept/Culled/uncurated). Destructive; the object simply
+// disappears from the dashboard and can be re-added later (NINA/bulk-add). The
+// executor is injectable so the verify script can run it inside a rolled-back
+// transaction. Returns how many frames were deleted.
+export async function deleteObject(
+  object: string,
+  q: Queryable = query,
+): Promise<{ deletedFrames: number }> {
+  const rows = await q<{ ok: number }>(
+    `DELETE FROM "astroSubs" WHERE "Object" = $1 RETURNING 1 AS ok`,
+    [object],
+  );
+  return { deletedFrames: rows.length };
 }
 
 export function astrobinToCsv(rows: AstrobinRow[]): string {

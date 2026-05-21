@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { DashboardData, ObjectCard } from "@/lib/types";
 import StatBand from "./components/StatBand";
 import ObjectCardTile from "./components/ObjectCardTile";
+import BulkAddButton from "./components/BulkAddButton";
 
 type SortKey = "integration" | "frames" | "recent" | "name";
 
@@ -20,7 +21,7 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortKey>("integration");
 
-  useEffect(() => {
+  const loadDashboard = useCallback(() => {
     fetch("/api/dashboard")
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -29,6 +30,10 @@ export default function Home() {
       .then(setData)
       .catch((e) => setError(String(e)));
   }, []);
+
+  useEffect(() => {
+    loadDashboard();
+  }, [loadDashboard]);
 
   const handleRemove = (object: string) =>
     setData((d) =>
@@ -91,6 +96,7 @@ export default function Home() {
               placeholder="Search targets…"
               className="glass w-full max-w-xs rounded-lg px-3.5 py-2 text-sm text-fg placeholder:text-faint focus:border-accent focus:outline-none focus:shadow-glowSoft sm:w-auto"
             />
+            <BulkAddButton onAdded={loadDashboard} />
             <div className="ml-auto flex items-center gap-2 text-sm">
               <span className="text-faint">Sort</span>
               <div className="flex gap-1 rounded-lg border border-border bg-surface/60 p-0.5">

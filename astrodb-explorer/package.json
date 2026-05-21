@@ -10,7 +10,9 @@
     "nina:verify": "tsx scripts/nina-verify.ts",
     "nina:ingest": "node --env-file=.env.local --import tsx scripts/nina-ingest.ts",
     "nina:ingest:verify": "node --env-file=.env.local --import tsx scripts/nina-ingest-verify.ts",
-    "update-subs:verify": "node --env-file=.env.local --import tsx scripts/update-subs-verify.ts"
+    "update-subs:verify": "node --env-file=.env.local --import tsx scripts/update-subs-verify.ts",
+    "bulk-add:verify": "node --env-file=.env.local --import tsx scripts/bulk-add-verify.ts",
+    "delete-object:verify": "node --env-file=.env.local --import tsx scripts/delete-object-verify.ts"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.12.0",
