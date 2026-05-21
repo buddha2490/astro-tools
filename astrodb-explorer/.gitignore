@@ -8,3 +8,7 @@ next-env.d.ts
 # secrets
 .env*.local
 .env
+
+# uploaded / downloaded images (large, local-only; dirs kept via .gitkeep)
+/public/uploads
+/public/dss/*.gif

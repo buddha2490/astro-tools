@@ -24,11 +24,12 @@ export default function ObjectCardTile({
       href={`/object/${encodeURIComponent(card.object)}`}
       className="glass group flex flex-col gap-4 rounded-2xl p-5 text-left shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-borderGlow hover:shadow-glowSoft focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
     >
-      {card.dssImagePath && (
+      {card.imagePath && (
         <div className="-mx-5 -mt-5 mb-0 h-28 overflow-hidden rounded-t-2xl">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={card.dssImagePath}
-            alt={`DSS field for ${card.object}`}
+            src={card.imagePath}
+            alt={`Image of ${card.object}`}
             className="h-full w-full object-cover opacity-50 transition-opacity duration-300 group-hover:opacity-70"
           />
         </div>

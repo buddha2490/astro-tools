@@ -23,6 +23,7 @@ import type {
   CatalogListData,
 } from "./types";
 import { CATALOGS, type CatalogSlug } from "./catalog";
+import { getObjectImagePaths } from "./images";
 import { DEFAULT_SITE } from "./astro/site";
 import { resolveCoord, normalizeName, type SkyCoord } from "./astro/coordinates";
 import {
@@ -168,12 +169,19 @@ export async function getDashboard(): Promise<DashboardData> {
     })
     .sort((a, b) => b.totalMinutes - a.totalMinutes);
 
-  // Append planned (no-frames) targets as empty tiles, skipping any that we've
-  // actually imaged (those already have a real tile above).
-  const [planned, dssPaths] = await Promise.all([
+  // Tile thumbnails: imaged objects show the user's own uploaded image;
+  // planned (catalog) targets show their downloaded DSS image. Then append
+  // planned targets as empty tiles, skipping any we've actually imaged.
+  const [planned, dssPaths, uploadPaths] = await Promise.all([
     getPlannedTargets(),
     getDSSImagePaths(),
+    getObjectImagePaths(),
   ]);
+
+  for (const card of objects) {
+    card.imagePath = uploadPaths.get(card.object) ?? null;
+  }
+
   const capturedNorm = new Set(objects.map((o) => normalizeName(o.object)));
   for (const p of planned) {
     if (capturedNorm.has(normalizeName(p.designation))) continue;
@@ -188,14 +196,8 @@ export async function getDashboard(): Promise<DashboardData> {
       catalogSlug: p.catalog_slug,
       objectType: p.object_type,
       constellation: p.constellation,
-      dssImagePath: dssPaths.get(p.designation) ?? null,
+      imagePath: dssPaths.get(p.designation) ?? null,
     });
-  }
-
-  for (const card of objects) {
-    if (card.dssImagePath === undefined) {
-      card.dssImagePath = dssPaths.get(card.object) ?? null;
-    }
   }
 
   return { stats, objects };

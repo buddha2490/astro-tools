@@ -9,7 +9,7 @@ import QualityStatCards from "@/app/components/QualityStatCards";
 import SessionChart from "@/app/components/charts/SessionChart";
 import QualityTrendChart from "@/app/components/charts/QualityTrendChart";
 import AltitudeSection from "@/app/components/AltitudeSection";
-import DSSImageSection from "@/app/components/DSSImageSection";
+import ObjectImageSection from "@/app/components/ObjectImageSection";
 
 export default function ObjectPage({
   params,
@@ -128,11 +128,8 @@ export default function ObjectPage({
             dates={detail.sessions.map((s) => s.date)}
           />
 
-          {/* DSS reference image */}
-          <DSSImageSection
-            object={detail.object}
-            endpoint={`/api/object/${enc}/dss`}
-          />
+          {/* My uploaded image */}
+          <ObjectImageSection object={detail.object} />
         </div>
       )}
     </main>

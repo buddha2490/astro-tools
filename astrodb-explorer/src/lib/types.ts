@@ -53,9 +53,10 @@ export interface ObjectCard {
   catalogSlug?: string | null;
   objectType?: string | null;
   constellation?: string | null;
-  // Local path to a downloaded DSS reference GIF, e.g. "/dss/ngc_281.gif".
-  // Null when the image hasn't been fetched yet.
-  dssImagePath?: string | null;
+  // Tile thumbnail path: the user's uploaded image for an imaged object
+  // (/uploads/…), or a downloaded DSS image for a planned target (/dss/…).
+  // Null when no image is available.
+  imagePath?: string | null;
 }
 
 export interface DashboardData {

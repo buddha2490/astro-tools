@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { resolveCoord } from "@/lib/astro/coordinates";
-import { getDssPath, fetchAndStoreDss } from "@/lib/dss";
+import { getObjectImagePath, storeObjectImage } from "@/lib/images";
 
 export const dynamic = "force-dynamic";
+// Allow long uploads of large (~50 MB) images.
+export const maxDuration = 300;
 
 export async function GET(
   _req: Request,
@@ -11,31 +12,33 @@ export async function GET(
   const { name } = await params;
   const object = decodeURIComponent(name);
   try {
-    return NextResponse.json({ path: await getDssPath(object) });
+    return NextResponse.json({ path: await getObjectImagePath(object) });
   } catch (err) {
-    console.error(`GET /api/object/${object}/dss failed`, err);
+    console.error(`GET /api/object/${object}/image failed`, err);
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }
 
 export async function POST(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ name: string }> },
 ) {
   const { name } = await params;
   const object = decodeURIComponent(name);
   try {
-    const coord = await resolveCoord(object);
-    if (!coord) {
+    const form = await req.formData();
+    const file = form.get("file");
+    if (!(file instanceof File)) {
       return NextResponse.json(
-        { error: `Could not resolve coordinates for "${object}"` },
-        { status: 422 },
+        { error: "No file provided (expected multipart field 'file')" },
+        { status: 400 },
       );
     }
-    const path = await fetchAndStoreDss(object, coord.raDeg, coord.decDeg);
+    const buf = Buffer.from(await file.arrayBuffer());
+    const path = await storeObjectImage(object, buf, file.name || "image");
     return NextResponse.json({ path });
   } catch (err) {
-    console.error(`POST /api/object/${object}/dss failed`, err);
+    console.error(`POST /api/object/${object}/image failed`, err);
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }
