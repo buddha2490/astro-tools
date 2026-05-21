@@ -1,11 +1,12 @@
 connectDB <- function () {
     DBI::dbConnect(
     RPostgres::Postgres(),
-    dbname   = "briancarter",      # case-sensitive — must be exactly this
-    host     = "aria-bot.local",
-    port     = 5432,
-    user     = "briancarter",
-    password = Sys.getenv("psql-db-password")
+    dbname     = "briancarter",      # case-sensitive — must be exactly this
+    host       = "aria-bot",
+    port       = 5432,
+    user       = "briancarter",
+    password   = Sys.getenv("sql-db-password"),
+    gssencmode = "disable"
   )
 }
 
@@ -29,22 +30,29 @@ inventoryNight <- function(nightDir) {
   if (!"ImageType" %in% names(meta)) meta$ImageType <- "LIGHT"
 
   selectedFiles <- if (dir.exists(sfsDir)) {
-    basename(list.files(sfsDir, pattern = "\\.xisf$"))
+    basename(list.files(sfsDir, pattern = "\\.(xisf|fits?)$"))
   } else {
     character(0)
   }
+  selectedStems <- sub("\\.(xisf|fits?)$", "", selectedFiles)
+  selectedExts  <- stringr::str_extract(selectedFiles, "\\.(xisf|fits?)$")
 
   object <- basename(dirname(nightDir))
   date   <- stringr::str_extract(basename(nightDir), "\\d{4}-\\d{2}-\\d{2}")
 
   meta %>%
-    mutate(Filename = sprintf("%s_%s_%s_%s_%.2f_%04d.xisf",
-                              object, date, ImageType, FilterName,
-                              Duration, ExposureNumber),
+    mutate(Stem = sprintf("%s_%s_%s_%s_%.2f_%04d",
+                          object, date, ImageType, FilterName,
+                          Duration, ExposureNumber),
+           Ext = ifelse(Stem %in% selectedStems,
+                        selectedExts[match(Stem, selectedStems)],
+                        ".xisf"),
+           Filename = paste0(Stem, Ext),
            Object = object,
            Date = date,
            SubFrameSelected = Filename %in% selectedFiles,
-           Status = ifelse(SubFrameSelected, "Included", "Excluded"))
+           Status = ifelse(SubFrameSelected, "Included", "Excluded")) %>%
+    select(-Stem, -Ext)
 }
 
 # Strip the trailing "_a" from .xisf files inside every SubFrameSelected folder
