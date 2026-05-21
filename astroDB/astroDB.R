@@ -27,9 +27,12 @@ metadata <- buildInventory(subs) %>%
 
 # Diff against existing astroSubs and update -------------------------------
 astroDB <- connectDB()
-old <- tbl(astroDB, "astroSubs") %>% collect() %>%
-  dplyr::filter(stringr::str_detect(Filename, ".fit") == FALSE)
-
+# Compare against EVERY existing filename. Do not filter by extension here:
+# excluding ".fit" rows hides already-stored .fits subs from the anti-join,
+# so they get re-appended on every run (duplicates).
+old <- tbl(astroDB, "astroSubs") %>%
+  collect() %>%
+  distinct(Filename)
 
 # Remove anything in metadata that was already written to the database
 new <- metadata %>%
@@ -37,12 +40,10 @@ new <- metadata %>%
 
 new_rows <- new %>% nrow()
 
-
-
 if (new_rows > 0) {
   msg <- glue::glue("There were {new_rows} new images added")
   log <- data.frame(Timestamp = Sys.time(), Action = "Inventory added", Status = msg)
-  dbAppendTable(astroDB, "astroSubs", metadata)
+  dbAppendTable(astroDB, "astroSubs", new)
   dbAppendTable(astroDB, "astroDBLog", log)
   message(msg)
 }

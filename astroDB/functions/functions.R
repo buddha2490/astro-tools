@@ -1,12 +1,11 @@
 connectDB <- function () {
     DBI::dbConnect(
     RPostgres::Postgres(),
-    dbname     = "briancarter",      # case-sensitive — must be exactly this
-    host       = "aria-bot",
-    port       = 5432,
-    user       = "briancarter",
-    password   = Sys.getenv("sql-db-password"),
-    gssencmode = "disable"
+    dbname   = "briancarter",      # case-sensitive — must be exactly this
+    host     = "aria-bot.local",
+    port     = 5432,
+    user     = "briancarter",
+    password = Sys.getenv("psql-db-password")
   )
 }
 
