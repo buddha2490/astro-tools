@@ -53,11 +53,9 @@ export function isIngestableFrame(stats: NinaImageStatistics): boolean {
   return stats.ImageType?.toUpperCase() === "LIGHT";
 }
 
-/** Filename stem = drop directory, extension, and a trailing "_a" (PI artifact). */
-export function stemOf(filename: string): string {
-  const base = filename.replace(/^.*[/\\]/, "");
-  return base.replace(/\.(xisf|fits?|fit)$/i, "").replace(/_a$/i, "");
-}
+// The join key with the R/curation side. Defined once in src/lib/stems.ts and
+// re-exported here so the existing module surface (and index.ts) is unchanged.
+export { stemOf } from "../../stems";
 
 const DATE_TOKEN = /_(\d{4}-\d{2}-\d{2})_/;
 

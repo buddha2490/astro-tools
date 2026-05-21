@@ -37,13 +37,16 @@ import {
 // ---------------------------------------------------------------------------
 // Translations of the R functions in astroDB/functions/functions.R.
 //
-// Every view starts from the same selection the R code uses: frames that were
-// kept by SubFrameSelector, not excluded, and attached to a named object.
+// Every view starts from the same selection: frames that weren't culled and are
+// attached to a named object. Curation now lives in the "Final" column
+// (Kept/Culled), set by the app's "Update subs" flow (src/lib/curation.ts);
+// freshly-captured frames (Final IS NULL) still show live until culled. Final is
+// backfilled from the legacy Status (Included→Kept, Excluded→Culled).
 // Filter ordering / labels / Astrobin IDs live in ./filters.ts (shared with
-// the client) — keep them in sync with the R encoding.
+// the client).
 // ---------------------------------------------------------------------------
 
-const BASE_WHERE = `"SubFrameSelected" = true AND "Status" <> 'Excluded' AND "Object" IS NOT NULL`;
+const BASE_WHERE = `"Final" IS DISTINCT FROM 'Culled' AND "Object" IS NOT NULL`;
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 

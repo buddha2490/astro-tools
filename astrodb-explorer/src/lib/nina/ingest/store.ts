@@ -4,7 +4,8 @@
 // only on the `pg` package, not on src/lib/db.ts.
 
 import type { Pool } from "pg";
-import { stemOf, type AstroSubRecord } from "./mapper";
+import type { AstroSubRecord } from "./mapper";
+import { stemOf, STEM_SQL } from "../../stems";
 
 export interface ImageStore {
   /** True if any astroSubs row (NINA .fits or R .xisf, with/without _a) shares this stem. */
@@ -12,10 +13,6 @@ export interface ImageStore {
   /** Insert a captured frame unless its stem already exists. Returns whether a row was written. */
   insertCapture(record: AstroSubRecord): Promise<{ inserted: boolean }>;
 }
-
-// SQL fragment that reduces a stored Filename to its stem (drop ext + trailing
-// _a), matching mapper.stemOf so existence checks see R and NINA rows alike.
-const STEM_SQL = `regexp_replace(regexp_replace("Filename", '\\.(xisf|fits?|fit)$', '', 'i'), '_a$', '', 'i')`;
 
 export class PostgresImageStore implements ImageStore {
   constructor(private readonly pool: Pool) {}

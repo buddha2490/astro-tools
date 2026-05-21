@@ -10,6 +10,7 @@ import SessionChart from "@/app/components/charts/SessionChart";
 import QualityTrendChart from "@/app/components/charts/QualityTrendChart";
 import AltitudeSection from "@/app/components/AltitudeSection";
 import ObjectImageSection from "@/app/components/ObjectImageSection";
+import UpdateSubsButton from "@/app/components/UpdateSubsButton";
 
 export default function ObjectPage({
   params,
@@ -72,12 +73,15 @@ export default function ObjectPage({
               >
                 {detail.isNarrowband ? "Narrowband" : "Broadband"}
               </span>
-              <a
-                href={`/api/object/${enc}/astrobin.csv`}
-                className="ml-auto rounded-lg bg-accent/15 px-3 py-1.5 text-sm font-medium text-accentBright ring-1 ring-accent/30 transition-colors hover:bg-accent/25"
-              >
-                Astrobin CSV ↓
-              </a>
+              <div className="ml-auto flex items-center gap-2">
+                <UpdateSubsButton object={detail.object} />
+                <a
+                  href={`/api/object/${enc}/astrobin.csv`}
+                  className="rounded-lg bg-accent/15 px-3 py-1.5 text-sm font-medium text-accentBright ring-1 ring-accent/30 transition-colors hover:bg-accent/25"
+                >
+                  Astrobin CSV ↓
+                </a>
+              </div>
             </div>
             <p className="mt-2 text-sm text-muted">
               {fmtHours(detail.totalMinutes)} hrs over {fmtInt(detail.nights)}{" "}
