@@ -1,0 +1,6 @@
+{
+  "M16": { "raDeg": 274.7, "decDeg": -13.8067, "resolvedFrom": "manual-J2000 (Eagle Nebula)" },
+  "M24": { "raDeg": 274.225, "decDeg": -18.4833, "resolvedFrom": "manual-J2000 (Sagittarius Star Cloud)" },
+  "M8ANDM20": { "raDeg": 270.75, "decDeg": -23.7, "resolvedFrom": "manual-J2000 (Lagoon+Trifid midpoint)" },
+  "MARKARIANCHAIN": { "raDeg": 186.75, "decDeg": 13.0167, "resolvedFrom": "manual-J2000 (Markarian's Chain center)" }
+}
