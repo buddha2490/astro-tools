@@ -4,3 +4,5 @@
 .Ruserdata
 *.Rout
 /logs
+# Split out into its own repo: github.com/buddha2490/astrodb-explorer
+/astrodb-explorer/
