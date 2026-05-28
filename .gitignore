@@ -11,7 +11,12 @@
 .env
 discord-bot-token.md
 discord-bot.log
+
+# NINA capture output
+nina/
 roofstatus.txt
 roofstatus.txt.tmp
+roofsafe.txt
+roofsafe.txt.tmp
 __pycache__/
 .venv/

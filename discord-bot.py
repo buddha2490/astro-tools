@@ -57,6 +57,11 @@ CHANNEL_ID = int(os.environ.get("ROOF_CHANNEL_ID", "0") or "0")
 STATUS_PATH = (BASE_DIR / os.environ.get("ROOF_STATUS_PATH", "roofstatus.txt")).resolve() \
     if not os.path.isabs(os.environ.get("ROOF_STATUS_PATH", "roofstatus.txt")) \
     else Path(os.environ["ROOF_STATUS_PATH"])
+# Single-line file the NINA ASCOM Generic File SafetyMonitor polls. Lives next to
+# the status file unless ROOF_SAFE_PATH overrides it. Format mirrors Starfront's
+# convention exactly ("Roof Status: OPEN/CLOSED") so NINA config is copy-paste.
+SAFE_PATH = Path(os.environ["ROOF_SAFE_PATH"]) if os.environ.get("ROOF_SAFE_PATH") \
+    else STATUS_PATH.with_name("roofsafe.txt")
 HEARTBEAT_SECONDS = int(os.environ.get("ROOF_HEARTBEAT_SECONDS", "60"))
 LOG_PATH = os.environ.get("ROOF_LOG_PATH", "discord-bot.log")
 
@@ -111,8 +116,31 @@ def now_iso():
     return datetime.datetime.now(datetime.timezone.utc).astimezone().isoformat(timespec="seconds")
 
 
+def _atomic_write(path, text):
+    """Write text to path via a temp file + rename so a reader never sees a
+    half-written file. Resilient: the target lives on a network mount, so if the
+    volume is unavailable we log and return rather than raise — the process stays
+    alive (launchd KeepAlive) and the file simply goes stale. We deliberately do
+    NOT mkdir the path: creating folders under an unmounted /Volumes share leaves
+    phantom local directories that prevent the real share from remounting.
+    """
+    tmp = path.with_name(path.name + ".tmp")
+    try:
+        tmp.write_text(text)
+        os.replace(tmp, path)
+        return True
+    except OSError as exc:
+        log.warning("Could not write %s: %s (is the network volume mounted?)", path, exc)
+        return False
+
+
 def write_status(connected):
-    """Atomically write the status file so the PC never reads a half-written file."""
+    """Write both output files: the rich human/debug status file, and the
+    single-line safety file the NINA ASCOM Generic File SafetyMonitor reads.
+
+    The safety file maps SAFE -> OPEN and everything else (UNSAFE *and* the
+    initial UNKNOWN) -> CLOSED, so an unseeded or unrecognized state fails safe.
+    """
     lines = [
         f"state={status['state']}",
         f"state_since={status['state_since'] or ''}",
@@ -120,9 +148,10 @@ def write_status(connected):
         f"connected={'true' if connected else 'false'}",
         f"source={status['source']}",
     ]
-    tmp = STATUS_PATH.with_name(STATUS_PATH.name + ".tmp")
-    tmp.write_text("\n".join(lines) + "\n")
-    os.replace(tmp, STATUS_PATH)
+    _atomic_write(STATUS_PATH, "\n".join(lines) + "\n")
+
+    roof = "OPEN" if status["state"] == "SAFE" else "CLOSED"
+    _atomic_write(SAFE_PATH, f"Roof Status: {roof}\n")
 
 
 def apply_message(msg, *, reason="message"):
@@ -215,7 +244,7 @@ def main():
         sys.exit("DISCORD_BOT_TOKEN is not set. Put a fresh token in .env (see README/setup steps).")
     if not CHANNEL_ID:
         sys.exit("ROOF_CHANNEL_ID is not set in .env.")
-    log.info("Starting roof monitor. Status file: %s", STATUS_PATH)
+    log.info("Starting roof monitor. Status file: %s | NINA safety file: %s", STATUS_PATH, SAFE_PATH)
     client.run(TOKEN, log_handler=None)  # reuse our logging config
 
 
