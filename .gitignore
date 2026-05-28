@@ -6,3 +6,12 @@
 /logs
 # Split out into its own repo: github.com/buddha2490/astrodb-explorer
 /astrodb-explorer/
+
+# Roof monitor secrets / runtime artifacts — never commit
+.env
+discord-bot-token.md
+discord-bot.log
+roofstatus.txt
+roofstatus.txt.tmp
+__pycache__/
+.venv/
